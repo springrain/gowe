@@ -17,6 +17,8 @@
 *.patch
 *.tmp
 *debug.test
+debug.test
+go.sum
 
 # system ignore
 .DS_Store
