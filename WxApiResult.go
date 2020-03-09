@@ -31,51 +31,51 @@ func (apiResult *APIResult) IsSuccess() bool {
 }
 
 func (apiResult *APIResult) getErrorCode() int {
-	return apiResult.getInt("errcode")
+	return mapGetInt(apiResult.Attrs, "errcode")
 }
 
 func (apiResult *APIResult) getErrorMsg() string {
-	errorCode := apiResult.getInt("errcode")
+	errorCode := mapGetInt(apiResult.Attrs, "errcode")
 	errMsg, ok := errCodeToErrMsgMap[errorCode]
 	if ok {
 		return errMsg
 	}
-	return apiResult.get("errmsg")
+	return mapGetString(apiResult.Attrs, "errmsg")
 }
 
 func (apiResult *APIResult) getOpenID() string {
-	return apiResult.get("openId")
+	return mapGetString(apiResult.Attrs, "openId")
 }
 func (apiResult *APIResult) getUnionID() string {
-	return apiResult.get("unionid")
+	return mapGetString(apiResult.Attrs, "unionid")
 }
 func (apiResult *APIResult) getSessionKey() string {
-	return apiResult.get("session_key")
+	return mapGetString(apiResult.Attrs, "session_key")
 }
 func (apiResult *APIResult) getScope() string {
-	return apiResult.get("scope")
+	return mapGetString(apiResult.Attrs, "scope")
 }
 func (apiResult *APIResult) getAccessToken() string {
-	return apiResult.get("access_token")
+	return mapGetString(apiResult.Attrs, "access_token")
 }
 func (apiResult *APIResult) isAccessTokenInvalid() bool {
-	errorCode := apiResult.getInt("errcode")
+	errorCode := mapGetInt(apiResult.Attrs, "errcode")
 	return errorCode == -2 || errorCode == 40001 || errorCode == 42001 || errorCode == 42002 || errorCode == 40014
 }
 func (apiResult *APIResult) getExpiresIn() int {
-	return apiResult.getInt("expires_in")
+	return mapGetInt(apiResult.Attrs, "expires_in")
 }
 
-func (apiResult *APIResult) get(name string) string {
-	value := apiResult.Attrs[name]
+func mapGetString(attrs map[string]interface{}, name string) string {
+	value := attrs[name]
 	stringValue, intOk := value.(string)
 	if !intOk {
 		return ""
 	}
 	return stringValue
 }
-func (apiResult *APIResult) getInt(name string) int {
-	value := apiResult.Attrs[name]
+func mapGetInt(attrs map[string]interface{}, name string) int {
+	value := attrs[name]
 	intValue, intOk := value.(int)
 	if !intOk {
 		return -2
