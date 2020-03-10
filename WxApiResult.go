@@ -1,72 +1,65 @@
 package gowe
 
 import (
-	"encoding/json"
 	"os"
 )
 
 //APIResult  封装 API 响应结果，将 json 字符串转换成 java 数据类型
 type APIResult struct {
-	Attrs   map[string]interface{}
-	jsonStr string
-	file    *os.File
+	ResultMap map[string]interface{}
+	file      *os.File
 }
 
 //错误的有效期时间
 const errExpires = -100
 
-//newAPIResult 创建APIResult
-func newAPIResult(jsonstr string) (*APIResult, error) {
+func newAPIResult(resultMap map[string]interface{}) APIResult {
 	apiResult := APIResult{}
-	apiResult.Attrs = make(map[string]interface{}, 0)
-	apiResult.jsonStr = jsonstr
-	if err := json.Unmarshal([]byte(jsonstr), &(apiResult.Attrs)); err != nil {
-		return nil, err
-	}
-	return &apiResult, nil
+	apiResult.ResultMap = resultMap
+	return apiResult
 }
 
 //IsSuccess 是否成功
 func (apiResult *APIResult) IsSuccess() bool {
-	errorCode := apiResult.getErrorCode()
+	errorCode := apiResult.GetErrorCode()
 	// errorCode 为 0 时也可以表示为成功,详见: https://developers.weixin.qq.com/doc/offiaccount/Getting_Started/Global_Return_Code.html
 	return errorCode == 0
 }
 
-func (apiResult *APIResult) getErrorCode() int {
-	return mapGetInt(apiResult.Attrs, "errcode")
+func (apiResult *APIResult) GetErrorCode() int {
+	return mapGetInt(apiResult.ResultMap, "errcode")
 }
 
-func (apiResult *APIResult) getErrorMsg() string {
-	errorCode := mapGetInt(apiResult.Attrs, "errcode")
+func (apiResult *APIResult) GetErrorMsg() string {
+	errorCode := mapGetInt(apiResult.ResultMap, "errcode")
 	errMsg, ok := errCodeToErrMsgMap[errorCode]
 	if ok {
 		return errMsg
 	}
-	return mapGetString(apiResult.Attrs, "errmsg")
+	return mapGetString(apiResult.ResultMap, "errmsg")
 }
 
-func (apiResult *APIResult) getOpenID() string {
-	return mapGetString(apiResult.Attrs, "openId")
+func (apiResult *APIResult) GetOpenID() string {
+	return mapGetString(apiResult.ResultMap, "openId")
 }
-func (apiResult *APIResult) getUnionID() string {
-	return mapGetString(apiResult.Attrs, "unionid")
+func (apiResult *APIResult) GetUnionID() string {
+	return mapGetString(apiResult.ResultMap, "unionid")
 }
-func (apiResult *APIResult) getSessionKey() string {
-	return mapGetString(apiResult.Attrs, "session_key")
+func (apiResult *APIResult) GetSessionKey() string {
+	return mapGetString(apiResult.ResultMap, "session_key")
 }
-func (apiResult *APIResult) getScope() string {
-	return mapGetString(apiResult.Attrs, "scope")
+func (apiResult *APIResult) GetScope() string {
+	return mapGetString(apiResult.ResultMap, "scope")
 }
-func (apiResult *APIResult) getAccessToken() string {
-	return mapGetString(apiResult.Attrs, "access_token")
+func (apiResult *APIResult) GetAccessToken() string {
+	return mapGetString(apiResult.ResultMap, "access_token")
 }
 func (apiResult *APIResult) isAccessTokenInvalid() bool {
-	errorCode := mapGetInt(apiResult.Attrs, "errcode")
+	errorCode := mapGetInt(apiResult.ResultMap, "errcode")
 	return errorCode == errExpires || errorCode == 40001 || errorCode == 42001 || errorCode == 42002 || errorCode == 40014
 }
 func (apiResult *APIResult) getExpiresIn() int {
-	return mapGetInt(apiResult.Attrs, "expires_in")
+	return mapGetInt(apiResult.ResultMap, "expires_in")
 }
 
 func mapGetString(attrs map[string]interface{}, name string) string {

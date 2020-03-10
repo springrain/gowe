@@ -14,8 +14,8 @@ type IWxConfig interface {
 	GetSecret() string
 }
 
-//IWxMpCongfig 公众号的配置
-type IWxMpCongfig interface {
+//IWxMpConfig 公众号的配置
+type IWxMpConfig interface {
 	IWxConfig
 
 	//GetToken 获取token

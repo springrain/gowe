@@ -18,12 +18,9 @@ import (
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#54
  */
 
-var accessTokenAPIURL = WxmpApiUrl + "/cgi-bin/token"
-var ticketAPIURL = WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token="
-
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, error) {
-	apiurl := accessTokenAPIURL + "?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
+	apiurl := WxmpApiUrl + "/cgi-bin/token" + "?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
 
 	resultMap, errMap := httpGetMap(apiurl)
 	if errMap != nil {
@@ -55,7 +52,7 @@ func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, er
 //GetJsTicket 获取jsTicket
 func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
 	accessToken := wxConfig.GetAccessToken()
-	apiurl := ticketAPIURL + accessToken + "&type=jsapi"
+	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
 	resultMap, errMap := httpGetMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -84,7 +81,7 @@ func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
 //GetCardTicket 获取cardTicket
 func GetCardTicket(ctx context.Context, wxConfig IWxConfig) (*WxCardTicket, error) {
 	accessToken := wxConfig.GetAccessToken()
-	apiurl := ticketAPIURL + accessToken + "&type=wx_card"
+	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
 	resultMap, errMap := httpGetMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
