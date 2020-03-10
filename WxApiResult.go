@@ -12,6 +12,9 @@ type APIResult struct {
 	file    *os.File
 }
 
+//错误的有效期时间
+const errExpires = -100
+
 //newAPIResult 创建APIResult
 func newAPIResult(jsonstr string) (*APIResult, error) {
 	apiResult := APIResult{}
@@ -60,7 +63,7 @@ func (apiResult *APIResult) getAccessToken() string {
 }
 func (apiResult *APIResult) isAccessTokenInvalid() bool {
 	errorCode := mapGetInt(apiResult.Attrs, "errcode")
-	return errorCode == -2 || errorCode == 40001 || errorCode == 42001 || errorCode == 42002 || errorCode == 40014
+	return errorCode == errExpires || errorCode == 40001 || errorCode == 42001 || errorCode == 42002 || errorCode == 40014
 }
 func (apiResult *APIResult) getExpiresIn() int {
 	return mapGetInt(apiResult.Attrs, "expires_in")
@@ -78,7 +81,7 @@ func mapGetInt(attrs map[string]interface{}, name string) int {
 	value := attrs[name]
 	intValue, intOk := value.(int)
 	if !intOk {
-		return -2
+		return errExpires
 	}
 	return intValue
 }

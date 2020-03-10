@@ -2,10 +2,7 @@ package gowe
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"io/ioutil"
-	"net/http"
 	"time"
 )
 
@@ -27,20 +24,16 @@ var accessTokenURL = WxmpApiUrl + "/cgi-bin/token"
 func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, error) {
 	apiurl := accessTokenURL + "?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
 
-	resp, errGet := http.Get(apiurl)
-
-	if errGet != nil {
-		return nil, errGet
-	}
-	defer resp.Body.Close()
-
-	body, errRead := ioutil.ReadAll(resp.Body)
-	if errRead != nil {
-		return nil, errRead
+	resultMap, errMap := httpGetMap(apiurl)
+	if errMap != nil {
+		return nil, errMap
 	}
 
-	resultMap := make(map[string]interface{})
-	json.Unmarshal(body, &resultMap)
+	expires := mapGetInt(resultMap, "expires_in")
+	if expires == errExpires {
+		return nil, errors.New("expires_in超时时间错误")
+	}
+
 	accessToken := mapGetString(resultMap, "access_token")
 
 	if len(accessToken) < 1 {
@@ -50,7 +43,7 @@ func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, er
 	wxAccessToken := WxAccessToken{}
 	wxAccessToken.AppId = wxConfig.GetAppId()
 	wxAccessToken.AccessToken = accessToken
-	wxAccessToken.ExpiresIn = mapGetInt(resultMap, "expires_in")
+	wxAccessToken.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxAccessToken.accessTokenExpiresTime = time.Now().Unix() + int64(wxAccessToken.ExpiresIn/2)
