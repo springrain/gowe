@@ -18,11 +18,12 @@ import (
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#54
  */
 
-var accessTokenURL = WxmpApiUrl + "/cgi-bin/token"
+var accessTokenAPIURL = WxmpApiUrl + "/cgi-bin/token"
+var ticketAPIURL = WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token="
 
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, error) {
-	apiurl := accessTokenURL + "?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
+	apiurl := accessTokenAPIURL + "?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
 
 	resultMap, errMap := httpGetMap(apiurl)
 	if errMap != nil {
@@ -49,4 +50,62 @@ func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, er
 	wxAccessToken.accessTokenExpiresTime = time.Now().Unix() + int64(wxAccessToken.ExpiresIn/2)
 
 	return &wxAccessToken, nil
+}
+
+//GetJsTicket 获取jsTicket
+func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
+	accessToken := wxConfig.GetAccessToken()
+	apiurl := ticketAPIURL + accessToken + "&type=jsapi"
+	resultMap, errMap := httpGetMap(apiurl)
+	if errMap != nil {
+		return nil, errMap
+	}
+
+	expires := mapGetInt(resultMap, "expires_in")
+	if expires == errExpires {
+		return nil, errors.New("expires_in超时时间错误")
+	}
+
+	ticket := mapGetString(resultMap, "ticket")
+
+	if len(ticket) < 1 {
+		return nil, errors.New("未能获得accessToken")
+	}
+	wxJsTicket := WxJsTicket{}
+	wxJsTicket.AppId = wxConfig.GetAppId()
+	wxJsTicket.JsTicket = ticket
+	wxJsTicket.ExpiresIn = expires
+	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
+	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
+	wxJsTicket.jsTicketExpiresTime = time.Now().Unix() + int64(wxJsTicket.ExpiresIn/2)
+	return &wxJsTicket, nil
+}
+
+//GetCardTicket 获取cardTicket
+func GetCardTicket(ctx context.Context, wxConfig IWxConfig) (*WxCardTicket, error) {
+	accessToken := wxConfig.GetAccessToken()
+	apiurl := ticketAPIURL + accessToken + "&type=wx_card"
+	resultMap, errMap := httpGetMap(apiurl)
+	if errMap != nil {
+		return nil, errMap
+	}
+
+	expires := mapGetInt(resultMap, "expires_in")
+	if expires == errExpires {
+		return nil, errors.New("expires_in超时时间错误")
+	}
+
+	ticket := mapGetString(resultMap, "ticket")
+
+	if len(ticket) < 1 {
+		return nil, errors.New("未能获得accessToken")
+	}
+	wxCardTicket := WxCardTicket{}
+	wxCardTicket.AppId = wxConfig.GetAppId()
+	wxCardTicket.CardTicket = ticket
+	wxCardTicket.ExpiresIn = expires
+	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
+	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
+	wxCardTicket.cardTicketExpiresTime = time.Now().Unix() + int64(wxCardTicket.ExpiresIn/2)
+	return &wxCardTicket, nil
 }
