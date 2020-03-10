@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -31,12 +30,16 @@ func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
 	return resultMap, nil
 }
 
-func httpPostResultMap(apiurl string, parm map[string]string) (map[string]interface{}, error) {
-	data := make(url.Values)
-	for k, v := range parm {
-		data.Add(k, v)
+func httpPostResultMap(apiurl string, parm map[string]interface{}) (map[string]interface{}, error) {
+	//data := make(url.Values)
+	//for k, v := range parm {
+	//	data.Add(k, v)
+	//}
+	byteparm, errparm := json.Marshal(parm)
+	if errparm != nil {
+		return nil, errparm
 	}
-	resp, errPost := http.NewRequest("post", apiurl, strings.NewReader(data.Encode()))
+	resp, errPost := http.NewRequest("post", apiurl, strings.NewReader(string(byteparm)))
 	if errPost != nil {
 		return nil, errPost
 	}
