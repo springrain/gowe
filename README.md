@@ -1,8 +1,7 @@
 # gowe
 
 #### 介绍
-golang微信SDK,[readygo](https://gitee.com/chunanyong/readygo)子项目  
-[API文档](https://pkg.go.dev/gitee.com/chunanyong/gowe?tab=doc)
+golang微信SDK,[readygo](https://gitee.com/chunanyong/readygo)子项目  [API文档](https://pkg.go.dev/gitee.com/chunanyong/gowe?tab=doc)  
 
 ``` 
 go get gitee.com/chunanyong/gowe 
