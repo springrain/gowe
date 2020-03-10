@@ -2,6 +2,7 @@ package gowe
 
 import "time"
 
+//WxAccessToken 微信accessToken
 type WxAccessToken struct {
 	AppId                  string
 	AccessToken            string
@@ -9,10 +10,12 @@ type WxAccessToken struct {
 	ExpiresIn              int
 }
 
+// token是否过期
 func (wxAccessToken *WxAccessToken) isAccessTokenExpired() bool {
 	return time.Now().Unix() > wxAccessToken.accessTokenExpiresTime
 }
 
+//WxCardTicket 微信卡券Ticket
 type WxCardTicket struct {
 	AppId                 string
 	CardTicket            string
@@ -20,10 +23,12 @@ type WxCardTicket struct {
 	ExpiresIn             int
 }
 
+//微信卡券Ticket是否过期
 func (wxCardTicket *WxCardTicket) isCardTicketExpired() bool {
 	return time.Now().Unix() > wxCardTicket.cardTicketExpiresTime
 }
 
+// 微信WxJsTicket
 type WxJsTicket struct {
 	AppId               string
 	JsTicket            string
@@ -31,6 +36,7 @@ type WxJsTicket struct {
 	ExpiresIn           int
 }
 
+//WxJsTicket 是否过期
 func (wxJsTicket *WxJsTicket) isJsTicketExpired() bool {
 	return time.Now().Unix() > wxJsTicket.jsTicketExpiresTime
 }
