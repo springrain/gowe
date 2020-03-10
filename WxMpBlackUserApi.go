@@ -8,7 +8,7 @@ import "context"
 func WxMpBlackUserList(ctx context.Context, wxMpConfig IWxMpConfig, beginOpenid string) (*APIResult, error) {
 	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.GetAccessToken()
 
-	parm := make(map[string]string)
+	parm := make(map[string]interface{})
 	if len(beginOpenid) > 0 {
 		parm["begin_openid"] = beginOpenid
 	}
