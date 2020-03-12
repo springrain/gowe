@@ -8,8 +8,8 @@ import (
 //WxMpBlackUserOpenIdList 获取公众号的黑名单列表
 //当 begin_openid 为空时，默认从开头拉取
 //https://developers.weixin.qq.com/doc/offiaccount/User_Management/Manage_blacklist.html
-func WxMpBlackUserOpenIdList(ctx context.Context, wxMpConfig IWxMpConfig, beginOpenid string) (*APIResult, error) {
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.GetAccessToken()
+func WxMpBlackUserOpenIdList(ctx context.Context, wxMpConfig WxMpConfig, beginOpenid string) (*APIResult, error) {
+	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.AccessToken
 
 	parm := make(map[string]interface{})
 	if len(beginOpenid) > 0 {
@@ -26,8 +26,8 @@ func WxMpBlackUserOpenIdList(ctx context.Context, wxMpConfig IWxMpConfig, beginO
 
 //WxBatchBlackUserOpenId  批量拉黑用户
 //openIds 需要拉黑的用户openId列表
-func WxBatchBlackUserOpenId(ctx context.Context, wxMpConfig IWxMpConfig, openIds []string) (*APIResult, error) {
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.GetAccessToken()
+func WxBatchBlackUserOpenId(ctx context.Context, wxMpConfig WxMpConfig, openIds []string) (*APIResult, error) {
+	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.AccessToken
 	if len(openIds) < 1 {
 		return nil, errors.New("需要拉黑的用户openId列表不能为空")
 	}
@@ -44,8 +44,8 @@ func WxBatchBlackUserOpenId(ctx context.Context, wxMpConfig IWxMpConfig, openIds
 
 //WxBatchUnBlackUserOpenId  批量解封拉黑的用户
 //openIds 需要解封的用户openId列表
-func WxBatchUnBlackUserOpenId(ctx context.Context, wxMpConfig IWxMpConfig, openIds []string) (*APIResult, error) {
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.GetAccessToken()
+func WxBatchUnBlackUserOpenId(ctx context.Context, wxMpConfig WxMpConfig, openIds []string) (*APIResult, error) {
+	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.AccessToken
 	if len(openIds) < 1 {
 		return nil, errors.New("需要拉黑的用户openId列表不能为空")
 	}

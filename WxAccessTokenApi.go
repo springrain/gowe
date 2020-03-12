@@ -19,8 +19,8 @@ import (
  */
 
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
-func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, error) {
-	apiurl := WxmpApiUrl + "/cgi-bin/token" + "?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
+func GetAccessToken(ctx context.Context, wxConfig WxConfig) (*WxAccessToken, error) {
+	apiurl := WxmpApiUrl + "/cgi-bin/token" + "?grant_type=client_credential&appid=" + wxConfig.AppId + "&secret=" + wxConfig.Secret
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -39,7 +39,7 @@ func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, er
 	}
 
 	wxAccessToken := WxAccessToken{}
-	wxAccessToken.AppId = wxConfig.GetAppId()
+	wxAccessToken.AppId = wxConfig.AppId
 	wxAccessToken.AccessToken = accessToken
 	wxAccessToken.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
@@ -50,8 +50,8 @@ func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, er
 }
 
 //GetJsTicket 获取jsTicket
-func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
-	accessToken := wxConfig.GetAccessToken()
+func GetJsTicket(ctx context.Context, wxConfig WxConfig) (*WxJsTicket, error) {
+	accessToken := wxConfig.AccessToken
 	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -69,7 +69,7 @@ func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
 		return nil, errors.New("未能获得accessToken")
 	}
 	wxJsTicket := WxJsTicket{}
-	wxJsTicket.AppId = wxConfig.GetAppId()
+	wxJsTicket.AppId = wxConfig.AppId
 	wxJsTicket.JsTicket = ticket
 	wxJsTicket.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
@@ -79,8 +79,8 @@ func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
 }
 
 //GetCardTicket 获取cardTicket
-func GetCardTicket(ctx context.Context, wxConfig IWxConfig) (*WxCardTicket, error) {
-	accessToken := wxConfig.GetAccessToken()
+func GetCardTicket(ctx context.Context, wxConfig WxConfig) (*WxCardTicket, error) {
+	accessToken := wxConfig.AccessToken
 	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -98,7 +98,7 @@ func GetCardTicket(ctx context.Context, wxConfig IWxConfig) (*WxCardTicket, erro
 		return nil, errors.New("未能获得accessToken")
 	}
 	wxCardTicket := WxCardTicket{}
-	wxCardTicket.AppId = wxConfig.GetAppId()
+	wxCardTicket.AppId = wxConfig.AppId
 	wxCardTicket.CardTicket = ticket
 	wxCardTicket.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些

@@ -9,6 +9,44 @@ var Wxqyapiurl = "https://qyapi.weixin.qq.com"
 var Wxreporturl = "http://report.mch.weixin.qq.com"
 var Wxpayappbaseurl = "https://payapp.weixin.qq.com"
 
+//WxConfig 微信的基础配置
+type WxConfig struct {
+	//Id 数据库记录的Id
+	Id string
+	//AppId 微信号的appId
+	AppId string
+	//AccessToken 获取到AccessToken
+	AccessToken string
+	//Secret 微信号的secret
+	Secret string
+}
+
+//WxMpConfig 公众号的配置
+type WxMpConfig struct {
+	WxConfig
+	//Token 获取token
+	Token string
+	//AesKey 获取aesKey
+	AesKey string
+	//开启oauth2.0认证,是否能够获取openId,0是关闭,1是开启
+	Oauth2 int
+}
+
+//WxPayConfig 公众号的配置
+type WxPayConfig struct {
+	WxConfig
+	//CertificateFile 获取商户证路径
+	CertificateFile string
+	//MchId 获取 Mch ID
+	MchId string
+	//Key 获取 API 密钥
+	Key string
+	//NotifyUrl 获取回调地址
+	NotifyUrl string
+	//SignType 获取加密类型
+	SignType string
+}
+
 //错误代码
 var errCodeToErrMsgMap = map[int]string{
 	-1:      "系统繁忙",
