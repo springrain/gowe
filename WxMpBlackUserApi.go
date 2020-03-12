@@ -30,15 +30,16 @@ func WxMpBlackUserOpenIdList(ctx context.Context, beginOpenid string) (*APIResul
 
 //WxBatchBlackUserOpenId  批量拉黑用户
 //openIds 需要拉黑的用户openId列表
-func WxBatchBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult, error) {
+func WxMpBatchBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult, error) {
+	if len(openIds) < 1 {
+		return nil, errors.New("需要拉黑的用户openId列表不能为空")
+	}
 	wxMpConfig, errWxMpConfig := getWxMpConfig(ctx)
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
+
 	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.AccessToken
-	if len(openIds) < 1 {
-		return nil, errors.New("需要拉黑的用户openId列表不能为空")
-	}
 
 	parm := make(map[string]interface{})
 	parm["openid_list"] = openIds
@@ -52,15 +53,16 @@ func WxBatchBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult, 
 
 //WxBatchUnBlackUserOpenId  批量解封拉黑的用户
 //openIds 需要解封的用户openId列表
-func WxBatchUnBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult, error) {
+func WxMpBatchUnBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult, error) {
+	if len(openIds) < 1 {
+		return nil, errors.New("需要拉黑的用户openId列表不能为空")
+	}
 	wxMpConfig, errWxMpConfig := getWxMpConfig(ctx)
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
+
 	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.AccessToken
-	if len(openIds) < 1 {
-		return nil, errors.New("需要拉黑的用户openId列表不能为空")
-	}
 
 	parm := make(map[string]interface{})
 	parm["openid_list"] = openIds
