@@ -12,14 +12,18 @@ import (
  * <p>
  * 生成签名之前必须先了解一下jsapi_ticket，jsapi_ticket是公众号用于调用微信JS接口的临时票据
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html
- * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62
+ * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDKs.html#62
  * <p>
  * 微信卡券接口签名凭证 api_ticket
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#54
  */
 
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
-func GetAccessToken(ctx context.Context, wxConfig WxConfig) (*WxAccessToken, error) {
+func GetAccessToken(ctx context.Context) (*WxAccessToken, error) {
+	wxConfig, errWxConfig := getWxConfig(ctx)
+	if errWxConfig != nil {
+		return nil, errWxConfig
+	}
 	apiurl := WxmpApiUrl + "/cgi-bin/token" + "?grant_type=client_credential&appid=" + wxConfig.AppId + "&secret=" + wxConfig.Secret
 
 	resultMap, errMap := httpGetResultMap(apiurl)
@@ -50,7 +54,11 @@ func GetAccessToken(ctx context.Context, wxConfig WxConfig) (*WxAccessToken, err
 }
 
 //GetJsTicket 获取jsTicket
-func GetJsTicket(ctx context.Context, wxConfig WxConfig) (*WxJsTicket, error) {
+func GetJsTicket(ctx context.Context) (*WxJsTicket, error) {
+	wxConfig, errWxConfig := getWxConfig(ctx)
+	if errWxConfig != nil {
+		return nil, errWxConfig
+	}
 	accessToken := wxConfig.AccessToken
 	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
 	resultMap, errMap := httpGetResultMap(apiurl)
@@ -79,7 +87,11 @@ func GetJsTicket(ctx context.Context, wxConfig WxConfig) (*WxJsTicket, error) {
 }
 
 //GetCardTicket 获取cardTicket
-func GetCardTicket(ctx context.Context, wxConfig WxConfig) (*WxCardTicket, error) {
+func GetCardTicket(ctx context.Context) (*WxCardTicket, error) {
+	wxConfig, errWxConfig := getWxConfig(ctx)
+	if errWxConfig != nil {
+		return nil, errWxConfig
+	}
 	accessToken := wxConfig.AccessToken
 	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
 	resultMap, errMap := httpGetResultMap(apiurl)

@@ -1,5 +1,10 @@
 package gowe
 
+import (
+	"context"
+	"errors"
+)
+
 // 微信API的服务器域名,方便处理请求代理跳转的情况
 var WxmpApiUrl = "https://api.weixin.qq.com"
 var WxmpWeixinUrl = "https://mp.weixin.qq.com"
@@ -8,6 +13,16 @@ var Wxmppaybaseurl = "https://api.mch.weixin.qq.com"
 var Wxqyapiurl = "https://qyapi.weixin.qq.com"
 var Wxreporturl = "http://report.mch.weixin.qq.com"
 var Wxpayappbaseurl = "https://payapp.weixin.qq.com"
+
+//全局变量,用于初始化,默认第一次初始化赋值,如果是多个微信号配置,就需要放到context
+var wxConfig *WxConfig = nil
+var wxMpConfig *WxMpConfig = nil
+var wxPayConfig *WxPayConfig = nil
+
+type wrapContextStringKey string
+
+//context WithValue的key,不能是基础类型,例如字符串,包装一下
+const contextWxConfigValueKey = wrapContextStringKey("contextWxConfigValueKey")
 
 //WxConfig 微信的基础配置
 type WxConfig struct {
@@ -45,6 +60,46 @@ type WxPayConfig struct {
 	NotifyUrl string
 	//SignType 获取加密类型
 	SignType string
+}
+
+//BindContextWxConfig 绑定wxConfig到Context,用于多个公众号进行绑定
+func BindContextWxConfig(parent context.Context, wxConfig *WxConfig) (context.Context, error) {
+	if parent == nil {
+		return nil, errors.New("context的parent不能为nil")
+	}
+	if wxConfig == nil {
+		return parent, errors.New("wxConfig不能为空")
+	}
+	ctx := context.WithValue(parent, contextWxConfigValueKey, wxConfig)
+	return ctx, nil
+}
+
+//从ctx获取*WxConfig,如果ctx中没有,返回默认值
+func getWxConfig(ctx context.Context) (*WxConfig, error) {
+	if ctx == nil {
+		return nil, errors.New("ctx不能为空")
+	}
+	value := ctx.Value(contextWxConfigValueKey)
+	if value == nil {
+		return wxConfig, nil
+	}
+
+	config := value.(*WxConfig)
+	return config, nil
+}
+
+//从ctx获取*WxConfig,如果ctx中没有,返回默认值
+func getWxMpConfig(ctx context.Context) (*WxMpConfig, error) {
+	if ctx == nil {
+		return nil, errors.New("ctx不能为空")
+	}
+	value := ctx.Value(contextWxConfigValueKey)
+	if value == nil {
+		return wxMpConfig, nil
+	}
+
+	config := value.(*WxMpConfig)
+	return config, nil
 }
 
 //错误代码
