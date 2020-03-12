@@ -74,7 +74,7 @@ func BindContextWxConfig(parent context.Context, wxConfig *WxConfig) (context.Co
 	return ctx, nil
 }
 
-//从ctx获取*WxConfig,如果ctx中没有,返回默认值
+//从ctx获取*WxConfig,返回默认值,如果没有,从context中查找
 func getWxConfig(ctx context.Context) (*WxConfig, error) {
 	if ctx == nil {
 		return nil, errors.New("ctx不能为空")
@@ -88,7 +88,7 @@ func getWxConfig(ctx context.Context) (*WxConfig, error) {
 	return config, nil
 }
 
-//从ctx获取*WxConfig,如果ctx中没有,返回默认值
+//从ctx获取*WxConfig,返回默认值,如果没有,从context中查找
 func getWxMpConfig(ctx context.Context) (*WxMpConfig, error) {
 	if ctx == nil {
 		return nil, errors.New("ctx不能为空")
