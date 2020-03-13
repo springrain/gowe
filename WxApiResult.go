@@ -1,13 +1,9 @@
 package gowe
 
-import (
-	"os"
-)
-
 //APIResult  封装 API 响应结果，将 json 字符串转换成 java 数据类型
 type APIResult struct {
 	ResultMap map[string]interface{}
-	file      *os.File
+	FileData  []byte
 }
 
 //错误的有效期时间
