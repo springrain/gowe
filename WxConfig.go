@@ -17,6 +17,7 @@ var Wxpayappbaseurl = "https://payapp.weixin.qq.com"
 //全局变量,用于初始化,默认第一次初始化赋值,如果是多个微信号配置,就需要放到context
 var wxConfig *WxConfig = nil
 var wxMpConfig *WxMpConfig = nil
+var wxMaConfig *WxMaConfig = nil
 var wxPayConfig *WxPayConfig = nil
 
 type wrapContextStringKey string
@@ -45,6 +46,11 @@ type WxMpConfig struct {
 	AesKey string
 	//开启oauth2.0认证,是否能够获取openId,0是关闭,1是开启
 	Oauth2 int
+}
+
+//WxMaConfig 微信小程序配置
+type WxMaConfig struct {
+	WxConfig
 }
 
 //WxPayConfig 公众号的配置
@@ -88,7 +94,7 @@ func getWxConfig(ctx context.Context) (*WxConfig, error) {
 	return config, nil
 }
 
-//从ctx获取*WxConfig,返回默认值,如果没有,从context中查找
+//从ctx获取*WxMpConfig,返回默认值,如果没有,从context中查找
 func getWxMpConfig(ctx context.Context) (*WxMpConfig, error) {
 	if ctx == nil {
 		return nil, errors.New("ctx不能为空")
@@ -99,6 +105,20 @@ func getWxMpConfig(ctx context.Context) (*WxMpConfig, error) {
 	}
 
 	config := value.(*WxMpConfig)
+	return config, nil
+}
+
+//从ctx获取*WxMaConfig,返回默认值,如果没有,从context中查找
+func getWxMaConfig(ctx context.Context) (*WxMaConfig, error) {
+	if ctx == nil {
+		return nil, errors.New("ctx不能为空")
+	}
+	value := ctx.Value(contextWxConfigValueKey)
+	if value == nil {
+		return wxMaConfig, nil
+	}
+
+	config := value.(*WxMaConfig)
 	return config, nil
 }
 
