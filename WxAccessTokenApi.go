@@ -24,7 +24,7 @@ func GetAccessToken(ctx context.Context) (*WxAccessToken, error) {
 	if errWxConfig != nil {
 		return nil, errWxConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/token" + "?grant_type=client_credential&appid=" + wxConfig.AppId + "&secret=" + wxConfig.Secret
+	apiurl := WxmpApiUrl + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.AppId + "&secret=" + wxConfig.Secret
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {

@@ -30,16 +30,16 @@ func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
 	return resultMap, nil
 }
 
-func httpPostResultMap(apiurl string, parm map[string]interface{}) (map[string]interface{}, error) {
+func httpPostResultMap(apiurl string, params map[string]interface{}) (map[string]interface{}, error) {
 	//data := make(url.Values)
-	//for k, v := range parm {
+	//for k, v := range params {
 	//	data.Add(k, v)
 	//}
-	byteparm, errparm := json.Marshal(parm)
-	if errparm != nil {
-		return nil, errparm
+	byteparams, errparams := json.Marshal(params)
+	if errparams != nil {
+		return nil, errparams
 	}
-	resp, errPost := http.NewRequest("post", apiurl, strings.NewReader(string(byteparm)))
+	resp, errPost := http.NewRequest("post", apiurl, strings.NewReader(string(byteparams)))
 	if errPost != nil {
 		return nil, errPost
 	}

@@ -60,11 +60,11 @@ func WxMpUpdateUserRemark(ctx context.Context, openId string, remark string) (*A
 	}
 	apiurl := WxmpApiUrl + "/cgi-bin/user/info/updateremark?access_token=" + wxMpConfig.AccessToken
 
-	parm := make(map[string]interface{})
-	parm["openid"] = openId
-	parm["remark"] = remark
+	params := make(map[string]interface{})
+	params["openid"] = openId
+	params["remark"] = remark
 
-	resultMap, errMap := httpPostResultMap(apiurl, parm)
+	resultMap, errMap := httpPostResultMap(apiurl, params)
 	if errMap != nil {
 		return nil, errMap
 	}
@@ -82,12 +82,12 @@ func WxMpBlackUserOpenIdList(ctx context.Context, beginOpenid string) (*APIResul
 	}
 	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.AccessToken
 
-	parm := make(map[string]interface{})
+	params := make(map[string]interface{})
 	if len(beginOpenid) > 0 {
-		parm["begin_openid"] = beginOpenid
+		params["begin_openid"] = beginOpenid
 	}
 
-	resultMap, errMap := httpPostResultMap(apiurl, parm)
+	resultMap, errMap := httpPostResultMap(apiurl, params)
 	if errMap != nil {
 		return nil, errMap
 	}
@@ -108,9 +108,9 @@ func WxMpBatchBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult
 
 	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.AccessToken
 
-	parm := make(map[string]interface{})
-	parm["openid_list"] = openIds
-	resultMap, errMap := httpPostResultMap(apiurl, parm)
+	params := make(map[string]interface{})
+	params["openid_list"] = openIds
+	resultMap, errMap := httpPostResultMap(apiurl, params)
 	if errMap != nil {
 		return nil, errMap
 	}
@@ -131,9 +131,9 @@ func WxMpBatchUnBlackUserOpenId(ctx context.Context, openIds []string) (*APIResu
 
 	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.AccessToken
 
-	parm := make(map[string]interface{})
-	parm["openid_list"] = openIds
-	resultMap, errMap := httpPostResultMap(apiurl, parm)
+	params := make(map[string]interface{})
+	params["openid_list"] = openIds
+	resultMap, errMap := httpPostResultMap(apiurl, params)
 	if errMap != nil {
 		return nil, errMap
 	}
