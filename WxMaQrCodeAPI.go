@@ -72,7 +72,7 @@ func (wxMaQrCode *WxMaQrCode) getQrCodeMap() map[string]interface{} {
 
 //WxMaCodeGetUnlimited 小程序码接口
 //https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
-func WxMaCodeGetUnlimited(ctx context.Context, wxMaQrCode WxMaQrCode) (*APIResult, error) {
+func WxMaCodeGetUnlimited(ctx context.Context, wxMaQrCode *WxMaQrCode) (*APIResult, error) {
 	wxMaConfig, errWxMaConfig := getWxMaConfig(ctx)
 	if errWxMaConfig != nil {
 		return nil, errWxMaConfig
