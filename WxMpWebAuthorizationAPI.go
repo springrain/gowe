@@ -33,7 +33,7 @@ func wrapAuthorizeURL(ctx context.Context, redirectUri string, state string, sns
 
 }
 
-//WxMpAuthAccessTokenByCode 用code换取accessToken, 认证的accessToken 和API的Token不一样
+//WxMpAuthAccessTokenByCode 用code换取accessToken, 认证的accessToken 和API的accessToken不一样
 func WxMpAuthAccessTokenByCode(ctx context.Context, code string) (*APIResult, error) {
 	if len(code) < 1 {
 		return nil, errors.New("code不能为空")
