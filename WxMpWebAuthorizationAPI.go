@@ -1,6 +1,9 @@
 package gowe
 
-import "context"
+import (
+	"context"
+	"errors"
+)
 
 //网页授权获取 access_token API
 //https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
@@ -28,4 +31,22 @@ func wrapAuthorizeURL(ctx context.Context, redirectUri string, state string, sns
 
 	return apiurl, nil
 
+}
+
+//WxMpAuthAccessTokenByCode 用code换取accessToken, 认证的accessToken 和API的Token不一样
+func WxMpAuthAccessTokenByCode(ctx context.Context, code string) (*APIResult, error) {
+	if len(code) < 1 {
+		return nil, errors.New("code不能为空")
+	}
+	wxMpConfig, errWxMpConfig := getWxMpConfig(ctx)
+	if errWxMpConfig != nil {
+		return nil, errWxMpConfig
+	}
+	apiurl := WxmpApiUrl + "/sns/oauth2?appid=" + wxMpConfig.AppId + "&secret=" + wxMpConfig.Secret + "&code=" + code + "&grant_type=authorization_code"
+	resultMap, errMap := httpGetResultMap(apiurl)
+	if errMap != nil {
+		return nil, errMap
+	}
+	apiResult := newAPIResult(resultMap)
+	return &apiResult, nil
 }
