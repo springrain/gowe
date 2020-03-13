@@ -47,3 +47,27 @@ func WxMpGetUserList(ctx context.Context, nextOpenId string) (*APIResult, error)
 	return &apiResult, nil
 
 }
+
+//WxMpUpdateUserRemark 更新用户备注/标识名称,新的备注名,长度必须小于30字符
+//https://developers.weixin.qq.com/doc/offiaccount/User_Management/Configuring_user_notes.html
+func WxMpUpdateUserRemark(ctx context.Context, openId string, remark string) (*APIResult, error) {
+	if len(openId) < 1 || len(remark) < 1 {
+		return nil, errors.New("openId或者remark不能为空")
+	}
+	wxMpConfig, errWxMpConfig := getWxMpConfig(ctx)
+	if errWxMpConfig != nil {
+		return nil, errWxMpConfig
+	}
+	apiurl := WxmpApiUrl + "/cgi-bin/user/info/updateremark?access_token=" + wxMpConfig.AccessToken
+
+	parm := make(map[string]interface{})
+	parm["openid"] = openId
+	parm["remark"] = remark
+
+	resultMap, errMap := httpPostResultMap(apiurl, parm)
+	if errMap != nil {
+		return nil, errMap
+	}
+	apiResult := newAPIResult(resultMap)
+	return &apiResult, nil
+}
