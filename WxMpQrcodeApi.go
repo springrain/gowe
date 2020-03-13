@@ -64,3 +64,11 @@ func WxMpQrCreatePermanent(ctx context.Context, sceneStr string) (*APIResult, er
 	apiResult := newAPIResult(resultMap)
 	return &apiResult, nil
 }
+
+//WxMpQrShowQrCodeUrl 通过ticket换取二维码地址
+func WxMpQrShowQrCodeUrl(ctx context.Context, ticket string) (string, error) {
+	if len(ticket) < 1 {
+		return "", errors.New("ticket不能为空")
+	}
+	return WxmpApiUrl + "/cgi-bin/showqrcode?ticket=" + ticket, nil
+}
