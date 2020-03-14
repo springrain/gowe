@@ -44,7 +44,7 @@ func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 	wxAccessToken.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
-	wxAccessToken.accessTokenExpiresTime = time.Now().Unix() + int64(wxAccessToken.ExpiresIn/2)
+	wxAccessToken.AccessTokenExpiresTime = time.Now().Unix() + int64(wxAccessToken.ExpiresIn/2)
 
 	return &wxAccessToken, nil
 }
@@ -75,7 +75,7 @@ func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
 	wxJsTicket.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
-	wxJsTicket.jsTicketExpiresTime = time.Now().Unix() + int64(wxJsTicket.ExpiresIn/2)
+	wxJsTicket.JsTicketExpiresTime = time.Now().Unix() + int64(wxJsTicket.ExpiresIn/2)
 	return &wxJsTicket, nil
 }
 
@@ -105,6 +105,6 @@ func GetCardTicket(wxConfig IWxConfig) (*WxCardTicket, error) {
 	wxCardTicket.ExpiresIn = expires
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
-	wxCardTicket.cardTicketExpiresTime = time.Now().Unix() + int64(wxCardTicket.ExpiresIn/2)
+	wxCardTicket.CardTicketExpiresTime = time.Now().Unix() + int64(wxCardTicket.ExpiresIn/2)
 	return &wxCardTicket, nil
 }
