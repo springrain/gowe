@@ -10,7 +10,7 @@ type WxAccessToken struct {
 	ExpiresIn              int
 }
 
-// token是否过期
+//IsAccessTokenExpired token是否过期
 func (wxAccessToken *WxAccessToken) IsAccessTokenExpired() bool {
 	return time.Now().Unix() > wxAccessToken.AccessTokenExpiresTime
 }
@@ -23,12 +23,12 @@ type WxCardTicket struct {
 	ExpiresIn             int
 }
 
-//微信卡券Ticket是否过期
+//IsCardTicketExpired 微信卡券Ticket是否过期
 func (wxCardTicket *WxCardTicket) IsCardTicketExpired() bool {
 	return time.Now().Unix() > wxCardTicket.CardTicketExpiresTime
 }
 
-// 微信WxJsTicket
+//WxJsTicket 微信WxJsTicket
 type WxJsTicket struct {
 	AppId               string
 	JsTicket            string
@@ -36,7 +36,7 @@ type WxJsTicket struct {
 	ExpiresIn           int
 }
 
-//WxJsTicket 是否过期
+//IsJsTicketExpired WxJsTicket 是否过期
 func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
 	return time.Now().Unix() > wxJsTicket.JsTicketExpiresTime
 }
