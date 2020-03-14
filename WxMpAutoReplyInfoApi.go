@@ -4,7 +4,7 @@ package gowe
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Getting_Rules_for_Auto_Replies.html
 func WxMpAutoreply(wxMpConfig IWxMpConfig) (*APIResult, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/get_current_autoreply_info?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/get_current_autoreply_info?access_token=" + wxMpConfig.GetAccessToken()
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {

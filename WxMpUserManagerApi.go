@@ -11,7 +11,7 @@ func WxMpGetUserBaseInfo(wxMpConfig IWxMpConfig, openId string) (*APIResult, err
 		return nil, errors.New("openId不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "&lang=zh_CN"
+	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "&lang=zh_CN"
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -26,7 +26,7 @@ func WxMpGetUserBaseInfo(wxMpConfig IWxMpConfig, openId string) (*APIResult, err
 //https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html
 func WxMpGetUserList(wxMpConfig IWxMpConfig, nextOpenId string) (*APIResult, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/user/getErrorMsgByCode?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/user/getErrorMsgByCode?access_token=" + wxMpConfig.GetAccessToken()
 
 	if len(nextOpenId) > 0 {
 		apiurl = apiurl + "&next_openid=" + nextOpenId
@@ -48,7 +48,7 @@ func WxMpUpdateUserRemark(wxMpConfig IWxMpConfig, openId string, remark string) 
 		return nil, errors.New("openId或者remark不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/user/info/updateremark?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/user/info/updateremark?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["openid"] = openId
@@ -67,7 +67,7 @@ func WxMpUpdateUserRemark(wxMpConfig IWxMpConfig, openId string, remark string) 
 //https://developers.weixin.qq.com/doc/offiaccount/User_Management/Manage_blacklist.html
 func WxMpBlackUserOpenIdList(wxMpConfig IWxMpConfig, beginOpenid string) (*APIResult, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	if len(beginOpenid) > 0 {
@@ -89,7 +89,7 @@ func WxMpBatchBlackUserOpenId(wxMpConfig IWxMpConfig, openIds []string) (*APIRes
 		return nil, errors.New("需要拉黑的用户openId列表不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["openid_list"] = openIds
@@ -108,7 +108,7 @@ func WxMpBatchUnBlackUserOpenId(wxMpConfig IWxMpConfig, openIds []string) (*APIR
 		return nil, errors.New("需要拉黑的用户openId列表不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["openid_list"] = openIds

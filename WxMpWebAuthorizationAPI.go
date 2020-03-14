@@ -7,14 +7,14 @@ import (
 //网页授权获取 access_token API
 //https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
 
+//WxMpWrapAuthorizeURL 包装网页授权的url
 func WxMpWrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, snsapiBase bool) (string, error) {
 	return wrapAuthorizeURL(wxMpConfig, redirectUri, "", snsapiBase)
 }
 
+//wrapAuthorizeURL 包装网页授权的url
 func wrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, state string, snsapiBase bool) (string, error) {
-
-	apiurl := WxmpApiUrl + "/connect/oauth2/authorize?appid=" + wxMpConfig.GetAppId() + "&response_type=code&redirect_uri=" + redirectUri
-
+	apiurl := WxMpAPIURL + "/connect/oauth2/authorize?appid=" + wxMpConfig.GetAppId() + "&response_type=code&redirect_uri=" + redirectUri
 	if snsapiBase {
 		apiurl = apiurl + "&scope=snsapi_base"
 	} else {
@@ -35,7 +35,7 @@ func WxMpAuthAccessTokenByCode(wxMpConfig IWxMpConfig, code string) (*APIResult,
 		return nil, errors.New("code不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/sns/oauth2?appid=" + wxMpConfig.GetAppId() + "&secret=" + wxMpConfig.GetSecret() + "&code=" + code + "&grant_type=authorization_code"
+	apiurl := WxMpAPIURL + "/sns/oauth2?appid=" + wxMpConfig.GetAppId() + "&secret=" + wxMpConfig.GetSecret() + "&code=" + code + "&grant_type=authorization_code"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap

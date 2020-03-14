@@ -15,7 +15,7 @@ func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSecond
 	if expireSeconds == 0 {
 		expireSeconds = 2592000
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/qrcode/create?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/qrcode/create?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["expire_seconds"] = expireSeconds
@@ -39,7 +39,7 @@ func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (*APIResult,
 		return nil, errors.New("sceneStr不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/qrcode/create?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/qrcode/create?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["action_name"] = "QR_LIMIT_STR_SCENE"
@@ -61,5 +61,5 @@ func WxMpQrShowQrCodeUrl(wxMpConfig IWxMpConfig, ticket string) (string, error) 
 	if len(ticket) < 1 {
 		return "", errors.New("ticket不能为空")
 	}
-	return WxmpApiUrl + "/cgi-bin/showqrcode?ticket=" + ticket, nil
+	return WxMpAPIURL + "/cgi-bin/showqrcode?ticket=" + ticket, nil
 }

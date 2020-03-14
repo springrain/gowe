@@ -10,7 +10,7 @@ import (
 //WxMTemplateMsgSend 发送模板消息
 func WxMTemplateMsgSend(wxMpConfig IWxMpConfig, params map[string]interface{}) (*APIResult, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken()
 	resultMap, errMap := httpPostResultMap(apiurl, params)
 	if errMap != nil {
 		return nil, errMap
@@ -25,7 +25,7 @@ func WxMpTemplateMsgSetIndustry(wxMpConfig IWxMpConfig, industryId1 string, indu
 		return nil, errors.New("industry_id1或者industry_id2不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["industry_id1"] = industryId1
@@ -41,7 +41,7 @@ func WxMpTemplateMsgSetIndustry(wxMpConfig IWxMpConfig, industryId1 string, indu
 //WxMpTemplateMsgGetIndustry 获取帐号设置的行业信息
 func WxMpTemplateMsgGetIndustry(wxMpConfig IWxMpConfig) (*APIResult, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/template/get_industry?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/template/get_industry?access_token=" + wxMpConfig.GetAccessToken()
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -57,7 +57,7 @@ func WxMpTemplateMsgGetTemplateId(wxMpConfig IWxMpConfig, templateIdShort string
 		return nil, errors.New("templateIdShort不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["template_id_short"] = templateIdShort
@@ -72,7 +72,7 @@ func WxMpTemplateMsgGetTemplateId(wxMpConfig IWxMpConfig, templateIdShort string
 //WxMpTemplateMsgGetAllTemplate 获取模板列表
 func WxMpTemplateMsgGetAllTemplate(wxMpConfig IWxMpConfig) (*APIResult, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/template/get_all_private_template?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/template/get_all_private_template?access_token=" + wxMpConfig.GetAccessToken()
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -87,7 +87,7 @@ func WxMpTemplateMsgDelPrivateTemplate(wxMpConfig IWxMpConfig, templateId string
 		return nil, errors.New("templateId不能为空")
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/template/del_private_template?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/template/del_private_template?access_token=" + wxMpConfig.GetAccessToken()
 
 	params := make(map[string]interface{})
 	params["template_id"] = templateId

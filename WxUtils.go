@@ -10,8 +10,10 @@ import (
 	"time"
 )
 
+//http请求的client
 var client *http.Client
 
+//初始化 http连接信息
 func init() {
 	client = &http.Client{
 		Timeout: 30 * time.Second,

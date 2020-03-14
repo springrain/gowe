@@ -20,7 +20,7 @@ import (
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 
-	apiurl := WxmpApiUrl + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
+	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -53,7 +53,7 @@ func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
 
 	accessToken := wxConfig.GetAccessToken()
-	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
+	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -67,7 +67,7 @@ func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
 	ticket := mapGetString(resultMap, "ticket")
 
 	if len(ticket) < 1 {
-		return nil, errors.New("未能获得accessToken")
+		return nil, errors.New("未能获得jsticket")
 	}
 	wxJsTicket := WxJsTicket{}
 	wxJsTicket.AppId = wxConfig.GetAppId()
@@ -83,7 +83,7 @@ func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
 func GetCardTicket(wxConfig IWxConfig) (*WxCardTicket, error) {
 
 	accessToken := wxConfig.GetAccessToken()
-	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
+	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -97,7 +97,7 @@ func GetCardTicket(wxConfig IWxConfig) (*WxCardTicket, error) {
 	ticket := mapGetString(resultMap, "ticket")
 
 	if len(ticket) < 1 {
-		return nil, errors.New("未能获得accessToken")
+		return nil, errors.New("未能获得cardticket")
 	}
 	wxCardTicket := WxCardTicket{}
 	wxCardTicket.AppId = wxConfig.GetAppId()
