@@ -2,8 +2,10 @@ package gowe
 
 //APIResult  封装 API 响应结果，将 json 字符串转换成 java 数据类型
 type APIResult struct {
+	//ResultMap 接口返回的json,格式化成map
 	ResultMap map[string]interface{}
-	FileData  []byte
+	//FileData 文件类型[]byte
+	FileData []byte
 }
 
 //错误的有效期时间
