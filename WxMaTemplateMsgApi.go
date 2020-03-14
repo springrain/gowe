@@ -1,7 +1,5 @@
 package gowe
 
-import "context"
-
 type WxMpTemplateMsg struct {
 	templateMsgMap map[string]interface{}
 	dataMap        map[string]interface{}
@@ -55,8 +53,8 @@ func (wxMpTemplateMsg *WxMpTemplateMsg) getTemplateMsgMap() map[string]interface
 
 //WxMaTemplateMsgSend 发送模板消息
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/template-message/templateMessage.send.html
-func WxMaTemplateMsgSend(ctx context.Context, wxMpTemplateMsg *WxMpTemplateMsg) (*APIResult, error) {
-	apiurl := WxmpApiUrl + "/cgi-bin/message/wxopen/template/send?access_token=" + wxMaConfig.getAccessToken(ctx)
+func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, wxMpTemplateMsg *WxMpTemplateMsg) (*APIResult, error) {
+	apiurl := WxmpApiUrl + "/cgi-bin/message/wxopen/template/send?access_token=" + wxMaConfig.GetAccessToken()
 
 	resultMap, errMap := httpPostResultMap(apiurl, wxMpTemplateMsg.getTemplateMsgMap())
 	if errMap != nil {

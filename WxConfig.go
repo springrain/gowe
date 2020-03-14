@@ -1,10 +1,5 @@
 package gowe
 
-import (
-	"context"
-	"errors"
-)
-
 // 微信API的服务器域名,方便处理请求代理跳转的情况
 var WxmpApiUrl = "https://api.weixin.qq.com"
 var WxmpWeixinUrl = "https://mp.weixin.qq.com"
@@ -14,134 +9,32 @@ var Wxqyapiurl = "https://qyapi.weixin.qq.com"
 var Wxreporturl = "http://report.mch.weixin.qq.com"
 var Wxpayappbaseurl = "https://payapp.weixin.qq.com"
 
-//全局变量,用于初始化,默认第一次初始化赋值,如果是多个微信号配置,就需要放到context,通过chan修改值
-var wxConfig *WxConfig = nil
-var wxMpConfig *WxMpConfig = nil
-var wxMaConfig *WxMaConfig = nil
-var wxPayConfig *WxPayConfig = nil
-
-type wrapContextStringKey string
-
-//context WithValue的key,不能是基础类型,例如字符串,包装一下
-const contextWxMpConfigValueKey = wrapContextStringKey("contextWxMpConfigValueKey")
-
-//WxConfig 微信的基础配置
-type WxConfig struct {
+//IWxConfig 微信的基础配置
+type IWxConfig interface {
 	//Id 数据库记录的Id
-	Id string
+	GetId() string
 	//AppId 微信号的appId
-	AppId string
+	GetAppId() string
 	//AccessToken 获取到AccessToken
-	//AccessToken string
+	GetAccessToken() string
 	//Secret 微信号的secret
-	Secret string
+	GetSecret() string
 }
 
-//获取accessionToken
-func (wxConfig *WxConfig) getAccessToken(ctx context.Context) string {
-
-	return ""
-
-}
-
-//获取JsTicket
-func (wxConfig *WxConfig) getJsTicket(ctx context.Context) string {
-
-	return ""
-}
-
-//获取CardTicket
-func (wxConfig *WxConfig) getCardTicket(ctx context.Context) string {
-
-	return ""
-}
-
-//WxMpConfig 公众号的配置
-type WxMpConfig struct {
-	WxConfig
+//IWxMpConfig 公众号的配置
+type IWxMpConfig interface {
+	IWxConfig
 	//Token 获取token
-	Token string
+	GetToken() string
 	//AesKey 获取aesKey
-	AesKey string
+	GetAesKey() string
 	//开启oauth2.0认证,是否能够获取openId,0是关闭,1是开启
-	Oauth2 int
+	GetOauth2() bool
 }
 
-//WxMaConfig 微信小程序配置
-type WxMaConfig struct {
-	WxConfig
-}
-
-//WxPayConfig 公众号的配置
-type WxPayConfig struct {
-	WxConfig
-	//CertificateFile 获取商户证路径
-	CertificateFile string
-	//MchId 获取 Mch ID
-	MchId string
-	//Key 获取 API 密钥
-	Key string
-	//NotifyUrl 获取回调地址
-	NotifyUrl string
-	//SignType 获取加密类型
-	SignType string
-}
-
-//BindContextWxMpConfig 绑定wxConfig到Context,用于多个公众号进行绑定
-func BindContextWxMpConfig(parent context.Context, wxMpConfig *WxMpConfig) (context.Context, error) {
-	if parent == nil {
-		return nil, errors.New("context的parent不能为nil")
-	}
-	if wxMpConfig == nil {
-		return parent, errors.New("wxConfig不能为空")
-	}
-	ctx := context.WithValue(parent, contextWxMpConfigValueKey, wxMpConfig)
-	return ctx, nil
-}
-
-//从ctx获取*WxConfig,返回默认值,如果没有,从context中查找
-//声明一个函数变量,外部给函数赋值,这里调用函数,findToken,通过这种方式实现缓存前置
-func getWxConfig(ctx context.Context) (*WxConfig, error) {
-	if ctx == nil {
-		return nil, errors.New("ctx不能为空")
-	}
-	value := ctx.Value(contextWxMpConfigValueKey)
-	if value == nil {
-		return wxConfig, nil
-	}
-
-	config := value.(*WxConfig)
-	return config, nil
-}
-
-//从ctx获取*WxMpConfig,返回默认值,如果没有,从context中查找
-//声明一个函数变量,外部给函数赋值,这里调用函数,findToken,通过这种方式实现缓存前置
-func getWxMpConfig(ctx context.Context) (*WxMpConfig, error) {
-	if ctx == nil {
-		return nil, errors.New("ctx不能为空")
-	}
-	value := ctx.Value(contextWxMpConfigValueKey)
-	if value == nil {
-		return wxMpConfig, nil
-	}
-
-	config := value.(*WxMpConfig)
-	return config, nil
-}
-
-//从ctx获取*WxMaConfig,返回默认值,如果没有,从context中查找
-//声明一个函数变量,外部给函数赋值,这里调用函数,findToken,通过这种方式实现缓存前置
-func getWxMaConfig(ctx context.Context) (*WxMaConfig, error) {
-	if ctx == nil {
-		return nil, errors.New("ctx不能为空")
-	}
-	value := ctx.Value(contextWxMpConfigValueKey)
-	if value == nil {
-		return wxMaConfig, nil
-	}
-
-	config := value.(*WxMaConfig)
-	return config, nil
+//IWxMaConfig 微信小程序配置
+type IWxMaConfig interface {
+	IWxConfig
 }
 
 //错误代码
