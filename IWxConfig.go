@@ -6,7 +6,7 @@ var WxMpWeiXinURL = "https://mp.weixin.qq.com"
 var WxMpOpenURL = "https://open.weixin.qq.com"
 var WxMpPayMchAPIURL = "https://api.mch.weixin.qq.com"
 var WxqyAPIURL = "https://qyapi.weixin.qq.com"
-var WxReportURL = "http://report.mch.weixin.qq.com"
+var WxPayReporMchtURL = "http://report.mch.weixin.qq.com"
 var WxPayAppURL = "https://payapp.weixin.qq.com"
 
 //IWxConfig 微信的基础配置
