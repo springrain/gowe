@@ -52,6 +52,7 @@ func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
 	return resultMap, nil
 }
 
+//httpPostResultMap post请求,返回的json封装成map
 func httpPostResultMap(apiurl string, params map[string]interface{}) (map[string]interface{}, error) {
 
 	body, errRead := httpPost(apiurl, params)
@@ -68,6 +69,7 @@ func httpPostResultMap(apiurl string, params map[string]interface{}) (map[string
 	return resultMap, nil
 }
 
+//httpPost post请求,返回原始的字节数组
 func httpPost(apiurl string, params map[string]interface{}) ([]byte, error) {
 	//data := make(url.Values)
 	//for k, v := range params {
