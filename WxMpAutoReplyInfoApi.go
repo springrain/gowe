@@ -9,7 +9,7 @@ func WxMpAutoreply(ctx context.Context) (*APIResult, error) {
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/get_current_autoreply_info?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/get_current_autoreply_info?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {

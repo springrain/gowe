@@ -15,7 +15,7 @@ func WxMpGetUserBaseInfo(ctx context.Context, openId string) (*APIResult, error)
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/user/info?access_token=" + wxMpConfig.AccessToken + "&openid=" + openId + "&lang=zh_CN"
+	apiurl := WxmpApiUrl + "/cgi-bin/user/info?access_token=" + wxMpConfig.getAccessToken(ctx) + "&openid=" + openId + "&lang=zh_CN"
 
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -33,7 +33,7 @@ func WxMpGetUserList(ctx context.Context, nextOpenId string) (*APIResult, error)
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/user/getErrorMsgByCode?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/user/getErrorMsgByCode?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	if len(nextOpenId) > 0 {
 		apiurl = apiurl + "&next_openid=" + nextOpenId
@@ -58,7 +58,7 @@ func WxMpUpdateUserRemark(ctx context.Context, openId string, remark string) (*A
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/user/info/updateremark?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/user/info/updateremark?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	params["openid"] = openId
@@ -80,7 +80,7 @@ func WxMpBlackUserOpenIdList(ctx context.Context, beginOpenid string) (*APIResul
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/getblacklist?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	if len(beginOpenid) > 0 {
@@ -106,7 +106,7 @@ func WxMpBatchBlackUserOpenId(ctx context.Context, openIds []string) (*APIResult
 		return nil, errWxMpConfig
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchblacklist?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	params["openid_list"] = openIds
@@ -129,7 +129,7 @@ func WxMpBatchUnBlackUserOpenId(ctx context.Context, openIds []string) (*APIResu
 		return nil, errWxMpConfig
 	}
 
-	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/tags/members/batchunblacklist?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	params["openid_list"] = openIds

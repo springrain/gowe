@@ -37,7 +37,7 @@ func WxMaAuthGetPaidUnionId(ctx context.Context, openId string) (*APIResult, err
 	if errWxMaConfig != nil {
 		return nil, errWxMaConfig
 	}
-	apiurl := WxmpApiUrl + "/wxa/getpaidunionid?access_token=" + wxMaConfig.AccessToken + "&openid=" + openId
+	apiurl := WxmpApiUrl + "/wxa/getpaidunionid?access_token=" + wxMaConfig.getAccessToken(ctx) + "&openid=" + openId
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap

@@ -23,7 +23,7 @@ var wxPayConfig *WxPayConfig = nil
 type wrapContextStringKey string
 
 //context WithValue的key,不能是基础类型,例如字符串,包装一下
-const contextWxConfigValueKey = wrapContextStringKey("contextWxConfigValueKey")
+const contextWxMpConfigValueKey = wrapContextStringKey("contextWxMpConfigValueKey")
 
 //WxConfig 微信的基础配置
 type WxConfig struct {
@@ -32,9 +32,28 @@ type WxConfig struct {
 	//AppId 微信号的appId
 	AppId string
 	//AccessToken 获取到AccessToken
-	AccessToken string
+	//AccessToken string
 	//Secret 微信号的secret
 	Secret string
+}
+
+//获取accessionToken
+func (wxConfig *WxConfig) getAccessToken(ctx context.Context) string {
+
+	return ""
+
+}
+
+//获取JsTicket
+func (wxConfig *WxConfig) getJsTicket(ctx context.Context) string {
+
+	return ""
+}
+
+//获取CardTicket
+func (wxConfig *WxConfig) getCardTicket(ctx context.Context) string {
+
+	return ""
 }
 
 //WxMpConfig 公众号的配置
@@ -68,15 +87,15 @@ type WxPayConfig struct {
 	SignType string
 }
 
-//BindContextWxConfig 绑定wxConfig到Context,用于多个公众号进行绑定
-func BindContextWxConfig(parent context.Context, wxConfig *WxConfig) (context.Context, error) {
+//BindContextWxMpConfig 绑定wxConfig到Context,用于多个公众号进行绑定
+func BindContextWxMpConfig(parent context.Context, wxMpConfig *WxMpConfig) (context.Context, error) {
 	if parent == nil {
 		return nil, errors.New("context的parent不能为nil")
 	}
-	if wxConfig == nil {
+	if wxMpConfig == nil {
 		return parent, errors.New("wxConfig不能为空")
 	}
-	ctx := context.WithValue(parent, contextWxConfigValueKey, wxConfig)
+	ctx := context.WithValue(parent, contextWxMpConfigValueKey, wxMpConfig)
 	return ctx, nil
 }
 
@@ -86,7 +105,7 @@ func getWxConfig(ctx context.Context) (*WxConfig, error) {
 	if ctx == nil {
 		return nil, errors.New("ctx不能为空")
 	}
-	value := ctx.Value(contextWxConfigValueKey)
+	value := ctx.Value(contextWxMpConfigValueKey)
 	if value == nil {
 		return wxConfig, nil
 	}
@@ -101,7 +120,7 @@ func getWxMpConfig(ctx context.Context) (*WxMpConfig, error) {
 	if ctx == nil {
 		return nil, errors.New("ctx不能为空")
 	}
-	value := ctx.Value(contextWxConfigValueKey)
+	value := ctx.Value(contextWxMpConfigValueKey)
 	if value == nil {
 		return wxMpConfig, nil
 	}
@@ -116,7 +135,7 @@ func getWxMaConfig(ctx context.Context) (*WxMaConfig, error) {
 	if ctx == nil {
 		return nil, errors.New("ctx不能为空")
 	}
-	value := ctx.Value(contextWxConfigValueKey)
+	value := ctx.Value(contextWxMpConfigValueKey)
 	if value == nil {
 		return wxMaConfig, nil
 	}

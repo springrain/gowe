@@ -59,7 +59,7 @@ func GetJsTicket(ctx context.Context) (*WxJsTicket, error) {
 	if errWxConfig != nil {
 		return nil, errWxConfig
 	}
-	accessToken := wxConfig.AccessToken
+	accessToken := wxConfig.getAccessToken(ctx)
 	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
@@ -92,7 +92,7 @@ func GetCardTicket(ctx context.Context) (*WxCardTicket, error) {
 	if errWxConfig != nil {
 		return nil, errWxConfig
 	}
-	accessToken := wxConfig.AccessToken
+	accessToken := wxConfig.getAccessToken(ctx)
 	apiurl := WxmpApiUrl + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {

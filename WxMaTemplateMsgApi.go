@@ -56,7 +56,7 @@ func (wxMpTemplateMsg *WxMpTemplateMsg) getTemplateMsgMap() map[string]interface
 //WxMaTemplateMsgSend 发送模板消息
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/template-message/templateMessage.send.html
 func WxMaTemplateMsgSend(ctx context.Context, wxMpTemplateMsg *WxMpTemplateMsg) (*APIResult, error) {
-	apiurl := WxmpApiUrl + "/cgi-bin/message/wxopen/template/send?access_token=" + wxMaConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/message/wxopen/template/send?access_token=" + wxMaConfig.getAccessToken(ctx)
 
 	resultMap, errMap := httpPostResultMap(apiurl, wxMpTemplateMsg.getTemplateMsgMap())
 	if errMap != nil {

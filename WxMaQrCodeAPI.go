@@ -77,7 +77,7 @@ func WxMaCodeGetUnlimited(ctx context.Context, wxMaQrCode *WxMaQrCode) (*APIResu
 	if errWxMaConfig != nil {
 		return nil, errWxMaConfig
 	}
-	apiurl := WxmpApiUrl + "/wxa/getwxacodeunlimit?access_token=" + wxMaConfig.AccessToken
+	apiurl := WxmpApiUrl + "/wxa/getwxacodeunlimit?access_token=" + wxMaConfig.getAccessToken(ctx)
 	apiResult := APIResult{}
 	data, errPost := httpPost(apiurl, wxMaQrCode.getQrCodeMap())
 	if errPost == nil { //正常

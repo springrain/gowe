@@ -11,7 +11,7 @@ type WxAccessToken struct {
 }
 
 // token是否过期
-func (wxAccessToken *WxAccessToken) isAccessTokenExpired() bool {
+func (wxAccessToken *WxAccessToken) IsAccessTokenExpired() bool {
 	return time.Now().Unix() > wxAccessToken.accessTokenExpiresTime
 }
 
@@ -24,7 +24,7 @@ type WxCardTicket struct {
 }
 
 //微信卡券Ticket是否过期
-func (wxCardTicket *WxCardTicket) isCardTicketExpired() bool {
+func (wxCardTicket *WxCardTicket) IsCardTicketExpired() bool {
 	return time.Now().Unix() > wxCardTicket.cardTicketExpiresTime
 }
 
@@ -37,6 +37,6 @@ type WxJsTicket struct {
 }
 
 //WxJsTicket 是否过期
-func (wxJsTicket *WxJsTicket) isJsTicketExpired() bool {
+func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
 	return time.Now().Unix() > wxJsTicket.jsTicketExpiresTime
 }

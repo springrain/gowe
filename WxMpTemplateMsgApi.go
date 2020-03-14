@@ -14,7 +14,7 @@ func WxMTemplateMsgSend(ctx context.Context, params map[string]interface{}) (*AP
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.getAccessToken(ctx)
 	resultMap, errMap := httpPostResultMap(apiurl, params)
 	if errMap != nil {
 		return nil, errMap
@@ -32,7 +32,7 @@ func WxMpTemplateMsgSetIndustry(ctx context.Context, industryId1 string, industr
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	params["industry_id1"] = industryId1
@@ -51,7 +51,7 @@ func WxMpTemplateMsgGetIndustry(ctx context.Context) (*APIResult, error) {
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/template/get_industry?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/template/get_industry?access_token=" + wxMpConfig.getAccessToken(ctx)
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -70,7 +70,7 @@ func WxMpTemplateMsgGetTemplateId(ctx context.Context, templateIdShort string) (
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/template/api_set_industry?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	params["template_id_short"] = templateIdShort
@@ -88,7 +88,7 @@ func WxMpTemplateMsgGetAllTemplate(ctx context.Context) (*APIResult, error) {
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/template/get_all_private_template?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/template/get_all_private_template?access_token=" + wxMpConfig.getAccessToken(ctx)
 	resultMap, errMap := httpGetResultMap(apiurl)
 	if errMap != nil {
 		return nil, errMap
@@ -106,7 +106,7 @@ func WxMpTemplateMsgDelPrivateTemplate(ctx context.Context, templateId string) (
 	if errWxMpConfig != nil {
 		return nil, errWxMpConfig
 	}
-	apiurl := WxmpApiUrl + "/cgi-bin/template/del_private_template?access_token=" + wxMpConfig.AccessToken
+	apiurl := WxmpApiUrl + "/cgi-bin/template/del_private_template?access_token=" + wxMpConfig.getAccessToken(ctx)
 
 	params := make(map[string]interface{})
 	params["template_id"] = templateId
