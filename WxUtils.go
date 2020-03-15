@@ -29,8 +29,8 @@ func init() {
 	}
 }
 
-//httpGetResultMap 发起get请求,并返回json格式的结果
-func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
+//httpGet 发起get请求
+func httpGet(apiurl string) ([]byte, error) {
 	resp, errGet := client.Get(apiurl)
 
 	if errGet != nil {
@@ -39,6 +39,13 @@ func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
 	defer resp.Body.Close()
 
 	body, errRead := ioutil.ReadAll(resp.Body)
+	return body, errRead
+}
+
+//httpGetResultMap 发起get请求,并返回json格式的结果
+func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
+
+	body, errRead := httpGet(apiurl)
 	if errRead != nil {
 		return nil, errRead
 	}

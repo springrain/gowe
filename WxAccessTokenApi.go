@@ -1,7 +1,7 @@
 package gowe
 
 import (
-	"errors"
+	"encoding/json"
 	"time"
 )
 
@@ -17,94 +17,102 @@ import (
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#54
  */
 
+//WxAccessToken 微信accessToken
+type WxAccessToken struct {
+	AccessToken            string `json:"access_token"`  // 获取到的凭证
+	ExpiresIn              int    `json:"expires_in"`    // SessionKey超时时间（秒）
+	RefreshToken           string `json:"refresh_token"` // 用户刷新access_tokenOpenId
+	OpenId                 string `json:"openid"`        // 用户唯一标识
+	Scope                  string `json:"scope"`         // 用户授权的作用域
+	ErrCode                int    `json:"errcode"`       // 错误码
+	ErrMsg                 string `json:"errmsg"`        // 错误信息
+	AccessTokenExpiresTime int64  //过期的时间,验证是否过期
+}
+
+//IsAccessTokenExpired token是否过期
+func (wxAccessToken *WxAccessToken) IsAccessTokenExpired() bool {
+	return time.Now().Unix() > wxAccessToken.AccessTokenExpiresTime
+}
+
+//WxCardTicket 微信卡券Ticket
+type WxCardTicket struct {
+	CardTicket            string `json:"ticket"`     // 获取到的凭证
+	ExpiresIn             int    `json:"expires_in"` // SessionKey超时时间（秒）
+	ErrCode               int    `json:"errcode"`    // 错误码
+	ErrMsg                string `json:"errmsg"`     // 错误信息
+	CardTicketExpiresTime int64
+}
+
+//IsCardTicketExpired 微信卡券Ticket是否过期
+func (wxCardTicket *WxCardTicket) IsCardTicketExpired() bool {
+	return time.Now().Unix() > wxCardTicket.CardTicketExpiresTime
+}
+
+//WxJsTicket 微信WxJsTicket
+type WxJsTicket struct {
+	JsTicket            string `json:"ticket"`     // 获取到的凭证
+	ExpiresIn           int    `json:"expires_in"` // SessionKey超时时间（秒）
+	ErrCode             int    `json:"errcode"`    // 错误码
+	ErrMsg              string `json:"errmsg"`     // 错误信息
+	JsTicketExpiresTime int64
+}
+
+//IsJsTicketExpired WxJsTicket 是否过期
+func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
+	return time.Now().Unix() > wxJsTicket.JsTicketExpiresTime
+}
+
+type WxSessionKey struct {
+	OpenId     string `json:"openid"`      // 用户唯一标识
+	SessionKey string `json:"session_key"` // 会话密钥
+	UnionId    string `json:"unionid"`     // 只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
+	ErrCode    int    `json:"errcode"`     // 错误码
+	ErrMsg     string `json:"errmsg"`      // 错误信息
+}
+
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
-
 	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
-
-	resultMap, errMap := httpGetResultMap(apiurl)
-	if errMap != nil {
-		return nil, errMap
-	}
-
-	expires := mapGetInt(resultMap, "expires_in")
-	if expires == errExpires {
-		return nil, errors.New("expires_in超时时间错误")
-	}
-
-	accessToken := mapGetString(resultMap, "access_token")
-
-	if len(accessToken) < 1 {
-		return nil, errors.New("未能获得accessToken")
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
 	}
 
 	wxAccessToken := WxAccessToken{}
-	wxAccessToken.AppId = wxConfig.GetAppId()
-	wxAccessToken.AccessToken = accessToken
-	wxAccessToken.ExpiresIn = expires
+	err = json.Unmarshal(body, &wxAccessToken)
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxAccessToken.AccessTokenExpiresTime = time.Now().Unix() + int64(wxAccessToken.ExpiresIn/2)
 
-	return &wxAccessToken, nil
+	return &wxAccessToken, err
 }
 
 //GetJsTicket 获取jsTicket
 func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
-
-	accessToken := wxConfig.GetAccessToken()
-	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi"
-	resultMap, errMap := httpGetResultMap(apiurl)
-	if errMap != nil {
-		return nil, errMap
-	}
-
-	expires := mapGetInt(resultMap, "expires_in")
-	if expires == errExpires {
-		return nil, errors.New("expires_in超时时间错误")
-	}
-
-	ticket := mapGetString(resultMap, "ticket")
-
-	if len(ticket) < 1 {
-		return nil, errors.New("未能获得jsticket")
+	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken() + "&type=jsapi"
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
 	}
 	wxJsTicket := WxJsTicket{}
-	wxJsTicket.AppId = wxConfig.GetAppId()
-	wxJsTicket.JsTicket = ticket
-	wxJsTicket.ExpiresIn = expires
+	err = json.Unmarshal(body, &wxJsTicket)
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxJsTicket.JsTicketExpiresTime = time.Now().Unix() + int64(wxJsTicket.ExpiresIn/2)
-	return &wxJsTicket, nil
+	return &wxJsTicket, err
 }
 
 //GetCardTicket 获取cardTicket
 func GetCardTicket(wxConfig IWxConfig) (*WxCardTicket, error) {
-
-	accessToken := wxConfig.GetAccessToken()
-	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=wx_card"
-	resultMap, errMap := httpGetResultMap(apiurl)
-	if errMap != nil {
-		return nil, errMap
-	}
-
-	expires := mapGetInt(resultMap, "expires_in")
-	if expires == errExpires {
-		return nil, errors.New("expires_in超时时间错误")
-	}
-
-	ticket := mapGetString(resultMap, "ticket")
-
-	if len(ticket) < 1 {
-		return nil, errors.New("未能获得cardticket")
+	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken() + "&type=wx_card"
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
 	}
 	wxCardTicket := WxCardTicket{}
-	wxCardTicket.AppId = wxConfig.GetAppId()
-	wxCardTicket.CardTicket = ticket
-	wxCardTicket.ExpiresIn = expires
+	err = json.Unmarshal(body, &wxCardTicket)
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxCardTicket.CardTicketExpiresTime = time.Now().Unix() + int64(wxCardTicket.ExpiresIn/2)
-	return &wxCardTicket, nil
+	return &wxCardTicket, err
 }
