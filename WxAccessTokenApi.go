@@ -62,14 +62,6 @@ func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
 	return time.Now().Unix() > wxJsTicket.JsTicketExpiresTime
 }
 
-type WxSessionKey struct {
-	OpenId     string `json:"openid"`      // 用户唯一标识
-	SessionKey string `json:"session_key"` // 会话密钥
-	UnionId    string `json:"unionid"`     // 只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
-	ErrCode    int    `json:"errcode"`     // 错误码
-	ErrMsg     string `json:"errmsg"`      // 错误信息
-}
-
 //GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()

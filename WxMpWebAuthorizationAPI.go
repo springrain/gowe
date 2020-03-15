@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -29,17 +30,32 @@ func wrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, state string, 
 
 }
 
-//WxMpAuthAccessTokenByCode 用code换取accessToken, 认证的accessToken 和API的accessToken不一样
-func WxMpAuthAccessTokenByCode(wxMpConfig IWxMpConfig, code string) (*APIResult, error) {
+//WxMpWebAuthAccessToken 用code换取accessToken. 认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
+func WxMpWebAuthAccessToken(wxMpConfig IWxMpConfig, code string) (*WxAccessToken, error) {
 	if len(code) < 1 {
 		return nil, errors.New("code不能为空")
 	}
-
 	apiurl := WxMpAPIURL + "/sns/oauth2?appid=" + wxMpConfig.GetAppId() + "&secret=" + wxMpConfig.GetSecret() + "&code=" + code + "&grant_type=authorization_code"
-	resultMap, errMap := httpGetResultMap(apiurl)
-	if errMap != nil {
-		return nil, errMap
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
 	}
-	apiResult := newAPIResult(resultMap)
-	return &apiResult, nil
+	wxAccessToken := WxAccessToken{}
+	err = json.Unmarshal(body, &wxAccessToken)
+	return &wxAccessToken, err
+}
+
+//WxMpWebAuthRefreshAccessToken 刷新认证的AccessToken.认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
+func WxMpWebAuthRefreshAccessToken(wxMpConfig IWxMpConfig, refreshToken string) (*WxAccessToken, error) {
+	if len(refreshToken) < 1 {
+		return nil, errors.New("refreshToken不能为空")
+	}
+	apiurl := WxMpAPIURL + "/sns/oauth2/refresh_token?appid=" + wxMpConfig.GetAppId() + "&grant_type=refresh_token&refresh_token=" + refreshToken
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
+	}
+	wxAccessToken := WxAccessToken{}
+	err = json.Unmarshal(body, &wxAccessToken)
+	return &wxAccessToken, err
 }
