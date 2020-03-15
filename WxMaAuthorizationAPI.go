@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -8,20 +9,29 @@ import (
 
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/user-info/auth.getPaidUnionId.html
 
+//SessionKey jsCode换取用户信息,获得sessionKey
+type SessionKey struct {
+	OpenId     string `json:"openid"`      // 用户唯一标识
+	SessionKey string `json:"session_key"` // 会话密钥
+	UnionId    string `json:"unionid"`     // 只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
+	ErrCode    int    `json:"errcode"`     // 错误码
+	ErrMsg     string `json:"errmsg"`      // 错误信息
+}
+
 //WxMaCode2Session 登录凭证校验.通过 wx.login 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
-func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (*APIResult, error) {
+func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (*SessionKey, error) {
 	if len(jsCode) < 1 {
-		return nil, errors.New("code不能为空")
+		return nil, errors.New("jsCode不能为空")
 	}
-
-	apiurl := WxMpAPIURL + "/sns/jscode2session?appid=" + wxMaConfig.GetAppId() + "&secret=" + wxMaConfig.GetSecret() + "&js_code=" + jsCode + "&grant_type=authorization_code"
-	resultMap, errMap := httpGetResultMap(apiurl)
-	if errMap != nil {
-		return nil, errMap
+	apiurl := WxMpAPIURL + "/sns/jscode2session?appid=" + wxMaConfig.GetAppId() + "&secret=" + wxMaConfig.GetSecret() + "&js_code=" + jsCode + "&&grant_type=authorization_code"
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
 	}
-	apiResult := newAPIResult(resultMap)
-	return &apiResult, nil
+	sessionKey := SessionKey{}
+	err = json.Unmarshal(body, &sessionKey)
+	return &sessionKey, err
 }
 
 //WxMaAuthGetPaidUnionId 用户支付完成后，获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
