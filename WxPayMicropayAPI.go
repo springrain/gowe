@@ -2,16 +2,28 @@ package gowe
 
 import "encoding/xml"
 
-// 场景信息模型
-type SceneInfoModel struct {
-	ID       string `json:"id"`        // 门店唯一标识
-	Name     string `json:"name"`      // 门店名称
-	AreaCode string `json:"area_code"` // 门店所在地行政区划码，详细见《最新县及县以上行政区划代码》
-	Address  string `json:"address"`   // 门店详细地址
+// 提交付款码支付
+func WxPayMicropay(wxPayConfig IWxPayConfig, body WxPayMicropayBody) (wxRsp WxPayMicropayResponse, err error) {
+	// 处理参数
+	if body.SceneInfo != nil {
+		body.SceneInfoStr = JsonString(*body.SceneInfo)
+	}
+	// 业务逻辑
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/micropay", body)
+	if err != nil {
+		return
+	}
+	// 结果校验
+	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+		return
+	}
+	// 解析返回值
+	err = xml.Unmarshal(bytes, &wxRsp)
+	return
 }
 
 // 提交付款码支付的参数
-type MicropayBody struct {
+type WxPayMicropayBody struct {
 	SignType       string `json:"sign_type,omitempty"`   // 签名类型，目前支持HMAC-SHA256和MD5，默认为MD5
 	DeviceInfo     string `json:"device_info,omitempty"` // 终端设备号(商户自定义，如门店编号)
 	Body           string `json:"body"`                  // 商品或支付单简要描述，格式要求：门店品牌名-城市分店名-实际商品名称
@@ -29,11 +41,11 @@ type MicropayBody struct {
 	Receipt        string `json:"receipt,omitempty"`     // Y，传入Y时，支付成功消息和支付详情页将出现开票入口。需要在微信支付商户平台或微信公众平台开通电子发票功能，传此字段才可生效
 	SceneInfoStr   string `json:"scene_info,omitempty"`  // 该字段用于上报场景信息，目前支持上报实际门店信息。该字段为JSON对象数据，对象格式为{"store_info":{"id": "门店ID","name": "名称","area_code": "编码","address": "地址" }} ，字段详细说明请点击行前的+展开
 	// 用于生成SceneInfoStr
-	SceneInfo *SceneInfoModel `json:"-"`
+	SceneInfo *WxPaySceneInfoModel `json:"-"`
 }
 
 // 提交付款码支付的返回值
-type MicropayResponse struct {
+type WxPayMicropayResponse struct {
 	ReturnCode string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识，非交易标识，交易是否成功需要查看result_code来判断
 	ReturnMsg  string `xml:"return_msg"`  // 返回信息，如非空，为错误原因：签名失败/参数格式校验错误
 	RetMsg     string `xml:"retmsg"`      // 沙盒时返回的错误信息
@@ -67,24 +79,4 @@ type MicropayResponse struct {
 	Attach             string `xml:"attach"`               // 商家数据包，原样返回
 	TimeEnd            string `xml:"time_end"`             // 订单生成时间，格式为yyyyMMddHHmmss，如2009年12月25日9点10分10秒表示为20091225091010。详见时间规则
 	PromotionDetail    string `xml:"promotion_detail"`     // TODO 单品优惠详情
-}
-
-// 提交付款码支付
-func WxPayMicropay(wxPayConfig IWxPayConfig, body MicropayBody) (wxRsp MicropayResponse, err error) {
-	// 处理参数
-	if body.SceneInfo != nil {
-		body.SceneInfoStr = JsonString(*body.SceneInfo)
-	}
-	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"pay/micropay", body)
-	if err != nil {
-		return
-	}
-	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
-	}
-	// 解析返回值
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return
 }
