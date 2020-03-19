@@ -46,19 +46,9 @@ type WxPayMicropayBody struct {
 
 // 提交付款码支付的返回值
 type WxPayMicropayResponse struct {
-	ReturnCode string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识，非交易标识，交易是否成功需要查看result_code来判断
-	ReturnMsg  string `xml:"return_msg"`  // 返回信息，如非空，为错误原因：签名失败/参数格式校验错误
-	RetMsg     string `xml:"retmsg"`      // 沙盒时返回的错误信息
+	WxResponseModel
 	// 当return_code为SUCCESS时
-	AppId      string `xml:"appid"`        // 微信分配的公众账号ID
-	MchId      string `xml:"mch_id"`       // 微信支付分配的商户号
-	SubAppId   string `xml:"sub_appid"`    // (服务商模式) 微信分配的子商户公众账号ID
-	SubMchId   string `xml:"sub_mch_id"`   // (服务商模式) 微信支付分配的子商户号
-	NonceStr   string `xml:"nonce_str"`    // 随机字符串，不长于32位
-	Sign       string `xml:"sign"`         // 签名，详见签名生成算法
-	ResultCode string `xml:"result_code"`  // SUCCESS/FAIL
-	ErrCode    string `xml:"err_code"`     // 详细参见第6节错误列表
-	ErrCodeDes string `xml:"err_code_des"` // 错误返回的信息描述
+	WxPayServiceResponseModel
 
 	DeviceInfo string `xml:"device_info"` // 调用接口提交的终端设备号
 	// 当return_code和result_code都为SUCCESS时
