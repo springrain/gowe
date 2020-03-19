@@ -11,8 +11,9 @@ type WxPaySceneInfoModel struct {
 type BodyMap map[string]interface{}
 
 const (
-	baseUrl        = "https://api.mch.weixin.qq.com/"            // (生产环境) 微信支付的基地址
-	baseUrlSandbox = "https://api.mch.weixin.qq.com/sandboxnew/" // (沙盒环境) 微信支付的基地址
+
+	//baseUrl        = "https://api.mch.weixin.qq.com/"            // (生产环境) 微信支付的基地址
+	//baseUrlSandbox = "https://api.mch.weixin.qq.com/sandboxnew/" // (沙盒环境) 微信支付的基地址
 
 	// wxURL_DownloadFundFlow  = wxBaseUrl + "pay/downloadfundflow"            // 下载资金账单
 	// wxURL_BatchQueryComment = wxBaseUrl + "billcommentsp/batchquerycomment" //
