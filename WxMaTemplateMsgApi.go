@@ -1,5 +1,7 @@
 package gowe
 
+import "encoding/json"
+
 //WxMaTemplateMsgSend 发送模板消息
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/template-message/templateMessage.send.html
 //WxMaTemplateMsg 微信公众号模板消息
@@ -68,13 +70,16 @@ func (wxMaTemplateMsg *WxMaTemplateMsg) getTemplateMsgMap() map[string]interface
 
 //WxMaTemplateMsgSend 发送模板消息
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/template-message/templateMessage.send.html
-func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, wxMaTemplateMsg *WxMaTemplateMsg) (*APIResult, error) {
+func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, wxMaTemplateMsg *WxMaTemplateMsg) (res ResponseBase, err error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/message/wxopen/template/send?access_token=" + wxMaConfig.GetAccessToken()
 
-	resultMap, errMap := httpPostResultMap(apiurl, wxMaTemplateMsg.getTemplateMsgMap())
-	if errMap != nil {
-		return nil, errMap
+	data, err := httpPost(apiurl, wxMaTemplateMsg.getTemplateMsgMap())
+	// 发送请求
+	if err != nil {
+		return res, err
 	}
-	apiResult := newAPIResult(resultMap)
-	return &apiResult, nil
+	// 尝试解码
+	_ = json.Unmarshal(data, &res)
+
+	return res, nil
 }
