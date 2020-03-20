@@ -53,8 +53,9 @@ func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (*WxMaAuthGet
 	return &res, err
 }
 
+//WxMaAuthGetPaidUnionIdResponse 支付后获取用户unionid
 type WxMaAuthGetPaidUnionIdResponse struct {
-	Unionid string `json:"unionid"` // 用户唯一标识,调用成功后返回
+	UnionId string `json:"unionid"` // 用户唯一标识,调用成功后返回
 	ErrCode int    `json:"errcode"` // 错误码
 	ErrMsg  string `json:"errmsg"`  // 错误信息
 }

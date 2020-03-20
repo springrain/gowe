@@ -34,6 +34,7 @@ func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) 
 	return &res, err
 }
 
+//WxMaTemplateMsgSendBody 小程序模板消息的请求参数
 type WxMaTemplateMsgSendBody struct {
 	Touser          string                 `json:"touser"`                     // 接收者(用户)的 openid
 	TemplateId      string                 `json:"template_id"`                // 所需下发的模板消息的id

@@ -46,6 +46,7 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 	return &res, err
 }
 
+//WxMpTemplateMsgSendBody 模板消息的请求参数
 type WxMpTemplateMsgSendBody struct {
 	Touser          string                 `json:"touser"`                     // 接收者(用户)的 openid
 	TemplateId      string                 `json:"template_id"`                // 所需下发的模板消息的id
@@ -58,8 +59,9 @@ type WxMpTemplateMsgSendBody struct {
 	dataMap         map[string]interface{} `json:"-"`                          //模板数据
 }
 
+//WxMpTemplateMsgSendResponse 发送模板消息的返回值
 type WxMpTemplateMsgSendResponse struct {
-	MsgID   int64  `json:"msgid"`   // 用户唯一标识,调用成功后返回
+	MsgId   int64  `json:"msgid"`   // 用户唯一标识,调用成功后返回
 	ErrCode int    `json:"errcode"` // 错误码
 	ErrMsg  string `json:"errmsg"`  // 错误信息
 }

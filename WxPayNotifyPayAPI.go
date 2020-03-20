@@ -1,15 +1,15 @@
 package gowe
 
 import (
+	"bytes"
 	"encoding/xml"
+	"fmt"
 
 	"github.com/beevik/etree"
 )
 
-type NotifyPayHandler func(WxPayNotifyPayBody) error
-
 //WxPayNotifyPay 支付结果通知
-func WxPayNotifyPay(wxPayConfig IWxPayConfig, handler NotifyPayHandler, requestBody []byte) (rspBody string, err error) {
+func WxPayNotifyPay(wxPayConfig IWxPayConfig, handler func(wxPayNotifyPayBody WxPayNotifyPayBody) error, requestBody []byte) (rspBody string, err error) {
 	// 验证Sign
 	if err = wxPayDoVerifySign(wxPayConfig, requestBody, false); err != nil {
 		return
@@ -24,15 +24,30 @@ func WxPayNotifyPay(wxPayConfig IWxPayConfig, handler NotifyPayHandler, requestB
 		return
 	}
 	// 返回处理结果
-	rspModel := WxPayNotifyResponseModel{
-		ReturnCode: ResponseSuccess,
-		ReturnMsg:  ResponseMessageOk,
+	rspModel := wxPayNotifyResponseModel{
+		ReturnCode: responseSuccess,
+		ReturnMsg:  responseMessageOk,
 	}
-	rspBody = rspModel.ToXmlString()
+	rspBody = rspModel.toXMLString()
 	return
 }
 
-// 支付结果通知的参数
+//wxPayNotifyResponseModel 微信通知的结果返回值
+type wxPayNotifyResponseModel struct {
+	ReturnCode string // SUCCESS/FAIL
+	ReturnMsg  string // 返回信息,如非空,为错误原因,或OK
+}
+
+func (m *wxPayNotifyResponseModel) toXMLString() string {
+	buffer := new(bytes.Buffer)
+	buffer.WriteString("<xml>")
+	buffer.WriteString(fmt.Sprintf("<return_code><![CDATA[%s]]></return_code>", m.ReturnCode))
+	buffer.WriteString(fmt.Sprintf("<return_msg><![CDATA[%s]]></return_msg>", m.ReturnMsg))
+	buffer.WriteString("</xml>")
+	return buffer.String()
+}
+
+//WxPayNotifyPayBody 支付结果通知的参数
 type WxPayNotifyPayBody struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
@@ -60,7 +75,7 @@ type WxPayNotifyPayBody struct {
 	Coupons []WxPayCouponResponseModel `xml:"-"`
 }
 
-// 支付结果通知-解析XML参数
+//wxPayNotifyParseParams 支付结果通知-解析XML参数
 func wxPayNotifyParseParams(xmlStr []byte, body *WxPayNotifyPayBody) (err error) {
 	if err = xml.Unmarshal(xmlStr, &body); err != nil {
 		return

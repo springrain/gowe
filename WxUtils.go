@@ -118,12 +118,12 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 	if wxPayConfig.IsProd() {
 		sign = wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
 	} else {
-		body["sign_type"] = SignTypeMD5
-		key, iErr := wxPaySandboxSign(wxPayConfig, nonceStr, SignTypeMD5)
+		body["sign_type"] = signTypeMD5
+		key, iErr := wxPaySandboxSign(wxPayConfig, nonceStr, signTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
-		sign = wxPayLocalSign(body, SignTypeMD5, key)
+		sign = wxPayLocalSign(body, signTypeMD5, key)
 	}
 	body["sign"] = sign
 	return
@@ -132,14 +132,14 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 // 是否是服务商模式
 func isWxPayFacilitator(serviceType int) bool {
 	switch serviceType {
-	case ServiceTypeFacilitatorDomestic, ServiceTypeFacilitatorAbroad, ServiceTypeBankServiceProvidor:
+	case serviceTypeFacilitatorDomestic, serviceTypeFacilitatorAbroad, serviceTypeBankServiceProvidor:
 		return true
 	default:
 		return false
 	}
 }
 
-// 生成请求XML的Body体
+//GenerateXml 生成请求XML的Body体
 func GenerateXml(data map[string]interface{}) string {
 	buffer := new(bytes.Buffer)
 	buffer.WriteString("<xml>")
@@ -150,18 +150,18 @@ func GenerateXml(data map[string]interface{}) string {
 	return buffer.String()
 }
 
-// 生成模型字符串
+//JsonString 生成模型字符串
 func JsonString(m interface{}) string {
 	bs, _ := json.Marshal(m)
 	return string(bs)
 }
 
-// 格式化时间,按照yyyyMMddHHmmss格式
+//FormatDateTime 格式化时间,按照yyyyMMddHHmmss格式
 func FormatDateTime(t time.Time) string {
 	return t.Format("20060102150405")
 }
 
-// 对URL进行Encode编码
+//EscapedPath 对URL进行Encode编码
 func EscapedPath(u string) (path string, err error) {
 	uriObj, err := url.Parse(u)
 	if err != nil {
@@ -171,22 +171,21 @@ func EscapedPath(u string) (path string, err error) {
 	return
 }
 
-// 解密填充模式(去除补全码) PKCS7UnPadding
-// 解密时,需要在最后面去掉加密时添加的填充byte
+//PKCS7UnPadding 解密填充模式(去除补全码) PKCS7UnPadding 解密时,需要在最后面去掉加密时添加的填充byte
 func PKCS7UnPadding(plainText []byte) []byte {
 	length := len(plainText)
 	unpadding := int(plainText[length-1])   // 找到Byte数组最后的填充byte
 	return plainText[:(length - unpadding)] // 只截取返回有效数字内的byte数组
 }
 
-// 18位纯数字,以10、11、12、13、14、15开头
+//IsValidAuthCode 18位纯数字,以10、11、12、13、14、15开头
 func IsValidAuthCode(authcode string) (ok bool) {
 	pattern := "^1[0-5][0-9]{16}$"
 	ok, _ = regexp.MatchString(pattern, authcode)
 	return
 }
 
-// 获取随机字符串
+//GetRandomString 获取随机字符串
 func GetRandomString(length int) string {
 	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 	b := []byte(str)
@@ -198,7 +197,7 @@ func GetRandomString(length int) string {
 	return string(result)
 }
 
-// 向微信发送请求
+//wxPayDoWeChat 向微信发送请求
 func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}) (bytes []byte, err error) {
 	// 转换参数
 	body, err := wxPayBuildBody(wxPayConfig, bodyObj)
@@ -210,7 +209,7 @@ func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{})
 	return
 }
 
-// 向微信发送带证书请求
+//wxPayDoWeChatWithCert 向微信发送带证书请求
 func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}) ([]byte, error) {
 	// 转换参数
 	body, err := wxPayBuildBody(wxPayConfig, bodyObj)
@@ -227,6 +226,7 @@ func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj inte
 	return bytes, err
 }
 
+//wxPayGetCertHttpClient 获取带证数的httpClient
 func wxPayGetCertHttpClient(wxPayConfig IWxPayConfig) (*http.Client, error) {
 	certPath := wxPayConfig.GetCertificateFile()
 	certData, err := ioutil.ReadFile(certPath)
@@ -238,6 +238,7 @@ func wxPayGetCertHttpClient(wxPayConfig IWxPayConfig) (*http.Client, error) {
 	return client, err
 }
 
+//wxPayBuildClient 构建带证数的httpClient
 func wxPayBuildClient(data []byte, mchId string) (client *http.Client, err error) {
 	// 将pkcs12证书转成pem
 	cert, err := wxPayPkc12ToPerm(data, mchId)
@@ -264,6 +265,7 @@ func wxPayBuildClient(data []byte, mchId string) (client *http.Client, err error
 	return
 }
 
+//wxPayPkc12ToPerm 证数格式转化
 func wxPayPkc12ToPerm(data []byte, mchId string) (cert tls.Certificate, err error) {
 	blocks, err := pkcs12.ToPEM(data, mchId)
 	if err != nil {

@@ -16,12 +16,11 @@ import (
 	"github.com/beevik/etree"
 )
 
-// 本地通过支付参数计算签名值
-// 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
+//wxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
 func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
 	signStr := wxPaySortSignParams(body, apiKey)
 	var hashSign []byte
-	if signType == SignTypeHmacSHA256 {
+	if signType == signTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
 		hash.Write([]byte(signStr))
 		hashSign = hash.Sum(nil)
@@ -33,7 +32,7 @@ func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string)
 	return strings.ToUpper(hex.EncodeToString(hashSign))
 }
 
-// 获取根据Key排序后的请求参数字符串
+//wxPaySortSignParams 获取根据Key排序后的请求参数字符串
 func wxPaySortSignParams(body map[string]interface{}, apiKey string) string {
 	keyList := make([]string, 0)
 	for k := range body {
@@ -49,7 +48,7 @@ func wxPaySortSignParams(body map[string]interface{}, apiKey string) string {
 	return buffer.String()
 }
 
-// 获取沙盒签名Key的返回值
+//getSignKeyResponse 获取沙盒签名Key的返回值
 type getSignKeyResponse struct {
 	ReturnCode     string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识,非交易标识,交易是否成功需要查看result_code来判断
 	ReturnMsg      string `xml:"return_msg"`  // 返回信息,如非空,为错误原因:签名失败/参数格式校验错误
@@ -59,7 +58,7 @@ type getSignKeyResponse struct {
 	SandboxSignkey string `xml:"sandbox_signkey"`
 }
 
-// 获取沙盒的签名
+//wxPaySandboxSign 获取沙盒的签名
 func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string) (key string, err error) {
 	body := make(map[string]interface{})
 	body["mch_id"] = wxPayConfig.GetMchId()
@@ -71,7 +70,7 @@ func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string
 	return
 }
 
-// 调用微信提供的接口获取SandboxSignkey
+//getSandBoxSignKey 调用微信提供的接口获取SandboxSignkey
 func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, err error) {
 	params := make(map[string]interface{})
 	params["mch_id"] = mchId
@@ -86,7 +85,7 @@ func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, 
 	if err = xml.Unmarshal(bytes, &keyResponse); err != nil {
 		return
 	}
-	if keyResponse.ReturnCode == ResponseFail {
+	if keyResponse.ReturnCode == responseFail {
 		err = errors.New(keyResponse.RetMsg)
 		return
 	}
@@ -94,7 +93,7 @@ func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, 
 	return
 }
 
-// 验证微信返回的结果签名
+//wxPayDoVerifySign 验证微信返回的结果签名
 func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bool) (err error) {
 	// 生成XML文档
 	doc := etree.NewDocument()
@@ -104,7 +103,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	root := doc.SelectElement("xml")
 	// 验证return_code
 	retCode := root.SelectElement("return_code").Text()
-	if retCode != ResponseSuccess && breakWhenFail {
+	if retCode != responseSuccess && breakWhenFail {
 		return
 	}
 	// 遍历所有Tag,生成Map和Sign
@@ -121,7 +120,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 		}
 	}
 	// 获取签名类型
-	signType := SignTypeMD5
+	signType := signTypeMD5
 	if result["sign_type"] != nil {
 		signType = result["sign_type"].(string)
 	}
@@ -130,11 +129,11 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	if wxPayConfig.IsProd() {
 		sign = wxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
 	} else {
-		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), SignTypeMD5)
+		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), signTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
-		sign = wxPayLocalSign(result, SignTypeMD5, key)
+		sign = wxPayLocalSign(result, signTypeMD5, key)
 	}
 	// 验证
 	if targetSign != sign {
@@ -153,7 +152,7 @@ func WxPayH5Sign(appId, nonceStr, packages, signType, timeStamp, apiKey string) 
 	signStr := buffer.String()
 	// 加密签名
 	var hashSign []byte
-	if signType == SignTypeHmacSHA256 {
+	if signType == signTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
 		hash.Write([]byte(signStr))
 		hashSign = hash.Sum(nil)
@@ -176,7 +175,7 @@ func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, api
 	// 加密签名
 	signStr := buffer.String()
 	var hashSign []byte
-	if signType == SignTypeHmacSHA256 {
+	if signType == signTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
 		hash.Write([]byte(signStr))
 		hashSign = hash.Sum(nil)
@@ -201,7 +200,7 @@ func WxPayAPPTicketSign(nonceStr, ticket, timeStamp, url string) (ticketSign str
 	return
 }
 
-// 获取根据Key排序后的请求参数字符串
+//wxPayAPPsortSignParams 获取根据Key排序后的请求参数字符串
 func wxPayAPPsortSignParams(nonceStr, ticket, timeStamp, url string) string {
 	body := make(map[string]interface{})
 	body["noncestr"] = nonceStr

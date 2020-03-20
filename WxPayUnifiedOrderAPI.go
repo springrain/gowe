@@ -49,7 +49,7 @@ type WxPayUnifiedOrderBody struct {
 	SceneInfoModel *WxPaySceneInfoModel `json:"-"`
 }
 
-// 统一下单的返回值
+//WxPayUnifiedOrderResponse 统一下单的返回值
 type WxPayUnifiedOrderResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时

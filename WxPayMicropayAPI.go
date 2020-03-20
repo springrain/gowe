@@ -23,7 +23,7 @@ func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMic
 	return &wxRsp, err
 }
 
-// 提交付款码支付的参数
+//WxPayMicropayBody 付款码支付的参数
 type WxPayMicropayBody struct {
 	SignType       string `json:"sign_type,omitempty"`   // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	DeviceInfo     string `json:"device_info,omitempty"` // 终端设备号(商户自定义,如门店编号)
@@ -45,7 +45,7 @@ type WxPayMicropayBody struct {
 	SceneInfo *WxPaySceneInfoModel `json:"-"`
 }
 
-// 提交付款码支付的返回值
+//WxPayMicropayResponse 付款码支付的返回值
 type WxPayMicropayResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时

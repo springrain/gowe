@@ -19,13 +19,13 @@ func WxPayReverseMicroOrder(wxPayConfig IWxPayConfig, body *WxPayReverseMicroOrd
 	return &wxRsp, err
 }
 
-// 撤销订单的参数
+//WxPayReverseMicroOrderBody 撤销订单的参数
 type WxPayReverseMicroOrderBody struct {
 	TransactionId string `json:"transaction_id,omitempty"` // 微信支付订单号
 	OutTradeNo    string `json:"out_trade_no"`             // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*@ ,且在同一个商户号下唯一.
 }
 
-// 撤销订单的返回值
+//WxPayReverseMicroOrderResponse 撤销订单的返回值
 type WxPayReverseMicroOrderResponse struct {
 	WxResponseModel
 	WxPayServiceResponseModel
