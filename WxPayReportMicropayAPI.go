@@ -6,12 +6,12 @@ import "encoding/xml"
 func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody) (*WxResponseModel, error) {
 	// 处理参数
 	var err error
-	if body.InterfaceUrl, err = escapedPath(WxMpPayMchAPIURL + "/pay/batchreport/micropay/total"); err != nil {
+	if body.InterfaceUrl, err = escapedPath(WxPayMchAPIURL + "/pay/batchreport/micropay/total"); err != nil {
 		return nil, err
 	}
 	body.TradesStr = jsonString(body.Trades)
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/payitil/report", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/payitil/report", body)
 	if err != nil {
 		return nil, err
 

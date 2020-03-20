@@ -5,7 +5,7 @@ import "encoding/xml"
 //WxPayReverseMicroOrder 撤销付款码订单 https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11&index=3
 func WxPayReverseMicroOrder(wxPayConfig IWxPayConfig, body *WxPayReverseMicroOrderBody) (*WxPayReverseMicroOrderResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/secapi/pay/reverse", body)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxPayMchAPIURL+"/secapi/pay/reverse", body)
 	if err != nil {
 		return nil, err
 	}

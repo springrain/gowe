@@ -8,7 +8,7 @@ import (
 //WxPayDownloadBill 下载对账单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_6
 func WxPayDownloadBill(wxPayConfig IWxPayConfig, body *WxPayDownloadBillBody) (*WxPayDownloadBillResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/downloadbill", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/downloadbill", body)
 	if err != nil {
 		return nil, err
 	}

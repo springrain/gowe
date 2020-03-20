@@ -4,9 +4,10 @@ package gowe
 var WxMpAPIURL = "https://api.weixin.qq.com"
 var WxMpWeiXinURL = "https://mp.weixin.qq.com"
 var WxMpOpenURL = "https://open.weixin.qq.com"
-var WxMpPayMchAPIURL = "https://api.mch.weixin.qq.com"
-var WxMpPaySanBoxAPIURL = "https://api.mch.weixin.qq.com/sandboxnew"
-var WxqyAPIURL = "https://qyapi.weixin.qq.com"
+var WxQyAPIURL = "https://qyapi.weixin.qq.com"
+
+var WxPayMchAPIURL = "https://api.mch.weixin.qq.com"
+var WxPaySanBoxAPIURL = "https://api.mch.weixin.qq.com/sandboxnew"
 var WxPayReporMchtURL = "http://report.mch.weixin.qq.com"
 var WxPayAppURL = "https://payapp.weixin.qq.com"
 

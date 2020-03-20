@@ -13,7 +13,7 @@ import (
 //WxPayQueryRefund 查询退款
 func WxPayQueryRefund(wxPayConfig IWxPayConfig, body *WxPayQueryRefundBody) (*WxPayQueryRefundResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/refundquery", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/refundquery", body)
 	if err != nil {
 		return nil, err
 	}

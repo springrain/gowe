@@ -8,7 +8,7 @@ import "encoding/xml"
 //WxPayPromotionMktTransfers 企业付款到零钱(前提用户必须关注公众号)
 func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body *WxPayPromotionMktTransfersBody) (*WxPayPromotionMktTransfersResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/mmpaymkttransfers/promotion/transfers", body)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxPayMchAPIURL+"/mmpaymkttransfers/promotion/transfers", body)
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +22,7 @@ func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body *WxPayPromotionMk
 //WxPayQueryMktTransfer 企业付款到零钱的查询
 func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body *WxPayQueryMktTransferBody) (*WxPayQueryMktTransferResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/mmpaymkttransfers/gettransferinfo", body)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxPayMchAPIURL+"/mmpaymkttransfers/gettransferinfo", body)
 	if err != nil {
 		return nil, err
 	}
