@@ -9,10 +9,10 @@ golang微信SDK,[readygo](https://gitee.com/chunanyong/readygo)子项目  [API�
 go get gitee.com/chunanyong/gowe 
 ```
 * 支持境内普通商户和境内服务商(境外和银行服务商没有条件测试)
-* 全部参数和返回值均使用`struct`类型传递，而不是`map`类型
+* 全部参数和返回值均使用`struct`类型传递
 * 缓存前置,使用项目现有的缓存体系  
 * 原生支持多微信号  
-* 支持请求微信域名跳板,例如Nginx做反向代理,内网服务器没有出口权限,需要Nginx进行跳板访问  
+* 支持请求微信API服务跳板,例如内网服务器没有网络出口权限,可以使用Nginx跳板请求微信API服务 
 * 原生支持集群部署  
 
 ### 初始化
