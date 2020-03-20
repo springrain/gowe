@@ -3,6 +3,8 @@
 #### 介绍
 golang微信SDK,[readygo](https://gitee.com/chunanyong/readygo)子项目  [API文档](https://pkg.go.dev/gitee.com/chunanyong/gowe?tab=doc)  
 
+感谢https://gitee.com/xiaochengtech/wechat提供的基础代码
+
 
 ``` 
 go get gitee.com/chunanyong/gowe 
