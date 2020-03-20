@@ -53,7 +53,7 @@ func (w wxconfig) GetSecret() string {
 
 ### 使用
 
-以下是通用的接口，使用上面初始化时生成的实例`client`进行相应函数的调用。其中带有`(*Client)`字样的接口，需要使用`wechat.NewClient`创建的实例对象来调用，而不带的接口，则可以直接使用`wechat.XXX`调用。
+以下是通用的接口，可以直接使用`gowe.XXX`调用。
 
 使用样例：
 
@@ -94,10 +94,10 @@ func TestGetAccessToken(t *testing.T)  {
 
 #### 微信公众号
 
-*  授权码查询OpenId：`(*Client) OpenIdByAuthCode`。
+*  授权码查询OpenId：``。
 * 获取基础支持的AccessToken：`WxMpWebAuthAccessToken`。
 * 获取用户基本信息(UnionId机制)：`WxMpGetUserInfo`。
-* 获取H5支付签名：`GetH5PaySign`。
+* 获取H5支付签名：`WxPayH5Sign`。
 
 #### 微信小程序
 
