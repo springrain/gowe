@@ -13,7 +13,7 @@ import (
 type SessionKey struct {
 	OpenId     string `json:"openid"`      // 用户唯一标识
 	SessionKey string `json:"session_key"` // 会话密钥
-	UnionId    string `json:"unionid"`     // 只有在用户将公众号绑定到微信开放平台帐号后，才会出现该字段。
+	UnionId    string `json:"unionid"`     // 只有在用户将公众号绑定到微信开放平台帐号后,才会出现该字段.
 	ErrCode    int    `json:"errcode"`     // 错误码
 	ErrMsg     string `json:"errmsg"`      // 错误信息
 }
@@ -33,7 +33,7 @@ func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (sessionKey Session
 	return sessionKey, err
 }
 
-//WxMaAuthGetPaidUnionId 用户支付完成后，获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
+//WxMaAuthGetPaidUnionId 用户支付完成后,获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
 func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (res WxMaAuthGetPaidUnionIdResponse, err error) {
 	if len(openId) < 1 {
 		return res, errors.New("openId不能为空")
@@ -52,7 +52,7 @@ func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (res WxMaAuth
 }
 
 type WxMaAuthGetPaidUnionIdResponse struct {
-	Unionid string `json:"unionid"` // 用户唯一标识，调用成功后返回
+	Unionid string `json:"unionid"` // 用户唯一标识,调用成功后返回
 	ErrCode int    `json:"errcode"` // 错误码
 	ErrMsg  string `json:"errmsg"`  // 错误信息
 }

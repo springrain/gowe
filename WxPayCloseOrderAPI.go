@@ -22,8 +22,8 @@ func WxPayCloseOrder(wxPayConfig IWxPayConfig, body WxPayCloseOrderBody) (wxRsp 
 
 //WxPayCloseOrderBody 关闭订单的参数
 type WxPayCloseOrderBody struct {
-	SignType   string `json:"sign_type,omitempty"` // 签名类型，目前支持HMAC-SHA256和MD5，默认为MD5
-	OutTradeNo string `json:"out_trade_no"`        // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*且在同一个商户号下唯一。详见商户订单号
+	SignType   string `json:"sign_type,omitempty"` // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
+	OutTradeNo string `json:"out_trade_no"`        // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*且在同一个商户号下唯一.详见商户订单号
 }
 
 //WxPayCloseOrderResponse 关闭订单的返回值

@@ -46,7 +46,7 @@ type IWxPayConfig interface {
 	//支付的mchId
 	GetMchId() string
 	GetSubAppId() string // 微信分配的子商户公众账号ID
-	GetSubMchId() string // 微信支付分配的子商户号，开发者模式下必填
+	GetSubMchId() string // 微信支付分配的子商户号,开发者模式下必填
 	//获取 API 密钥
 	GetAPIKey() string
 	//支付通知回调的地址

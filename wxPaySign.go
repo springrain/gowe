@@ -51,8 +51,8 @@ func wxPaySortSignParams(body map[string]interface{}, apiKey string) string {
 
 // 获取沙盒签名Key的返回值
 type getSignKeyResponse struct {
-	ReturnCode     string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识，非交易标识，交易是否成功需要查看result_code来判断
-	ReturnMsg      string `xml:"return_msg"`  // 返回信息，如非空，为错误原因：签名失败/参数格式校验错误
+	ReturnCode     string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识,非交易标识,交易是否成功需要查看result_code来判断
+	ReturnMsg      string `xml:"return_msg"`  // 返回信息,如非空,为错误原因：签名失败/参数格式校验错误
 	RetMsg         string `xml:"retmsg"`      // 沙盒时返回的错误信息
 	Retcode        string `xml:"retcode"`
 	MchId          string `xml:"mch_id"`
@@ -66,7 +66,7 @@ func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string
 	body["nonce_str"] = nonceStr
 	// 计算沙箱参数Sign
 	sanboxSign := wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
-	// 沙箱环境：获取key后，重新计算Sign
+	// 沙箱环境：获取key后,重新计算Sign
 	key, err = getSandBoxSignKey(wxPayConfig.GetMchId(), nonceStr, sanboxSign)
 	return
 }
@@ -107,7 +107,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	if retCode != ResponseSuccess && breakWhenFail {
 		return
 	}
-	// 遍历所有Tag，生成Map和Sign
+	// 遍历所有Tag,生成Map和Sign
 	result, targetSign := make(map[string]interface{}), ""
 	for _, elem := range root.ChildElements() {
 		// 跳过空值
@@ -143,7 +143,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	return
 }
 
-//WxPayH5Sign JSAPI支付，统一下单获取支付参数后，再次计算出微信内H5支付需要用的paySign
+//WxPayH5Sign JSAPI支付,统一下单获取支付参数后,再次计算出微信内H5支付需要用的paySign
 func WxPayH5Sign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
 	// 原始字符串
 	raw := fmt.Sprintf("appId=%s&nonceStr=%s&package=%s&signType=%s&timeStamp=%s&key=%s",
@@ -166,7 +166,7 @@ func WxPayH5Sign(appId, nonceStr, packages, signType, timeStamp, apiKey string) 
 	return
 }
 
-//WxPayAppSign APP支付，统一下单获取支付参数后，再次计算APP支付所需要的的sign
+//WxPayAppSign APP支付,统一下单获取支付参数后,再次计算APP支付所需要的的sign
 func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, apiKey string) (paySign string) {
 	// 原始字符串
 	raw := fmt.Sprintf("appId=%s&nonceStr=%s&package==Sign=WXPay&partnerid=%s&prepayid=%s&timeStamp=%s&key=%s",

@@ -27,11 +27,11 @@ func WxPayRefund(wxPayConfig IWxPayConfig, body WxPayRefundBody) (wxRsp WxPayRef
 // 申请退款的参数
 type WxPayRefundBody struct {
 	TransactionId string `json:"transaction_id"`            // 微信支付订单号
-	OutTradeNo    string `json:"out_trade_no"`              // 商户系统内部订单号，要求32个字符内，只能是数字、大小写字母_-|*@ ，且在同一个商户号下唯一。
-	OutRefundNo   string `json:"out_refund_no"`             // 商户系统内部的退款单号，商户系统内部唯一，只能是数字、大小写字母_-|*@ ，同一退款单号多次请求只退一笔。
-	TotalFee      int    `json:"total_fee"`                 // 订单总金额，单位为分，只能为整数，详见支付金额
-	RefundFee     int    `json:"refund_fee"`                // 退款总金额，单位为分，只能为整数，可部分退款。详见支付金额
-	RefundFeeType string `json:"refund_fee_type,omitempty"` // 退款货币类型，需与支付一致，或者不填。符合ISO 4217标准的三位字母代码，默认人民币：CNY
+	OutTradeNo    string `json:"out_trade_no"`              // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*@ ,且在同一个商户号下唯一.
+	OutRefundNo   string `json:"out_refund_no"`             // 商户系统内部的退款单号,商户系统内部唯一,只能是数字、大小写字母_-|*@ ,同一退款单号多次请求只退一笔.
+	TotalFee      int    `json:"total_fee"`                 // 订单总金额,单位为分,只能为整数,详见支付金额
+	RefundFee     int    `json:"refund_fee"`                // 退款总金额,单位为分,只能为整数,可部分退款.详见支付金额
+	RefundFeeType string `json:"refund_fee_type,omitempty"` // 退款货币类型,需与支付一致,或者不填.符合ISO 4217标准的三位字母代码,默认人民币：CNY
 	RefundDesc    string `json:"refund_desc,omitempty"`     // 现退款原因
 	RefundAccount string `json:"refund_account,omitempty"`  // 退款资金来源(见constatnt定义)
 	NotifyUrl     string `json:"notify_url,omitempty"`      // 异步接收微信支付退款结果通知的回调地址

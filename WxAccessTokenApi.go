@@ -9,7 +9,7 @@ import (
  * 认证并获取 access_token API
  * https://developers.weixin.qq.com/doc/offiaccount/WeChat_Invoice/Nontax_Bill/API_list.html
  * <p>
- * 生成签名之前必须先了解一下jsapi_ticket，jsapi_ticket是公众号用于调用微信JS接口的临时票据
+ * 生成签名之前必须先了解一下jsapi_ticket,jsapi_ticket是公众号用于调用微信JS接口的临时票据
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDKs.html#62
  * <p>
@@ -20,7 +20,7 @@ import (
 //WxAccessToken 微信accessToken
 type WxAccessToken struct {
 	AccessToken            string `json:"access_token"`  // 获取到的凭证
-	ExpiresIn              int    `json:"expires_in"`    // SessionKey超时时间（秒）
+	ExpiresIn              int    `json:"expires_in"`    // SessionKey超时时间(秒)
 	RefreshToken           string `json:"refresh_token"` // 用户刷新access_tokenOpenId
 	OpenId                 string `json:"openid"`        // 用户唯一标识
 	Scope                  string `json:"scope"`         // 用户授权的作用域
@@ -37,7 +37,7 @@ func (wxAccessToken *WxAccessToken) IsAccessTokenExpired() bool {
 //WxCardTicket 微信卡券Ticket
 type WxCardTicket struct {
 	CardTicket            string `json:"ticket"`     // 获取到的凭证
-	ExpiresIn             int    `json:"expires_in"` // SessionKey超时时间（秒）
+	ExpiresIn             int    `json:"expires_in"` // SessionKey超时时间(秒)
 	ErrCode               int    `json:"errcode"`    // 错误码
 	ErrMsg                string `json:"errmsg"`     // 错误信息
 	CardTicketExpiresTime int64
@@ -51,7 +51,7 @@ func (wxCardTicket *WxCardTicket) IsCardTicketExpired() bool {
 //WxJsTicket 微信WxJsTicket
 type WxJsTicket struct {
 	JsTicket            string `json:"ticket"`     // 获取到的凭证
-	ExpiresIn           int    `json:"expires_in"` // SessionKey超时时间（秒）
+	ExpiresIn           int    `json:"expires_in"` // SessionKey超时时间(秒)
 	ErrCode             int    `json:"errcode"`    // 错误码
 	ErrMsg              string `json:"errmsg"`     // 错误信息
 	JsTicketExpiresTime int64
@@ -62,7 +62,7 @@ func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
 	return time.Now().Unix() > wxJsTicket.JsTicketExpiresTime
 }
 
-//GetAccessToken 获取 access token，如果未取到或者 access token 不可用则先更新再获取
+//GetAccessToken 获取 access token,如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
 	body, err := httpGet(apiurl)
