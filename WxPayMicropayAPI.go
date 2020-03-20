@@ -6,7 +6,7 @@ import "encoding/xml"
 func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMicropayResponse, error) {
 	// 处理参数
 	if body.SceneInfo != nil {
-		body.SceneInfoStr = JsonString(body.SceneInfo)
+		body.SceneInfoStr = jsonString(body.SceneInfo)
 	}
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/micropay", body)

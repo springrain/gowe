@@ -6,7 +6,7 @@ import "encoding/xml"
 func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*WxPayUnifiedOrderResponse, error) {
 	// 处理参数
 	if body.SceneInfoModel != nil {
-		body.SceneInfo = JsonString(*body.SceneInfoModel)
+		body.SceneInfo = jsonString(*body.SceneInfoModel)
 	}
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/unifiedorder", body)

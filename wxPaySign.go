@@ -76,7 +76,7 @@ func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, 
 	params["mch_id"] = mchId
 	params["nonce_str"] = nonceStr
 	params["sign"] = sign
-	paramXml := GenerateXml(params)
+	paramXml := generateXml(params)
 	bytes, err := httpPostXml(WxMpPaySanBoxAPIURL+"/pay/getsignkey", paramXml)
 	if err != nil {
 		return

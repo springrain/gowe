@@ -110,7 +110,7 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 		body["sub_appid"] = wxPayConfig.GetSubAppId()
 		body["sub_mch_id"] = wxPayConfig.GetSubMchId()
 	}
-	nonceStr := GetRandomString(32)
+	nonceStr := getRandomString(32)
 	body["nonce_str"] = nonceStr
 	// 生成签名
 	signType, _ := body["sign_type"].(string)
@@ -139,8 +139,8 @@ func isWxPayFacilitator(serviceType int) bool {
 	}
 }
 
-//GenerateXml 生成请求XML的Body体
-func GenerateXml(data map[string]interface{}) string {
+//generateXml 生成请求XML的Body体
+func generateXml(data map[string]interface{}) string {
 	buffer := new(bytes.Buffer)
 	buffer.WriteString("<xml>")
 	for k, v := range data {
@@ -150,19 +150,19 @@ func GenerateXml(data map[string]interface{}) string {
 	return buffer.String()
 }
 
-//JsonString 生成模型字符串
-func JsonString(m interface{}) string {
+//jsonString 生成模型字符串
+func jsonString(m interface{}) string {
 	bs, _ := json.Marshal(m)
 	return string(bs)
 }
 
-//FormatDateTime 格式化时间,按照yyyyMMddHHmmss格式
-func FormatDateTime(t time.Time) string {
+//formatDateTime 格式化时间,按照yyyyMMddHHmmss格式
+func formatDateTime(t time.Time) string {
 	return t.Format("20060102150405")
 }
 
-//EscapedPath 对URL进行Encode编码
-func EscapedPath(u string) (path string, err error) {
+//escapedPath 对URL进行Encode编码
+func escapedPath(u string) (path string, err error) {
 	uriObj, err := url.Parse(u)
 	if err != nil {
 		return
@@ -171,22 +171,22 @@ func EscapedPath(u string) (path string, err error) {
 	return
 }
 
-//PKCS7UnPadding 解密填充模式(去除补全码) PKCS7UnPadding 解密时,需要在最后面去掉加密时添加的填充byte
-func PKCS7UnPadding(plainText []byte) []byte {
+//pkcs7UnPadding 解密填充模式(去除补全码) pkcs7UnPadding 解密时,需要在最后面去掉加密时添加的填充byte
+func pkcs7UnPadding(plainText []byte) []byte {
 	length := len(plainText)
 	unpadding := int(plainText[length-1])   // 找到Byte数组最后的填充byte
 	return plainText[:(length - unpadding)] // 只截取返回有效数字内的byte数组
 }
 
-//IsValidAuthCode 18位纯数字,以10、11、12、13、14、15开头
-func IsValidAuthCode(authcode string) (ok bool) {
+//isValidAuthCode 18位纯数字,以10、11、12、13、14、15开头
+func isValidAuthCode(authcode string) (ok bool) {
 	pattern := "^1[0-5][0-9]{16}$"
 	ok, _ = regexp.MatchString(pattern, authcode)
 	return
 }
 
-//GetRandomString 获取随机字符串
-func GetRandomString(length int) string {
+//getRandomString 获取随机字符串
+func getRandomString(length int) string {
 	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 	b := []byte(str)
 	var result []byte
@@ -205,7 +205,7 @@ func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{})
 		return
 	}
 	// 发起请求
-	bytes, err = httpPostXml(apiurl, GenerateXml(body))
+	bytes, err = httpPostXml(apiurl, generateXml(body))
 	return
 }
 
@@ -222,7 +222,7 @@ func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj inte
 		return nil, err
 	}
 	// 发起请求
-	bytes, err := httpPostXmlWithCert(apiurl, GenerateXml(body), client)
+	bytes, err := httpPostXmlWithCert(apiurl, generateXml(body), client)
 	return bytes, err
 }
 
