@@ -1,15 +1,5 @@
 package gowe
 
-// 微信API的服务器域名,方便处理请求代理跳转的情况
-var WxMpAPIURL = "https://api.weixin.qq.com"
-var WxMpWeiXinURL = "https://mp.weixin.qq.com"
-var WxMpOpenURL = "https://open.weixin.qq.com"
-var WxMpPayMchAPIURL = "https://api.mch.weixin.qq.com"
-var WxMpPaySanBoxAPIURL = "https://api.mch.weixin.qq.com/sandboxnew"
-var WxqyAPIURL = "https://qyapi.weixin.qq.com"
-var WxPayReporMchtURL = "http://report.mch.weixin.qq.com"
-var WxPayAppURL = "https://payapp.weixin.qq.com"
-
 //IWxConfig 微信的基础配置
 type IWxConfig interface {
 	//Id 数据库记录的Id

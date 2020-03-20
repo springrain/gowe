@@ -61,7 +61,7 @@ type getSignKeyResponse struct {
 
 // 获取沙盒的签名
 func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string) (key string, err error) {
-	body := make(BodyMap)
+	body := make(map[string]interface{})
 	body["mch_id"] = wxPayConfig.GetMchId()
 	body["nonce_str"] = nonceStr
 	// 计算沙箱参数Sign
