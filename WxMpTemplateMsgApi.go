@@ -52,7 +52,7 @@ type WxMpTemplateMsgSendBody struct {
 	MaAppid         string                 `json:"-"`                          //需要跳转的小程序APPID
 	MaPagepath      string                 `json:"-"`                          //所需跳转到小程序的具体页面路径,支持带参数,(示例index?foo=bar),要求该小程序已发布,暂不支持小游戏
 	Page            string                 `json:"page,omitempty"`             // 点击模板卡片后的跳转页面,仅限本小程序内的页面.支持带参数,(示例index?foo=bar).该字段不填则模板无跳转.
-	FormId          string                 `json:"form_id"`                    //表单提交场景下,为 submit 事件带上的 formId；支付场景下,为本次支付的 prepay_id
+	FormId          string                 `json:"form_id"`                    //表单提交场景下,为 submit 事件带上的 formId;支付场景下,为本次支付的 prepay_id
 	EmphasisKeyword string                 `json:"emphasis_keyword,omitempty"` // 模板需要放大的关键词,不填则默认无放大
 	dataMap         map[string]interface{} `json:"-"`                          //模板数据
 }

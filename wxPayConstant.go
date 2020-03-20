@@ -111,8 +111,8 @@ const (
 	ErrCodeLackParams           = "LACK_PARAMS"           // 缺少参数 支付确认失败 缺少必要的请求参数 请检查参数是否齐全
 	ErrCodeMchIdNotExist        = "MCHID_NOT_EXIST"       // MCHID不存在 支付确认失败 参数中缺少MCHID 请检查MCHID是否正确
 	ErrCodeNoAuth               = "NOAUTH"                // 商户无权限 支付确认失败 商户没有开通被扫支付权限 请开通商户号权限.请联系产品或商务申请
-	ErrCodeNotEnough            = "NOTENOUGH"             // 余额不足 支付确认失败 用户的零钱余额不足 请收银员提示用户更换当前支付的卡,然后请收银员重新扫码.建议：商户系统返回给收银台的提示为“用户余额不足.提示用户换卡支付”
-	ErrCodeNotSuportCard        = "NOTSUPORTCARD"         // 不支持卡类型 支付确认失败 用户使用卡种不支持当前支付形式 请用户重新选择卡种 建议：商户系统返回给收银台的提示为“该卡不支持当前支付,提示用户换卡支付或绑新卡支付”
+	ErrCodeNotEnough            = "NOTENOUGH"             // 余额不足 支付确认失败 用户的零钱余额不足 请收银员提示用户更换当前支付的卡,然后请收银员重新扫码.建议:商户系统返回给收银台的提示为“用户余额不足.提示用户换卡支付”
+	ErrCodeNotSuportCard        = "NOTSUPORTCARD"         // 不支持卡类型 支付确认失败 用户使用卡种不支持当前支付形式 请用户重新选择卡种 建议:商户系统返回给收银台的提示为“该卡不支持当前支付,提示用户换卡支付或绑新卡支付”
 	ErrCodeNotUtf8              = "NOT_UTF8"              // 编码格式错误 支付确认失败 未使用指定编码格式 请使用UTF-8编码格式
 	ErrCodeOrderClosed          = "ORDERCLOSED"           // 订单已关闭 支付确认失败 该订单已关 商户订单号异常,请重新下单支付
 	ErrCodeOrderPaid            = "ORDERPAID"             // 订单已支付 支付确认失败 订单号重复 请确认该订单号是否重复支付,如果是新单,请使用新订单号提交
@@ -120,7 +120,7 @@ const (
 	ErrCodeOutTradeNoUsed       = "OUT_TRADE_NO_USED"     // 商户订单号重复 支付确认失败 同一笔交易不能多次提交 请核实商户订单号是否重复提交
 	ErrCodeParamError           = "PARAM_ERROR"           // 参数错误 支付确认失败 请求参数未按指引进行填写 请根据接口返回的详细信息检查您的程序
 	ErrCodePostDataEmpty        = "POST_DATA_EMPTY"       // post数据为空 post数据不能为空 请检查post数据是否为空
-	ErrCodeRefundNotExist       = "REFUNDNOTEXIST"        // 退款订单查询失败 订单号错误或订单状态不正确 请检查订单号是否有误以及订单状态是否正确,如：未支付、已支付未退款
+	ErrCodeRefundNotExist       = "REFUNDNOTEXIST"        // 退款订单查询失败 订单号错误或订单状态不正确 请检查订单号是否有误以及订单状态是否正确,如:未支付、已支付未退款
 	ErrCodeRequirePostMethod    = "REQUIRE_POST_METHOD"   // 请使用post方法 支付确认失败 未使用post传递参数 请检查请求参数是否通过post方法提交
 	ErrCodeSignError            = "SIGNERROR"             // 签名错误 支付确认失败 参数签名结果不正确 请检查签名参数和方法是否都符合签名算法要求
 	ErrCodeSystemError          = "SYSTEMERROR"           // 接口返回错误 支付结果未知 系统超时 请立即调用被扫订单结果查询API,查询当前订单状态,并根据订单的状态决定下一步的操作.

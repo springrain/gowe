@@ -46,9 +46,9 @@ type WxPayNotifyPayBody struct {
 	TradeType          string `xml:"trade_type"`           // 交易类型
 	BankType           string `xml:"bank_type"`            // 银行类型,采用字符串类型的银行标识,银行类型见附表
 	TotalFee           int    `xml:"total_fee"`            // 订单总金额,单位为分
-	FeeType            string `xml:"fee_type"`             // 货币类型,符合ISO 4217标准的三位字母代码,默认人民币：CNY,其他值列表详见货币类型
+	FeeType            string `xml:"fee_type"`             // 货币类型,符合ISO 4217标准的三位字母代码,默认人民币:CNY,其他值列表详见货币类型
 	CashFee            int    `xml:"cash_fee"`             // 现金支付金额订单现金支付金额,详见支付金额
-	CashFeeType        string `xml:"cash_fee_type"`        // 货币类型,符合ISO 4217标准的三位字母代码,默认人民币：CNY,其他值列表详见货币类型
+	CashFeeType        string `xml:"cash_fee_type"`        // 货币类型,符合ISO 4217标准的三位字母代码,默认人民币:CNY,其他值列表详见货币类型
 	SettlementTotalFee int    `xml:"settlement_total_fee"` // 应结订单金额=订单金额-非充值代金券金额,应结订单金额<=订单金额.
 	CouponFee          int    `xml:"coupon_fee"`           // 代金券或立减优惠金额<=订单总金额,订单总金额-代金券或立减优惠金额=现金支付金额,详见支付金额
 	CouponCount        int    `xml:"coupon_count"`         // 代金券或立减优惠使用数量

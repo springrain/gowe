@@ -35,7 +35,7 @@ func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body WxPayQueryMktTransferB
 type WxPayPromotionMktTransfersBody struct {
 	DeviceInfo     string `json:"device_info,omitempty"`  // 终端设备号
 	PartnerTradeNo string `json:"partner_trade_no"`       // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*且在同一个商户号下唯一.详见商户订单号
-	OpenId         string `json:"openid"`                 // 商品或支付单简要描述,格式要求：门店品牌名-城市分店名-实际商品名称
+	OpenId         string `json:"openid"`                 // 商品或支付单简要描述,格式要求:门店品牌名-城市分店名-实际商品名称
 	CheckName      string `json:"check_name"`             // 校验用户姓名选项(见constant定义)
 	ReUserName     string `json:"re_user_name,omitempty"` // 收款用户姓名
 	Amount         int    `json:"amount"`                 // 企业找零金额,单位为分
