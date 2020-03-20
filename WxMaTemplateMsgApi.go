@@ -4,18 +4,18 @@ import "encoding/json"
 
 //WxMaTemplateMsgSend 发送模板消息
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/template-message/templateMessage.send.html
-func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body WxMaTemplateMsgSendBody) (res ResponseBase, err error) {
+func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) (*ResponseBase, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/message/wxopen/template/send?access_token=" + wxMaConfig.GetAccessToken()
 
 	// 参数处理
 	bodyStr, err := json.Marshal(body)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	params := make(map[string]interface{})
 	if err = json.Unmarshal(bodyStr, &params); err != nil {
-		return
+		return nil, err
 	}
 
 	if body.dataMap != nil {
@@ -25,12 +25,13 @@ func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body WxMaTemplateMsgSendBody) (
 	data, err := httpPost(apiurl, params)
 	// 发送请求
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 	// 尝试解码
-	_ = json.Unmarshal(data, &res)
+	res := ResponseBase{}
+	err = json.Unmarshal(data, &res)
 
-	return res, nil
+	return &res, err
 }
 
 type WxMaTemplateMsgSendBody struct {
@@ -43,7 +44,7 @@ type WxMaTemplateMsgSendBody struct {
 }
 
 //AddData 模板内容,不填则下发空模板.具体格式请参考示例.
-func (wxMaTemplateMsg WxMaTemplateMsgSendBody) AddData(key string, value string) {
+func (wxMaTemplateMsg *WxMaTemplateMsgSendBody) AddData(key string, value string) {
 	if wxMaTemplateMsg.dataMap == nil {
 		wxMaTemplateMsg.dataMap = make(map[string]interface{})
 	}

@@ -6,29 +6,31 @@ import "encoding/xml"
 //https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_1
 
 //WxPayPromotionMktTransfers 企业付款到零钱(前提用户必须关注公众号)
-func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body WxPayPromotionMktTransfersBody) (wxRsp WxPayPromotionMktTransfersResponse, err error) {
+func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body *WxPayPromotionMktTransfersBody) (*WxPayPromotionMktTransfersResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/mmpaymkttransfers/promotion/transfers", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 不返回sign不需要校验
 	// 解析返回值
+	wxRsp := WxPayPromotionMktTransfersResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 //WxPayQueryMktTransfer 企业付款到零钱的查询
-func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body WxPayQueryMktTransferBody) (wxRsp WxPayQueryMktTransferResponse, err error) {
+func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body *WxPayQueryMktTransferBody) (*WxPayQueryMktTransferResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/mmpaymkttransfers/gettransferinfo", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 不返回sign不需要校验
 	// 解析返回值
+	wxRsp := WxPayQueryMktTransferResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 // 微信找零的参数

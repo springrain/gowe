@@ -3,19 +3,20 @@ package gowe
 import "encoding/xml"
 
 //WxPayReverseMicroOrder 撤销付款码订单 https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_11&index=3
-func WxPayReverseMicroOrder(wxPayConfig IWxPayConfig, body WxPayReverseMicroOrderBody) (wxRsp WxPayReverseMicroOrderResponse, err error) {
+func WxPayReverseMicroOrder(wxPayConfig IWxPayConfig, body *WxPayReverseMicroOrderBody) (*WxPayReverseMicroOrderResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/secapi/pay/reverse", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 结果校验
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
+	wxRsp := WxPayReverseMicroOrderResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 // 撤销订单的参数

@@ -3,7 +3,7 @@ package gowe
 import "encoding/xml"
 
 //WxPayUnifiedOrder 统一下单
-func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body WxPayUnifiedOrderBody) (*WxPayUnifiedOrderResponse, error) {
+func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*WxPayUnifiedOrderResponse, error) {
 	// 处理参数
 	if body.SceneInfoModel != nil {
 		body.SceneInfo = JsonString(*body.SceneInfoModel)

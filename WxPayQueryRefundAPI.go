@@ -11,21 +11,20 @@ import (
 //退款查询 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_5
 
 //WxPayQueryRefund 查询退款
-func WxPayQueryRefund(wxPayConfig IWxPayConfig, body WxPayQueryRefundBody) (wxRsp WxPayQueryRefundResponse, err error) {
+func WxPayQueryRefund(wxPayConfig IWxPayConfig, body *WxPayQueryRefundBody) (*WxPayQueryRefundResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/refundquery", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 结果校验
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
+		return nil, err
 	}
-	// 常规解析
-	if err = wxPayQueryRefundParseResponse(bytes, &wxRsp); err != nil {
-		return
-	}
-	return
+	// 解析返回值
+	wxRsp := WxPayQueryRefundResponse{}
+	err = wxPayQueryRefundParseResponse(bytes, &wxRsp)
+	return &wxRsp, err
 }
 
 // 查询退款的参数

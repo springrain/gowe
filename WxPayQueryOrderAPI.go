@@ -9,21 +9,20 @@ import (
 //查询支付订单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_2
 
 // 查询订单
-func WxPayQueryOrder(wxPayConfig IWxPayConfig, body WxPayQueryOrderBody) (wxRsp WxPayQueryOrderResponse, err error) {
+func WxPayQueryOrder(wxPayConfig IWxPayConfig, body *WxPayQueryOrderBody) (*WxPayQueryOrderResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/orderquery", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 结果校验
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
-	if err = wxPayQueryOrderParseResponse(bytes, &wxRsp); err != nil {
-		return
-	}
-	return
+	wxRsp := WxPayQueryOrderResponse{}
+	err = wxPayQueryOrderParseResponse(bytes, &wxRsp)
+	return &wxRsp, err
 }
 
 // 查询订单的参数

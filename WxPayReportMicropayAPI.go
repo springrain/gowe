@@ -3,20 +3,23 @@ package gowe
 import "encoding/xml"
 
 //WxPayReportMicropay 交易保障(MICROPAY) https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_14&index=8
-func WxPayReportMicropay(wxPayConfig IWxPayConfig, body WxPayReportMicropayBody) (wxRsp WxPayReportMicropayResponse, err error) {
+func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody) (*WxPayReportMicropayResponse, error) {
 	// 处理参数
+	var err error
 	if body.InterfaceUrl, err = EscapedPath(WxMpPayMchAPIURL + "/pay/batchreport/micropay/total"); err != nil {
-		return
+		return nil, err
 	}
 	body.TradesStr = JsonString(body.Trades)
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/payitil/report", body)
 	if err != nil {
-		return
+		return nil, err
+
 	}
 	// 解析返回值
+	wxRsp := WxPayReportMicropayResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 // 交易保障(MICROPAY)的参数

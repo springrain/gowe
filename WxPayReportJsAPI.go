@@ -3,19 +3,21 @@ package gowe
 import "encoding/xml"
 
 //WxPayReportJsApi  交易保障(JSAPI) https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_8&index=9
-func WxPayReportJsApi(wxPayConfig IWxPayConfig, body WxPayReportJsApiBody) (wxRsp WxPayReportJsApiResponse, err error) {
+func WxPayReportJsApi(wxPayConfig IWxPayConfig, body *WxPayReportJsApiBody) (*WxPayReportJsApiResponse, error) {
+	var err error
 	// 处理参数
 	if body.InterfaceUrl, err = EscapedPath(body.InterfaceUrl); err != nil {
-		return
+		return nil, err
 	}
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/payitil/report", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
+	wxRsp := WxPayReportJsApiResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 // 交易保障(JSAPI)的参数

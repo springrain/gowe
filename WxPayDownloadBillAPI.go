@@ -5,23 +5,21 @@ import (
 	"errors"
 )
 
-//下载对账单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_6
-
-//WxPayDownloadBill 下载对账单
-func WxPayDownloadBill(wxPayConfig IWxPayConfig, body WxPayDownloadBillBody) (wxRsp string, failRsp *WxPayDownloadBillResponse, err error) {
+//WxPayDownloadBill 下载对账单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_6
+func WxPayDownloadBill(wxPayConfig IWxPayConfig, body *WxPayDownloadBillBody) (*WxPayDownloadBillResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/downloadbill", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
-	failRsp = new(WxPayDownloadBillResponse)
+	failRsp := new(WxPayDownloadBillResponse)
 	err = xml.Unmarshal(bytes, failRsp)
 	if err != nil {
-		return string(bytes), nil, nil
+		return nil, errors.New(string(bytes))
 	} else {
 		err = errors.New(failRsp.ReturnMsg)
-		return
+		return failRsp, err
 	}
 }
 

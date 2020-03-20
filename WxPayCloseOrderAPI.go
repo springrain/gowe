@@ -2,22 +2,21 @@ package gowe
 
 import "encoding/xml"
 
-//关闭订单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_3
-
-//WxPayCloseOrder 关闭订单
-func WxPayCloseOrder(wxPayConfig IWxPayConfig, body WxPayCloseOrderBody) (wxRsp WxPayCloseOrderResponse, err error) {
+//WxPayCloseOrder 关闭订单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_3
+func WxPayCloseOrder(wxPayConfig IWxPayConfig, body *WxPayCloseOrderBody) (*WxPayCloseOrderResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/closeorder", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 结果校验
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
+	wxRsp := WxPayCloseOrderResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 //WxPayCloseOrderBody 关闭订单的参数

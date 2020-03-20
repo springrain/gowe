@@ -9,9 +9,9 @@ import (
 //https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html
 //expireSeconds:该二维码有效时间,以秒为单位. 最大不超过2592000(即30天),默认2592000
 //sceneStr:场景值ID(字符串形式的ID),字符串类型,长度限制为1到64.这里只使用字符串了,用途更广
-func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSeconds int) (wxqrr WxMpQrCreateResponse, err error) {
+func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSeconds int) (*WxMpQrCreateResponse, error) {
 	if len(sceneStr) < 1 {
-		return wxqrr, errors.New("sceneStr不能为空")
+		return nil, errors.New("sceneStr不能为空")
 	}
 	if expireSeconds == 0 {
 		expireSeconds = 2592000
@@ -29,18 +29,19 @@ func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSecond
 	data, err := httpPost(apiurl, params)
 	// 发送请求
 	if err != nil {
-		return wxqrr, err
+		return nil, err
 	}
 	// 尝试解码
+	wxqrr := WxMpQrCreateResponse{}
 	_ = json.Unmarshal(data, &wxqrr)
 
-	return wxqrr, nil
+	return &wxqrr, nil
 }
 
 //WxMpQrCreatePermanent 创建永久的带参数二维码
-func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (wxqrr WxMpQrCreateResponse, err error) {
+func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (*WxMpQrCreateResponse, error) {
 	if len(sceneStr) < 1 {
-		return wxqrr, errors.New("sceneStr不能为空")
+		return nil, errors.New("sceneStr不能为空")
 	}
 
 	apiurl := WxMpAPIURL + "/cgi-bin/qrcode/create?access_token=" + wxMpConfig.GetAccessToken()
@@ -56,12 +57,13 @@ func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (wxqrr WxMpQ
 	data, err := httpPost(apiurl, params)
 	// 发送请求
 	if err != nil {
-		return wxqrr, err
+		return nil, err
 	}
 	// 尝试解码
-	_ = json.Unmarshal(data, &wxqrr)
+	wxqrr := WxMpQrCreateResponse{}
+	err = json.Unmarshal(data, &wxqrr)
 
-	return wxqrr, nil
+	return &wxqrr, err
 }
 
 //WxMpQrShowQrCodeUrl 通过ticket换取二维码地址

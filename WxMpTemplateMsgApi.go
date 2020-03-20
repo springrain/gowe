@@ -6,19 +6,19 @@ import "encoding/json"
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
 
 //WxMTemplateMsgSend 发送模板消息
-func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body WxMpTemplateMsgSendBody) (res WxMpTemplateMsgSendResponse, err error) {
+func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
 	apiurl := WxMpAPIURL + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken()
 
 	// 参数处理
 	bodyStr, err := json.Marshal(body)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	params := make(map[string]interface{})
 	if err = json.Unmarshal(bodyStr, &params); err != nil {
-		return
+		return nil, err
 	}
 
 	if body.dataMap != nil {
@@ -37,12 +37,13 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body WxMpTemplateMsgSendBody) (
 	data, err := httpPost(apiurl, params)
 	// 发送请求
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 	// 尝试解码
-	_ = json.Unmarshal(data, &res)
+	res := WxMpTemplateMsgSendResponse{}
+	err = json.Unmarshal(data, &res)
 
-	return res, nil
+	return &res, err
 }
 
 type WxMpTemplateMsgSendBody struct {
@@ -64,7 +65,7 @@ type WxMpTemplateMsgSendResponse struct {
 }
 
 //AddData 模板内容,不填则下发空模板.具体格式请参考示例,color默认#173177
-func (wxMpTemplateMsg WxMpTemplateMsgSendBody) AddData(key string, value string, color string) {
+func (wxMpTemplateMsg *WxMpTemplateMsgSendBody) AddData(key string, value string, color string) {
 	if wxMpTemplateMsg.dataMap == nil {
 		wxMpTemplateMsg.dataMap = make(map[string]interface{})
 	}

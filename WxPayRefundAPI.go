@@ -9,19 +9,20 @@ import (
 //申请退款 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
 
 // 申请退款
-func WxPayRefund(wxPayConfig IWxPayConfig, body WxPayRefundBody) (wxRsp WxPayRefundResponse, err error) {
+func WxPayRefund(wxPayConfig IWxPayConfig, body *WxPayRefundBody) (*WxPayRefundResponse, error) {
 	// 业务逻辑
 	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxMpPayMchAPIURL+"/secapi/pay/refund", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 结果校验
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
+	wxRsp := WxPayRefundResponse{}
 	err = wxPayRefundParseResponse(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 // 申请退款的参数

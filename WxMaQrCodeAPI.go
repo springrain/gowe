@@ -7,16 +7,16 @@ import (
 
 //WxMaCodeGetUnlimited 小程序码接口
 //https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
-func WxMaCodeGetUnlimited(wxMaConfig IWxMaConfig, body WxMaCodeGetUnlimitedBody) (data []byte, baseErr ResponseBase, err error) {
+func WxMaCodeGetUnlimited(wxMaConfig IWxMaConfig, body *WxMaCodeGetUnlimitedBody) ([]byte, *ResponseBase, error) {
 	apiurl := WxMpAPIURL + fmt.Sprintf("/wxa/getwxacodeunlimit?access_token=%s", wxMaConfig.GetAccessToken())
 	// 参数处理
 	bodyStr, err := json.Marshal(body)
 	if err != nil {
-		return
+		return nil, nil, err
 	}
 	params := make(map[string]interface{})
 	if err = json.Unmarshal(bodyStr, &params); err != nil {
-		return
+		return nil, nil, err
 	}
 	if !body.AutoColor && (body.LineColorR > 0 || body.LineColorG > 0 || body.LineColorB > 0) {
 		params["line_color"] = map[string]interface{}{
@@ -25,13 +25,15 @@ func WxMaCodeGetUnlimited(wxMaConfig IWxMaConfig, body WxMaCodeGetUnlimitedBody)
 			"b": body.LineColorB,
 		}
 	}
+	data, err := httpPost(apiurl, params)
 	// 发送请求
-	if data, err = httpPost(apiurl, params); err != nil {
-		return
+	if err != nil {
+		return nil, nil, err
 	}
 	// 尝试解码
+	baseErr := ResponseBase{}
 	_ = json.Unmarshal(data, &baseErr)
-	return
+	return data, &baseErr, err
 }
 
 type WxMaCodeGetUnlimitedBody struct {

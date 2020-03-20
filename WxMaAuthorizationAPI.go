@@ -20,35 +20,37 @@ type SessionKey struct {
 
 //WxMaCode2Session 登录凭证校验.通过 wx.login 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
-func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (sessionKey SessionKey, err error) {
+func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (*SessionKey, error) {
 	if len(jsCode) < 1 {
-		return sessionKey, errors.New("jsCode不能为空")
+		return nil, errors.New("jsCode不能为空")
 	}
 	apiurl := WxMpAPIURL + "/sns/jscode2session?appid=" + wxMaConfig.GetAppId() + "&secret=" + wxMaConfig.GetSecret() + "&js_code=" + jsCode + "&&grant_type=authorization_code"
 	body, err := httpGet(apiurl)
 	if err != nil {
-		return sessionKey, err
+		return nil, err
 	}
+	sessionKey := SessionKey{}
 	err = json.Unmarshal(body, &sessionKey)
-	return sessionKey, err
+	return &sessionKey, err
 }
 
 //WxMaAuthGetPaidUnionId 用户支付完成后,获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
-func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (res WxMaAuthGetPaidUnionIdResponse, err error) {
+func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (*WxMaAuthGetPaidUnionIdResponse, error) {
 	if len(openId) < 1 {
-		return res, errors.New("openId不能为空")
+		return nil, errors.New("openId不能为空")
 	}
 
 	apiurl := WxMpAPIURL + "/wxa/getpaidunionid?access_token=" + wxMaConfig.GetAccessToken() + "&openid=" + openId
 	data, err := httpGet(apiurl)
 	// 发送请求
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 	// 尝试解码
-	_ = json.Unmarshal(data, &res)
+	res := WxMaAuthGetPaidUnionIdResponse{}
+	err = json.Unmarshal(data, &res)
 
-	return res, nil
+	return &res, err
 }
 
 type WxMaAuthGetPaidUnionIdResponse struct {

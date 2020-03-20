@@ -2,24 +2,25 @@ package gowe
 
 import "encoding/xml"
 
-// 提交付款码支付
-func WxPayMicropay(wxPayConfig IWxPayConfig, body WxPayMicropayBody) (wxRsp WxPayMicropayResponse, err error) {
+//WxPayMicropay 提交付款码支付 https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
+func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMicropayResponse, error) {
 	// 处理参数
 	if body.SceneInfo != nil {
-		body.SceneInfoStr = JsonString(*body.SceneInfo)
+		body.SceneInfoStr = JsonString(body.SceneInfo)
 	}
 	// 业务逻辑
 	bytes, err := wxPayDoWeChat(wxPayConfig, WxMpPayMchAPIURL+"/pay/micropay", body)
 	if err != nil {
-		return
+		return nil, err
 	}
 	// 结果校验
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return
+		return nil, err
 	}
 	// 解析返回值
+	wxRsp := WxPayMicropayResponse{}
 	err = xml.Unmarshal(bytes, &wxRsp)
-	return
+	return &wxRsp, err
 }
 
 // 提交付款码支付的参数
