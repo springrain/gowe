@@ -53,7 +53,7 @@ func (w wxconfig) GetSecret() string {
 
 ### 使用
 
-以下是通用的接口，可以直接使用`gowe.XXX`调用。
+以下是通用的接口，wxconfig 设置为全局变量，可以直接使用`gowe.XXX`调用。
 
 使用样例：
 
