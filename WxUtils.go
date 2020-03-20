@@ -50,40 +50,6 @@ func httpGet(apiurl string) ([]byte, error) {
 	return body, errRead
 }
 
-//httpGetResultMap 发起get请求,并返回json格式的结果
-func httpGetResultMap(apiurl string) (map[string]interface{}, error) {
-
-	body, errRead := httpGet(apiurl)
-	if errRead != nil {
-		return nil, errRead
-	}
-
-	resultMap := make(map[string]interface{})
-	errJSON := json.Unmarshal(body, &resultMap)
-	if errJSON != nil {
-		return nil, errJSON
-	}
-
-	return resultMap, nil
-}
-
-//httpPostResultMap post请求,返回的json封装成map
-func httpPostResultMap(apiurl string, params map[string]interface{}) (map[string]interface{}, error) {
-
-	body, errRead := httpPost(apiurl, params)
-	if errRead != nil {
-		return nil, errRead
-	}
-
-	resultMap := make(map[string]interface{})
-	errJSON := json.Unmarshal(body, &resultMap)
-	if errJSON != nil {
-		return nil, errJSON
-	}
-
-	return resultMap, nil
-}
-
 //httpPost post请求,返回原始的字节数组
 func httpPost(apiurl string, params map[string]interface{}) ([]byte, error) {
 	//data := make(url.Values)
