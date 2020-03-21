@@ -132,7 +132,7 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 // 是否是服务商模式
 func isWxPayFacilitator(serviceType int) bool {
 	switch serviceType {
-	case serviceTypeFacilitatorDomestic, serviceTypeFacilitatorAbroad, serviceTypeBankServiceProvidor:
+	case ServiceTypeFacilitatorDomestic, ServiceTypeFacilitatorAbroad, ServiceTypeBankServiceProvidor:
 		return true
 	default:
 		return false

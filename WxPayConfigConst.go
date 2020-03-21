@@ -22,19 +22,19 @@ const (
 	// wxURL_SanBox_BatchQueryComment = wxBaseUrlSandbox + "billcommentsp/batchquerycomment"
 
 	// 服务模式
-	serviceTypeNormalDomestic      = 1 // 境内普通商户
-	serviceTypeNormalAbroad        = 2 // 境外普通商户
-	serviceTypeFacilitatorDomestic = 3 // 境内服务商
-	serviceTypeFacilitatorAbroad   = 4 // 境外服务商
-	serviceTypeBankServiceProvidor = 5 // 银行服务商
+	ServiceTypeNormalDomestic      = 1 // 境内普通商户
+	ServiceTypeNormalAbroad        = 2 // 境外普通商户
+	ServiceTypeFacilitatorDomestic = 3 // 境内服务商
+	ServiceTypeFacilitatorAbroad   = 4 // 境外服务商
+	ServiceTypeBankServiceProvidor = 5 // 银行服务商
 
 	// 支付类型
-	tradeTypeApplet   = "JSAPI"    // 小程序支付
-	tradeTypeJsApi    = "JSAPI"    // JSAPI支付
-	tradeTypeApp      = "APP"      // APP支付
-	tradeTypeH5       = "MWEB"     // H5支付
-	tradeTypeNative   = "NATIVE"   // Native支付
-	tradeTypeMicropay = "MICROPAY" // 付款码支付
+	TradeTypeMiniApp  = "JSAPI"    // 小程序支付
+	TradeTypeJsApi    = "JSAPI"    // JSAPI支付
+	TradeTypeApp      = "APP"      // APP支付
+	TradeTypeH5       = "MWEB"     // H5支付
+	TradeTypeNative   = "NATIVE"   // Native支付
+	TradeTypeMicropay = "MICROPAY" // 付款码支付
 
 	// 交易状态
 	tradeStateSuccess    = "SUCCESS"    // 支付成功
