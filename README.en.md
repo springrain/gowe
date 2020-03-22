@@ -40,7 +40,7 @@ func (wxConfig *WxConfig) GetAppId() string {
 
 func (wxConfig *WxConfig) GetAccessToken() string {
 	//从缓存中获取wxAccessToken,这里只是演示
-	wxAccessToken, err := GetAccessToken(wxConfig)
+	wxAccessToken, err := gowe.GetAccessToken(wxConfig)
 	if err == nil && wxAccessToken.ErrCode == 0 {
 		return wxAccessToken.AccessToken
 	}
