@@ -28,10 +28,9 @@ func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) 
 		return nil, err
 	}
 	// 尝试解码
-	res := ResponseBase{}
-	err = json.Unmarshal(data, &res)
-
-	return &res, err
+	res := &ResponseBase{}
+	err = json.Unmarshal(data, res)
+	return res, err
 }
 
 //WxMaTemplateMsgSendBody 小程序模板消息的请求参数

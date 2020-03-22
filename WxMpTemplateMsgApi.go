@@ -40,10 +40,10 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 		return nil, err
 	}
 	// 尝试解码
-	res := WxMpTemplateMsgSendResponse{}
-	err = json.Unmarshal(data, &res)
+	res := &WxMpTemplateMsgSendResponse{}
+	err = json.Unmarshal(data, res)
 
-	return &res, err
+	return res, err
 }
 
 //WxMpTemplateMsgSendBody 模板消息的请求参数

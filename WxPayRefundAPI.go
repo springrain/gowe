@@ -18,9 +18,9 @@ func WxPayRefund(wxPayConfig IWxPayConfig, body *WxPayRefundBody) (*WxPayRefundR
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxPayRefundResponse{}
-	err = wxPayRefundParseResponse(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayRefundResponse{}
+	err = wxPayRefundParseResponse(bytes, res)
+	return res, err
 }
 
 //WxPayRefundBody 申请退款的参数

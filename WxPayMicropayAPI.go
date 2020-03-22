@@ -18,9 +18,9 @@ func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMic
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxPayMicropayResponse{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayMicropayResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayMicropayBody 付款码支付的参数

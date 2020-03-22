@@ -14,9 +14,9 @@ func WxPayCloseOrder(wxPayConfig IWxPayConfig, body *WxPayCloseOrderBody) (*WxPa
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxPayCloseOrderResponse{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayCloseOrderResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayCloseOrderBody 关闭订单的参数

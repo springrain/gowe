@@ -29,9 +29,9 @@ func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (*SessionKey, error
 	if err != nil {
 		return nil, err
 	}
-	sessionKey := SessionKey{}
-	err = json.Unmarshal(body, &sessionKey)
-	return &sessionKey, err
+	sessionKey := &SessionKey{}
+	err = json.Unmarshal(body, sessionKey)
+	return sessionKey, err
 }
 
 //WxMaAuthGetPaidUnionId 用户支付完成后,获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
@@ -47,10 +47,10 @@ func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (*WxMaAuthGet
 		return nil, err
 	}
 	// 尝试解码
-	res := WxMaAuthGetPaidUnionIdResponse{}
-	err = json.Unmarshal(data, &res)
+	res := &WxMaAuthGetPaidUnionIdResponse{}
+	err = json.Unmarshal(data, res)
 
-	return &res, err
+	return res, err
 }
 
 //WxMaAuthGetPaidUnionIdResponse 支付后获取用户unionid

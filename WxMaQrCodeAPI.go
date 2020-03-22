@@ -31,9 +31,9 @@ func WxMaCodeGetUnlimited(wxMaConfig IWxMaConfig, body *WxMaCodeGetUnlimitedBody
 		return nil, nil, err
 	}
 	// 尝试解码
-	baseErr := ResponseBase{}
-	_ = json.Unmarshal(data, &baseErr)
-	return data, &baseErr, err
+	baseErr := &ResponseBase{}
+	err = json.Unmarshal(data, baseErr)
+	return data, baseErr, err
 }
 
 //WxMaCodeGetUnlimitedBody 小程序码请求参数

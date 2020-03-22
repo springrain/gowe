@@ -17,9 +17,9 @@ func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody
 
 	}
 	// 解析返回值
-	wxRsp := WxResponseModel{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxResponseModel{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayReportMicropayBody 交易保障(MICROPAY)的参数

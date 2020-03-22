@@ -32,10 +32,9 @@ func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSecond
 		return nil, err
 	}
 	// 尝试解码
-	wxqrr := WxMpQrCreateResponse{}
-	_ = json.Unmarshal(data, &wxqrr)
-
-	return &wxqrr, nil
+	res := &WxMpQrCreateResponse{}
+	err = json.Unmarshal(data, res)
+	return res, err
 }
 
 //WxMpQrCreatePermanent 创建永久的带参数二维码
@@ -60,10 +59,9 @@ func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (*WxMpQrCrea
 		return nil, err
 	}
 	// 尝试解码
-	wxqrr := WxMpQrCreateResponse{}
-	err = json.Unmarshal(data, &wxqrr)
-
-	return &wxqrr, err
+	res := &WxMpQrCreateResponse{}
+	err = json.Unmarshal(data, res)
+	return res, err
 }
 
 //WxMpQrShowQrCodeUrl 通过ticket换取二维码地址

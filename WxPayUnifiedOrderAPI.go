@@ -17,10 +17,10 @@ func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*
 	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
 		return nil, err
 	}
-	wxRsp := WxPayUnifiedOrderResponse{}
+	res := &WxPayUnifiedOrderResponse{}
 	// 解析返回值
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayUnifiedOrderBody 统一下单的参数

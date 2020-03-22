@@ -14,9 +14,9 @@ func WxPayReverseMicroOrder(wxPayConfig IWxPayConfig, body *WxPayReverseMicroOrd
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxPayReverseMicroOrderResponse{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayReverseMicroOrderResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayReverseMicroOrderBody 撤销订单的参数

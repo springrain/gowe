@@ -14,9 +14,9 @@ func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body *WxPayPromotionMk
 	}
 	// 不返回sign不需要校验
 	// 解析返回值
-	wxRsp := WxPayPromotionMktTransfersResponse{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayPromotionMktTransfersResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayQueryMktTransfer 企业付款到零钱的查询
@@ -28,9 +28,9 @@ func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body *WxPayQueryMktTransfer
 	}
 	// 不返回sign不需要校验
 	// 解析返回值
-	wxRsp := WxPayQueryMktTransferResponse{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayQueryMktTransferResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayPromotionMktTransfersBody 微信找零的参数

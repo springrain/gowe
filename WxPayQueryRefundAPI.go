@@ -22,9 +22,9 @@ func WxPayQueryRefund(wxPayConfig IWxPayConfig, body *WxPayQueryRefundBody) (*Wx
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxPayQueryRefundResponse{}
-	err = wxPayQueryRefundParseResponse(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayQueryRefundResponse{}
+	err = wxPayQueryRefundParseResponse(bytes, res)
+	return res, err
 }
 
 //WxPayQueryRefundBody 查询退款的参数

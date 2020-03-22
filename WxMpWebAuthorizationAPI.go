@@ -40,9 +40,9 @@ func WxMpWebAuthAccessToken(wxMpConfig IWxMpConfig, code string) (*WxAccessToken
 	if err != nil {
 		return nil, err
 	}
-	wxAccessToken := WxAccessToken{}
-	err = json.Unmarshal(body, &wxAccessToken)
-	return &wxAccessToken, err
+	wxAccessToken := &WxAccessToken{}
+	err = json.Unmarshal(body, wxAccessToken)
+	return wxAccessToken, err
 }
 
 //WxMpWebAuthRefreshAccessToken 刷新认证的AccessToken.认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
@@ -55,9 +55,9 @@ func WxMpWebAuthRefreshAccessToken(wxMpConfig IWxMpConfig, refreshToken string) 
 	if err != nil {
 		return nil, err
 	}
-	wxAccessToken := WxAccessToken{}
-	err = json.Unmarshal(body, &wxAccessToken)
-	return &wxAccessToken, err
+	wxAccessToken := &WxAccessToken{}
+	err = json.Unmarshal(body, wxAccessToken)
+	return wxAccessToken, err
 }
 
 //WxMpUserInfo 用户信息

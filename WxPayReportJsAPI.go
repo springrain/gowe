@@ -15,9 +15,9 @@ func WxPayReportJsApi(wxPayConfig IWxPayConfig, body *WxPayReportJsAPIBody) (*Wx
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxResponseModel{}
-	err = xml.Unmarshal(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxResponseModel{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
 }
 
 //WxPayReportJsAPIBody 交易保障(JSAPI)的参数

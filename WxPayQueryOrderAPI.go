@@ -20,9 +20,9 @@ func WxPayQueryOrder(wxPayConfig IWxPayConfig, body *WxPayQueryOrderBody) (*WxPa
 		return nil, err
 	}
 	// 解析返回值
-	wxRsp := WxPayQueryOrderResponse{}
-	err = wxPayQueryOrderParseResponse(bytes, &wxRsp)
-	return &wxRsp, err
+	res := &WxPayQueryOrderResponse{}
+	err = wxPayQueryOrderParseResponse(bytes, res)
+	return res, err
 }
 
 //WxPayQueryOrderBody 查询订单的参数
