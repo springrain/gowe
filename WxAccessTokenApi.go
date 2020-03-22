@@ -2,6 +2,8 @@ package gowe
 
 import (
 	"encoding/json"
+	"errors"
+	"strconv"
 	"time"
 )
 
@@ -70,13 +72,19 @@ func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 		return nil, err
 	}
 
-	wxAccessToken := WxAccessToken{}
-	err = json.Unmarshal(body, &wxAccessToken)
+	wxAccessToken := &WxAccessToken{}
+	err = json.Unmarshal(body, wxAccessToken)
+	if err != nil {
+		return wxAccessToken, err
+	}
+	if wxAccessToken.ErrCode != 0 { //失败了
+		return wxAccessToken, errors.New("ErrCode:" + strconv.Itoa(wxAccessToken.ErrCode) + ",ErrMsg:" + wxAccessToken.ErrMsg)
+	}
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxAccessToken.AccessTokenExpiresTime = time.Now().Unix() + int64(wxAccessToken.ExpiresIn/2)
 
-	return &wxAccessToken, err
+	return wxAccessToken, err
 }
 
 //GetJsTicket 获取jsTicket
@@ -86,12 +94,19 @@ func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
 	if err != nil {
 		return nil, err
 	}
-	wxJsTicket := WxJsTicket{}
-	err = json.Unmarshal(body, &wxJsTicket)
+	wxJsTicket := &WxJsTicket{}
+	err = json.Unmarshal(body, wxJsTicket)
+	if err != nil {
+		return wxJsTicket, err
+	}
+	if wxJsTicket.ErrCode != 0 { //失败了
+		return wxJsTicket, errors.New("ErrCode:" + strconv.Itoa(wxJsTicket.ErrCode) + ",ErrMsg:" + wxJsTicket.ErrMsg)
+	}
+
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxJsTicket.JsTicketExpiresTime = time.Now().Unix() + int64(wxJsTicket.ExpiresIn/2)
-	return &wxJsTicket, err
+	return wxJsTicket, err
 }
 
 //GetCardTicket 获取cardTicket
@@ -101,10 +116,16 @@ func GetCardTicket(wxConfig IWxConfig) (*WxCardTicket, error) {
 	if err != nil {
 		return nil, err
 	}
-	wxCardTicket := WxCardTicket{}
-	err = json.Unmarshal(body, &wxCardTicket)
+	wxCardTicket := &WxCardTicket{}
+	err = json.Unmarshal(body, wxCardTicket)
+	if err != nil {
+		return wxCardTicket, err
+	}
+	if wxCardTicket.ErrCode != 0 { //失败了
+		return wxCardTicket, errors.New("ErrCode:" + strconv.Itoa(wxCardTicket.ErrCode) + ",ErrMsg:" + wxCardTicket.ErrMsg)
+	}
 	// 生产遇到接近过期时间时,access_token在某些服务器上会提前失效,设置时间短一些
 	// https://developers.weixin.qq.com/community/develop/doc/0008cc492503e8e04dc7d619754c00
 	wxCardTicket.CardTicketExpiresTime = time.Now().Unix() + int64(wxCardTicket.ExpiresIn/2)
-	return &wxCardTicket, err
+	return wxCardTicket, err
 }
