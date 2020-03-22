@@ -18,39 +18,41 @@ go get gitee.com/chunanyong/gowe
 ### 初始化
 
 ```go
-type wxconfig struct {
-	id string
-	appid string
-	accesstoken string
-	secret string
-}
-var wx = &wxconfig{
-	id:"test",
-	appid:"XXXXXXXXXXXXXXxxx",
-	secret:"XXXXXXXXXXXXXXX",
+type WxConfig struct {
+	Id     string
+	AppId  string
+	Secret string
 }
 
-func (w wxconfig) GetId() string {
-	return w.id
+var wxConfig = &WxConfig{
+	Id:     "test",
+	AppId:  "XXXXXXXXXXXXXXxxx",
+	Secret: "XXXXXXXXXXXXXXX",
 }
 
-func (w wxconfig) GetAppId() string {
-	return w.appid
+func (wxConfig *WxConfig) GetId() string {
+	return wxConfig.Id
 }
 
-func (w wxconfig) GetAccessToken() string {
-	return w.accesstoken
+func (wxConfig *WxConfig) GetAppId() string {
+	return wxConfig.AppId
 }
 
-func (w wxconfig) GetSecret() string {
-	return w.secret
+func (wxConfig *WxConfig) GetAccessToken() string {
+	//应该把wxAccessToken缓存起来,从缓存中获取
+	wxAccessToken, _ := GetAccessToken(wxConfig)
+	return wxAccessToken.AccessToken
+}
+
+func (wxConfig *WxConfig) GetSecret() string {
+	return wxConfig.Secret
 }
 
 ```
 
 ### 使用
 
-以下是通用的接口，wxconfig 设置为全局变量，可以直接使用`gowe.XXX`调用
+以下是通用的接口，WxConfig 设置为全局变量，可以直接使用`gowe.XXX`调用
 
 使用样例：
 
