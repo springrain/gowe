@@ -39,9 +39,12 @@ func (wxConfig *WxConfig) GetAppId() string {
 }
 
 func (wxConfig *WxConfig) GetAccessToken() string {
-	//应该把wxAccessToken缓存起来,从缓存中获取
-	wxAccessToken, _ := GetAccessToken(wxConfig)
-	return wxAccessToken.AccessToken
+	//从缓存中获取wxAccessToken,这里只是演示
+	wxAccessToken, err := GetAccessToken(wxConfig)
+	if err == nil && wxAccessToken.ErrCode == 0 {
+		return wxAccessToken.AccessToken
+	}
+	return ""
 }
 
 func (wxConfig *WxConfig) GetSecret() string {
@@ -63,9 +66,7 @@ func TestGetAccessToken(t *testing.T)  {
 	if err != nil {
 		t.Log("error:" ,err)
 	}
-
 	t.Log("token:",token)
-
 }
 
 ```
