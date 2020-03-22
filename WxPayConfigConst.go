@@ -21,20 +21,29 @@ const (
 	// wxURL_SanBox_DownloadFundFlow  = wxBaseUrlSandbox + "pay/downloadfundflow"
 	// wxURL_SanBox_BatchQueryComment = wxBaseUrlSandbox + "billcommentsp/batchquerycomment"
 
-	// 服务模式
-	ServiceTypeNormalDomestic      = 1 // 境内普通商户
-	ServiceTypeNormalAbroad        = 2 // 境外普通商户
-	ServiceTypeFacilitatorDomestic = 3 // 境内服务商
-	ServiceTypeFacilitatorAbroad   = 4 // 境外服务商
-	ServiceTypeBankServiceProvidor = 5 // 银行服务商
+	//ServiceTypeNormalDomestic 服务模式-境内普通商户
+	ServiceTypeNormalDomestic = 1
+	//ServiceTypeNormalAbroad 服务模式-境外普通商户
+	ServiceTypeNormalAbroad = 2
+	//ServiceTypeFacilitatorDomestic 服务模式-境内服务商
+	ServiceTypeFacilitatorDomestic = 3
+	//ServiceTypeFacilitatorAbroad 服务模式-境外服务商
+	ServiceTypeFacilitatorAbroad = 4
+	//ServiceTypeBankServiceProvidor 服务模式-银行服务商
+	ServiceTypeBankServiceProvidor = 5
 
-	// 支付类型
-	TradeTypeMiniApp  = "JSAPI"    // 小程序支付
-	TradeTypeJsApi    = "JSAPI"    // JSAPI支付
-	TradeTypeApp      = "APP"      // APP支付
-	TradeTypeH5       = "MWEB"     // H5支付
-	TradeTypeNative   = "NATIVE"   // Native支付
-	TradeTypeMicropay = "MICROPAY" // 付款码支付
+	//TradeTypeMiniApp 支付类型-小程序支付
+	TradeTypeMiniApp = "JSAPI"
+	//TradeTypeJsApi 支付类型-JSAPI支付
+	TradeTypeJsApi = "JSAPI"
+	//TradeTypeApp 支付类型-APP支付
+	TradeTypeApp = "APP"
+	//TradeTypeH5 支付类型-H5支付
+	TradeTypeH5 = "MWEB"
+	//TradeTypeNative 支付类型-Native支付
+	TradeTypeNative = "NATIVE"
+	//TradeTypeMicropay 支付类型-付款码支付
+	TradeTypeMicropay = "MICROPAY"
 
 	// 交易状态
 	tradeStateSuccess    = "SUCCESS"    // 支付成功
@@ -50,9 +59,10 @@ const (
 	reportMicropayTradeStateFail   = "FAIL"   // 失败
 	reportMicropayTradeStateCancel = "CANCLE" // 取消
 
-	// 签名方式
-	signTypeMD5        = "MD5" // 默认
-	signTypeHmacSHA256 = "HMAC-SHA256"
+	//SignTypeMD5 签名方式-默认MD5
+	SignTypeMD5 = "MD5"
+	//SignTypeHmacSHA256 签名方式-HMAC-SHA256
+	SignTypeHmacSHA256 = "HMAC-SHA256"
 
 	// 货币类型
 	feeTypeCNY = "CNY" // 人民币

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/md5"
-	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/xml"
@@ -20,7 +19,7 @@ import (
 func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
 	signStr := wxPaySortSignParams(body, apiKey)
 	var hashSign []byte
-	if signType == signTypeHmacSHA256 {
+	if signType == SignTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
 		hash.Write([]byte(signStr))
 		hashSign = hash.Sum(nil)
@@ -120,7 +119,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 		}
 	}
 	// 获取签名类型
-	signType := signTypeMD5
+	signType := SignTypeMD5
 	if result["sign_type"] != nil {
 		signType = result["sign_type"].(string)
 	}
@@ -129,11 +128,11 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	if wxPayConfig.IsProd() {
 		sign = wxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
 	} else {
-		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), signTypeMD5)
+		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), SignTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
-		sign = wxPayLocalSign(result, signTypeMD5, key)
+		sign = wxPayLocalSign(result, SignTypeMD5, key)
 	}
 	// 验证
 	if targetSign != sign {
@@ -142,6 +141,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	return
 }
 
+/*
 //WxPayH5Sign JSAPI支付,统一下单获取支付参数后,再次计算出微信内H5支付需要用的paySign
 func WxPayH5Sign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
 	// 原始字符串
@@ -152,7 +152,7 @@ func WxPayH5Sign(appId, nonceStr, packages, signType, timeStamp, apiKey string) 
 	signStr := buffer.String()
 	// 加密签名
 	var hashSign []byte
-	if signType == signTypeHmacSHA256 {
+	if signType == SignTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
 		hash.Write([]byte(signStr))
 		hashSign = hash.Sum(nil)
@@ -175,7 +175,7 @@ func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, api
 	// 加密签名
 	signStr := buffer.String()
 	var hashSign []byte
-	if signType == signTypeHmacSHA256 {
+	if signType == SignTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
 		hash.Write([]byte(signStr))
 		hashSign = hash.Sum(nil)
@@ -220,3 +220,4 @@ func wxPayAPPsortSignParams(nonceStr, ticket, timeStamp, url string) string {
 	}
 	return buffer.String()
 }
+*/
