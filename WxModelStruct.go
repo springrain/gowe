@@ -28,8 +28,8 @@ type WxResponseModel struct {
 	RetMsg     string `xml:"retmsg"`      // 沙盒时返回的错误信息
 }
 
-//WxPayServiceResponseModel 业务返回结果的错误信息
-type WxPayServiceResponseModel struct {
+//WxPayPartnerResponseModel 业务返回结果的错误信息
+type WxPayPartnerResponseModel struct {
 	AppId      string `xml:"appid"`        // 微信分配的公众账号ID
 	MchId      string `xml:"mch_id"`       // 微信支付分配的商户号
 	SubAppId   string `xml:"sub_appid"`    // (服务商模式) 微信分配的子商户公众账号ID

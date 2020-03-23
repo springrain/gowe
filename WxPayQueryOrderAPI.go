@@ -36,7 +36,7 @@ type WxPayQueryOrderBody struct {
 type WxPayQueryOrderResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 	// 当return_code、result_code、trade_state都为SUCCESS时有返回,如trade_state不为SUCCESS,则只返回out_trade_no(必传)和attach(选传).
 	DeviceInfo         string `xml:"device_info"`          // 微信支付分配的终端设备号
 	OpenId             string `xml:"openid"`               // 用户在商户appid下的唯一标识

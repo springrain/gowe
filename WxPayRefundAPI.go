@@ -39,7 +39,7 @@ type WxPayRefundBody struct {
 //WxResponseModel 申请退款的返回值
 type WxPayRefundResponse struct {
 	WxResponseModel
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 	TransactionId       string `xml:"transaction_id"`
 	OutTradeNo          string `xml:"out_trade_no"`
 	OutRefundNo         string `xml:"out_refund_no"`

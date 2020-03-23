@@ -28,6 +28,6 @@ type WxPayReverseMicroOrderBody struct {
 //WxPayReverseMicroOrderResponse 撤销订单的返回值
 type WxPayReverseMicroOrderResponse struct {
 	WxResponseModel
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 	Recall string `xml:"recall"` // 是否需要继续调用撤销,Y-需要,N-不需要
 }

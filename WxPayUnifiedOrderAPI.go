@@ -53,7 +53,7 @@ type WxPayUnifiedOrderBody struct {
 type WxPayUnifiedOrderResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 
 	DeviceInfo string `xml:"device_info"` // 调用接口提交的终端设备号
 	// 当return_code 和result_code都为SUCCESS时

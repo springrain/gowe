@@ -41,7 +41,7 @@ type WxPayQueryRefundBody struct {
 type WxPayQueryRefundResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 	TransactionId      string `xml:"transaction_id"`       // 微信订单号
 	OutTradeNo         string `xml:"out_trade_no"`         // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*@ ,且在同一个商户号下唯一.
 	TotalFee           int    `xml:"total_fee"`            // 订单总金额,单位为分,只能为整数,详见支付金额

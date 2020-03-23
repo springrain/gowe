@@ -29,6 +29,6 @@ type WxPayCloseOrderBody struct {
 type WxPayCloseOrderResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 	ResultMsg string `xml:"result_msg"` // 对业务结果的补充说明
 }

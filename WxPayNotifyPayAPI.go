@@ -51,7 +51,7 @@ func (m *wxPayNotifyResponseModel) toXMLString() string {
 type WxPayNotifyPayBody struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
-	WxPayServiceResponseModel
+	WxPayPartnerResponseModel
 
 	DeviceInfo         string `xml:"device_info"`          // 微信支付分配的终端设备号
 	IsSubscribe        string `xml:"is_subscribe"`         // 用户是否关注公众账号(机构商户不返回)
