@@ -15,8 +15,8 @@ import (
 	"github.com/beevik/etree"
 )
 
-//WxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
-func WxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
+//wxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
+func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
 	signStr := wxPaySortSignParams(body, apiKey)
 	var hashSign []byte
 	if signType == SignTypeHmacSHA256 {
@@ -63,7 +63,7 @@ func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string
 	body["mch_id"] = wxPayConfig.GetMchId()
 	body["nonce_str"] = nonceStr
 	// 计算沙箱参数Sign
-	sanboxSign := WxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
+	sanboxSign := wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
 	// 沙箱环境:获取key后,重新计算Sign
 	key, err = getSandBoxSignKey(wxPayConfig.GetMchId(), nonceStr, sanboxSign)
 	return
@@ -126,19 +126,49 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	// 生成签名
 	var sign string
 	if wxPayConfig.IsProd() {
-		sign = WxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
+		sign = wxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
 	} else {
 		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), SignTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
-		sign = WxPayLocalSign(result, SignTypeMD5, key)
+		sign = wxPayLocalSign(result, SignTypeMD5, key)
 	}
 	// 验证
 	if targetSign != sign {
 		err = errors.New("签名无效")
 	}
 	return
+}
+
+//WxPayJSAPISign 统一下单获取prepay_id参数后,再次计算出JSAPI需要的sign
+//https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
+func WxPayJSAPISign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
+	signParams := make(map[string]interface{}, 0)
+	signParams["appId"] = appId
+	signParams["nonceStr"] = nonceStr
+	signParams["package"] = packages
+	signParams["signType"] = signType
+	signParams["timeStamp"] = timeStamp
+	return wxPayLocalSign(signParams, signType, apiKey)
+}
+
+//WxPayMaSign 统一下单获取prepay_id参数后,再次计算出小程序需要的sign
+//https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=7_7&index=5
+func WxPayMaSign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
+	return WxPayJSAPISign(appId, nonceStr, packages, signType, timeStamp, apiKey)
+}
+
+//WxPayAppSign APP支付,统一下单获取支付参数后,再次计算APP支付所需要的的sign
+//https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_3
+func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, apiKey string) (paySign string) {
+	signParams := make(map[string]interface{}, 0)
+	signParams["appId"] = appId
+	signParams["nonceStr"] = nonceStr
+	signParams["package"] = "Sign=WXPay"
+	signParams["partnerid"] = partnerId
+	signParams["timeStamp"] = timeStamp
+	return wxPayLocalSign(signParams, signType, apiKey)
 }
 
 /*

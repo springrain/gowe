@@ -94,11 +94,12 @@ func TestGetAccessToken(t *testing.T)  {
 * 获取基础支持的AccessToken：`WxMpWebAuthAccessToken`
 * 获取用户基本信息(UnionId机制)：`WxMpGetUserInfo`
 * 获取H5支付签名：`WxPayH5Sign`
-* 获取二维码：`WxMpQrCreateTemporary` //生成带参数的临时二维码 `WxMpQrCreatePermanent` //创建永久的带参数二维码 
+* 带参数的临时二维码：`WxMpQrCreateTemporary` 
+* 带参数的永久二维码：`WxMpQrCreatePermanent` 
 
 #### 微信小程序
 
-* 获取小程序支付签名：`wxPayLocalSign`
+* 获取小程序支付签名：`WxPayMaSign`
 * 获取小程序码：`WxMaCodeGetUnlimited`
 
 ### 文档
