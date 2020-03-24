@@ -9,7 +9,7 @@ import (
 )
 
 //WxPayNotifyPay 支付结果通知
-func WxPayNotifyPay(wxPayConfig IWxPayConfig, handler func(wxPayNotifyPayBody WxPayNotifyPayBody) error, requestBody []byte) (rspBody string, err error) {
+func WxPayNotifyPay(wxPayConfig IWxPayConfig, requestBody []byte, handler func(wxPayNotifyPayBody WxPayNotifyPayBody) error) (rspBody string, err error) {
 	// 验证Sign
 	if err = wxPayDoVerifySign(wxPayConfig, requestBody, false); err != nil {
 		return
