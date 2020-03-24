@@ -116,14 +116,14 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 	signType, _ := body["sign_type"].(string)
 	var sign string
 	if wxPayConfig.IsProd() {
-		sign = wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
+		sign = WxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
 	} else {
 		body["sign_type"] = SignTypeMD5
 		key, iErr := wxPaySandboxSign(wxPayConfig, nonceStr, SignTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
-		sign = wxPayLocalSign(body, SignTypeMD5, key)
+		sign = WxPayLocalSign(body, SignTypeMD5, key)
 	}
 	body["sign"] = sign
 	return

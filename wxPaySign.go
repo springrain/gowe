@@ -15,8 +15,8 @@ import (
 	"github.com/beevik/etree"
 )
 
-//wxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
-func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
+//WxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
+func WxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
 	signStr := wxPaySortSignParams(body, apiKey)
 	var hashSign []byte
 	if signType == SignTypeHmacSHA256 {
@@ -63,7 +63,7 @@ func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string
 	body["mch_id"] = wxPayConfig.GetMchId()
 	body["nonce_str"] = nonceStr
 	// 计算沙箱参数Sign
-	sanboxSign := wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
+	sanboxSign := WxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
 	// 沙箱环境:获取key后,重新计算Sign
 	key, err = getSandBoxSignKey(wxPayConfig.GetMchId(), nonceStr, sanboxSign)
 	return
@@ -126,13 +126,13 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	// 生成签名
 	var sign string
 	if wxPayConfig.IsProd() {
-		sign = wxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
+		sign = WxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
 	} else {
 		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), SignTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
-		sign = wxPayLocalSign(result, SignTypeMD5, key)
+		sign = WxPayLocalSign(result, SignTypeMD5, key)
 	}
 	// 验证
 	if targetSign != sign {
