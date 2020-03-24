@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha1"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/xml"
@@ -17,7 +18,8 @@ import (
 
 //wxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
 func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
-	signStr := wxPaySortSignParams(body, apiKey)
+	signStr := wxPaySortSignParams(body)
+	signStr = signStr + "&key=" + apiKey
 	var hashSign []byte
 	if signType == SignTypeHmacSHA256 {
 		hash := hmac.New(sha256.New, []byte(apiKey))
@@ -32,18 +34,22 @@ func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string)
 }
 
 //wxPaySortSignParams 获取根据Key排序后的请求参数字符串
-func wxPaySortSignParams(body map[string]interface{}, apiKey string) string {
+func wxPaySortSignParams(body map[string]interface{}) string {
 	keyList := make([]string, 0)
 	for k := range body {
 		keyList = append(keyList, k)
 	}
 	sort.Strings(keyList)
 	buffer := new(bytes.Buffer)
-	for _, k := range keyList {
-		s := fmt.Sprintf("%s=%s&", k, fmt.Sprintf("%v", body[k]))
+	keyLen := len(keyList)
+	for i, k := range keyList {
+		s := fmt.Sprintf("%s=%s", k, fmt.Sprintf("%v", body[k]))
 		buffer.WriteString(s)
+		if (i + 1) < keyLen { //不是最后一个
+			buffer.WriteString("&")
+		}
 	}
-	buffer.WriteString(fmt.Sprintf("key=%s", apiKey))
+	//buffer.WriteString(fmt.Sprintf("key=%s", apiKey))
 	return buffer.String()
 }
 
@@ -144,7 +150,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 //WxPayJSAPISign 统一下单获取prepay_id参数后,再次计算出JSAPI需要的sign
 //https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
 func WxPayJSAPISign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
-	signParams := make(map[string]interface{}, 0)
+	signParams := make(map[string]interface{})
 	signParams["appId"] = appId
 	signParams["nonceStr"] = nonceStr
 	signParams["package"] = packages
@@ -169,6 +175,24 @@ func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, api
 	signParams["partnerid"] = partnerId
 	signParams["timeStamp"] = timeStamp
 	return wxPayLocalSign(signParams, signType, apiKey)
+}
+
+//WxJSSDKTicketSign 生成JS-SDK权限验证的签名
+//https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62
+func WxJSSDKTicketSign(nonceStr, ticket, timeStamp, url string) (ticketSign string) {
+	signParams := make(map[string]interface{})
+	signParams["noncestr"] = nonceStr
+	signParams["jsapi_ticket"] = ticket
+	signParams["timestamp"] = timeStamp
+	signParams["url"] = url
+
+	// 生成参数排序并拼接
+	signStr := wxPaySortSignParams(signParams)
+	// 加密签名
+	h := sha1.New()
+	h.Write([]byte(signStr))
+	ticketSign = hex.EncodeToString(h.Sum([]byte("")))
+	return
 }
 
 /*
