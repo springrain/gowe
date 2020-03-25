@@ -5,7 +5,7 @@ import "encoding/json"
 //模板消息
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
 
-//WxMTemplateMsgSend 发送模板消息
+//WxMpTemplateMsgSend 发送模板消息
 func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
 	apiurl := WxMpAPIURL + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken()
