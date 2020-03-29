@@ -102,7 +102,6 @@ func TestGetAccessToken(t *testing.T)  {
 
 * 获取小程序支付签名：`WxPayMaSign`
 * 获取小程序码：`WxMaCodeGetUnlimited`
-* 发送模板消息：`WxMaTemplateMsgSend`
 * 发送订阅消息：`WxMaSubscribeMessageSend`
 
 ### 文档
