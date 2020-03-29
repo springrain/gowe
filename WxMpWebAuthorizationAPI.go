@@ -90,7 +90,7 @@ func WxMpGetUserInfo(wxMpConfig IWxMpConfig, openId, lang string) (*WxMpUserInfo
 	if len(lang) <= 0 {
 		lang = "zh_CN"
 	}
-	apiurl := WxMpAPIURL + "/sns/userinfo?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "s&lang=" + lang
+	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "s&lang=" + lang
 	body, err := httpGet(apiurl)
 	if err != nil {
 		return nil, err
@@ -98,4 +98,27 @@ func WxMpGetUserInfo(wxMpConfig IWxMpConfig, openId, lang string) (*WxMpUserInfo
 	userInfo := WxMpUserInfo{}
 	err = json.Unmarshal(body, &userInfo)
 	return &userInfo, err
+}
+
+type WxMpUserOpenIds struct{
+ 	Total 		int 		`json:"total"`  //	关注该公众账号的总用户数
+	Count       int 		`json:"count"` //	拉取的OPENID个数，最大值为10000
+	Data 	    map[string][]string 	`json:"data"` //列表数据，OPENID的列表
+	NextOpenid	string 		`json:"next_openid"` //拉取列表的最后一个用户的OPENID
+	ErrCode        int      `json:"errcode"`         // 错误码
+	ErrMsg         string   `json:"errmsg"`          // 错误信息
+}
+
+//WxMpGetUserInfos 获取用户基本信息,包括UnionID机制(授权机制)
+//https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html
+func WxMpGetUserOpenIds(wxMpConfig IWxMpConfig, openId string) (*WxMpUserOpenIds, error) {
+
+	apiurl := WxMpAPIURL + "/cgi-bin/user/get?access_token=" + wxMpConfig.GetAccessToken() + "&next_openid=" + openId
+	body, err := httpGet(apiurl)
+	if err != nil {
+		return nil, err
+	}
+	userOpenIds := WxMpUserOpenIds{}
+	err = json.Unmarshal(body, &userOpenIds)
+	return &userOpenIds, err
 }
