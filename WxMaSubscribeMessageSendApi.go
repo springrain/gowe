@@ -34,8 +34,6 @@ func wxMaSendTemplateMsg(wxMaConfig IWxMaConfig, apiurl string, body *WxMaTempla
 	if body.dataMap != nil {
 		params["data"] = body.dataMap
 	}
-	//delete(params, "FormId")
-
 	data, err := httpPost(apiurl, params)
 	// 发送请求
 	if err != nil {

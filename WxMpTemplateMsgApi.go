@@ -53,12 +53,12 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 //WxMpSubscribeMsgURL 构造订阅模板消息的授权URL
 func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
 
-	msgURL := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + url.QueryEscape(body.RedirectURL)
+	apiurl := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + url.QueryEscape(body.RedirectURL)
 	if len(body.Reserved) >= 0 {
-		msgURL = msgURL + "&reserved=" + body.Reserved
+		apiurl = apiurl + "&reserved=" + body.Reserved
 	}
-	msgURL = msgURL + "#wechat_redirect"
-	return msgURL, nil
+	apiurl = apiurl + "#wechat_redirect"
+	return apiurl, nil
 
 }
 
@@ -116,8 +116,8 @@ type WxMpSubscribeMsgURLBody struct {
 //WxMpSubscribeMsgSendBody 一次订阅消息的请求参数
 type WxMpSubscribeMsgSendBody struct {
 	wxMpTemplateMsgBody
-	scene string `json:"scene"` //订阅场景值
-	title string `json:"title"` // 消息标题，15字以内
+	Scene string `json:"scene"` //订阅场景值
+	Title string `json:"title"` // 消息标题，15字以内
 }
 
 //WxMpTemplateMsgSendBody 模板消息的请求参数
