@@ -97,6 +97,7 @@ func TestGetAccessToken(t *testing.T)  {
 * 临时二维码：`WxMpQrCreateTemporary` 
 * 永久二维码：`WxMpQrCreatePermanent`
 * 发送模板消息：`WxMpTemplateMsgSend` 
+* 发送订阅消息: `WxMpSubscribeMsgSend`
 
 #### 微信小程序
 

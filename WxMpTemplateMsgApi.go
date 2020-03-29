@@ -4,7 +4,6 @@ import "encoding/json"
 
 //模板消息
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
-
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
 
 //WxMpTemplateMsgSend 发送模板消息
@@ -48,9 +47,8 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 	return res, err
 }
 
-//https://api.weixin.qq.com/cgi-bin/message/template/subscribe?access_token=ACCESS_TOKEN
 //WxMpSubscribeMsgSend 发送一次订阅消息
-
+//https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
 func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
 	apiurl := WxMpAPIURL + "/cgi-bin/message/template/subscribe?access_token=" + wxMpConfig.GetAccessToken()
@@ -92,29 +90,27 @@ func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody
 }
 
 //WxMpSubscribeMsgSendBody 一次订阅消息的请求参数
-
-type WxMpSubscribeMsgSendBody struct{
-
-	Touser          string                 `json:"touser"`                     // 接收者(用户)的 openid
-	TemplateId      string                 `json:"template_id"`                // 所需下发的模板消息的id
-	URL             string                 `json:"url,omitempty"`              // 模板跳转链接(海外帐号没有跳转能力)
-	MaAppid         string                 `json:"-"`                          //需要跳转的小程序APPID
-	MaPagepath      string                 `json:"-"`                          //所需跳转到小程序的具体页面路径,支持带参数,(示例index?foo=bar),要求该小程序已发布,暂不支持小游戏
-	scene           string                 `json:"scene"`                    //订阅场景值
-	title           string                 `json:"title,omitempty"` // 消息标题，15字以内
-	dataMap         map[string]interface{} `json:"-"`                          //消息正文，value为消息内容文本（200字以内），没有固定格式，可用\n换行，color为整段消息内容的字体颜色（目前仅支持整段消息为一种颜色）
+type WxMpSubscribeMsgSendBody struct {
+	wxMpTemplateMsgBody
+	scene string `json:"scene"` //订阅场景值
+	title string `json:"title"` // 消息标题，15字以内
 }
-
 
 //WxMpTemplateMsgSendBody 模板消息的请求参数
 type WxMpTemplateMsgSendBody struct {
-	Touser          string                 `json:"touser"`                     // 接收者(用户)的 openid
-	TemplateId      string                 `json:"template_id"`                // 所需下发的模板消息的id
-	URL             string                 `json:"url,omitempty"`              // 模板跳转链接(海外帐号没有跳转能力)
-	MaAppid         string                 `json:"-"`                          //需要跳转的小程序APPID
-	MaPagepath      string                 `json:"-"`                          //所需跳转到小程序的具体页面路径,支持带参数,(示例index?foo=bar),要求该小程序已发布,暂不支持小游戏
-	EmphasisKeyword string                 `json:"emphasis_keyword,omitempty"` // 模板需要放大的关键词,不填则默认无放大
-	dataMap         map[string]interface{} `json:"-"`                          //模板数据
+	wxMpTemplateMsgBody
+	EmphasisKeyword string `json:"emphasis_keyword,omitempty"` // 模板需要放大的关键词,不填则默认无放大
+
+}
+
+//wxMpTemplateMsgBody 公用的模板消息参数
+type wxMpTemplateMsgBody struct {
+	Touser     string                 `json:"touser"`        // 接收者(用户)的 openid
+	TemplateId string                 `json:"template_id"`   // 所需下发的模板消息的id
+	URL        string                 `json:"url,omitempty"` // 模板跳转链接(海外帐号没有跳转能力)
+	MaAppid    string                 `json:"-"`             //需要跳转的小程序APPID
+	MaPagepath string                 `json:"-"`             //所需跳转到小程序的具体页面路径,支持带参数,(示例index?foo=bar),要求该小程序已发布,暂不支持小游戏
+	dataMap    map[string]interface{} `json:"-"`             //模板数据
 }
 
 //WxMpTemplateMsgSendResponse 发送模板消息的返回值
@@ -125,7 +121,7 @@ type WxMpTemplateMsgSendResponse struct {
 }
 
 //AddData 模板内容,不填则下发空模板.具体格式请参考示例,color默认#173177
-func (wxMpTemplateMsg *WxMpTemplateMsgSendBody) AddData(key string, value string, color string) {
+func (wxMpTemplateMsg *wxMpTemplateMsgBody) AddData(key string, value string, color string) {
 	if wxMpTemplateMsg.dataMap == nil {
 		wxMpTemplateMsg.dataMap = make(map[string]interface{})
 	}
