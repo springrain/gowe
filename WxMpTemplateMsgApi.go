@@ -1,6 +1,9 @@
 package gowe
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/url"
+)
 
 //模板消息
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
@@ -47,6 +50,18 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 	return res, err
 }
 
+//WxMpSubscribeMsgURL 构造订阅模板消息的授权URL
+func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
+
+	msgURL := WxMpAPIURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + url.QueryEscape(body.RedirectURL)
+	if len(body.Reserved) >= 0 {
+		msgURL = msgURL + "&reserved=" + body.Reserved
+	}
+	msgURL = msgURL + "#wechat_redirect"
+	return msgURL, nil
+
+}
+
 //WxMpSubscribeMsgSend 发送一次订阅消息
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
 func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
@@ -87,6 +102,15 @@ func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody
 	err = json.Unmarshal(data, res)
 
 	return res, err
+}
+
+//用于生成授权URL的实体类
+type WxMpSubscribeMsgURLBody struct {
+	AppId       string //公众号的唯一标识
+	Scene       string //重定向后会带上scene参数，开发者可以填0-10000的整形值，用来标识订阅场景值
+	TemplateId  string //订阅消息模板ID，登录公众平台后台，在接口权限列表处可查看订阅模板ID
+	RedirectURL string //授权后重定向的回调地址，请使用UrlEncode对链接进行处理。 注：要求redirect_url的域名要跟登记的业务域名一致，且业务域名不能带路径。 业务域名需登录公众号，在设置-公众号设置-功能设置里面对业务域名设置。
+	Reserved    string //用于保持请求和回调的状态，授权请后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加session进行校验，开发者可以填写a-zA-Z0-9的参数值，最多128字节，要求做urlencode
 }
 
 //WxMpSubscribeMsgSendBody 一次订阅消息的请求参数
