@@ -14,7 +14,7 @@ go get gitee.com/chunanyong/gowe
 * 原生支持多微信号  
 * 支持跳板请求微信API服务.例如内网服务器没有网络出口权限,可以使用Nginx跳板请求微信API服务 
 * 原生支持集群部署  
-
+ 
 ### 初始化
 
 ```go
