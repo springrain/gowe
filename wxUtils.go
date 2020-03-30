@@ -161,8 +161,8 @@ func formatDateTime(t time.Time) string {
 	return t.Format("20060102150405")
 }
 
-//escapedPath 对URL进行Encode编码
-func escapedPath(u string) (path string, err error) {
+//encodePath 对URL进行Encode编码
+func encodePath(u string) (path string, err error) {
 	uriObj, err := url.Parse(u)
 	if err != nil {
 		return

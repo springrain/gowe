@@ -6,7 +6,7 @@ import "encoding/xml"
 func WxPayReportJsApi(wxPayConfig IWxPayConfig, body *WxPayReportJsAPIBody) (*WxResponseModel, error) {
 	var err error
 	// 处理参数
-	if body.InterfaceUrl, err = escapedPath(body.InterfaceUrl); err != nil {
+	if body.InterfaceUrl, err = encodePath(body.InterfaceUrl); err != nil {
 		return nil, err
 	}
 	// 业务逻辑

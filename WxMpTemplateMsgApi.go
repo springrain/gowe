@@ -51,8 +51,11 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 
 //WxMpSubscribeMsgURL 构造订阅模板消息的授权URL
 func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
-
-	apiurl := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + escapedPath(body.RedirectURL)
+	esurl, errEsUrl := encodePath(body.RedirectURL)
+	if errEsUrl != nil {
+		return "", errEsUrl
+	}
+	apiurl := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + esurl
 	if len(body.Reserved) >= 0 {
 		apiurl = apiurl + "&reserved=" + body.Reserved
 	}
