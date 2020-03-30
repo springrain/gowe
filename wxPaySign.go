@@ -99,17 +99,17 @@ func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, 
 }
 
 //wxPayDoVerifySign 验证微信返回的结果签名
-func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bool) (err error) {
+func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bool) error {
 	// 生成XML文档
 	doc := etree.NewDocument()
-	if err = doc.ReadFromBytes(xmlStr); err != nil {
-		return
+	if err := doc.ReadFromBytes(xmlStr); err != nil {
+		return err
 	}
 	root := doc.SelectElement("xml")
 	// 验证return_code
 	retCode := root.SelectElement("return_code").Text()
 	if retCode != responseSuccess && breakWhenFail {
-		return
+		return errors.New(retCode)
 	}
 	// 遍历所有Tag,生成Map和Sign
 	result, targetSign := make(map[string]interface{}), ""
@@ -129,22 +129,22 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	if result["sign_type"] != nil {
 		signType = result["sign_type"].(string)
 	}
-	// 生成签名
-	var sign string
-	if wxPayConfig.IsProd() {
-		sign = wxPayLocalSign(result, signType, wxPayConfig.GetAPIKey())
-	} else {
-		key, iErr := wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), SignTypeMD5)
-		if err = iErr; iErr != nil {
-			return
+
+	key := wxPayConfig.GetAPIKey()
+	if !wxPayConfig.IsProd() { //测试的沙箱环境
+		var errSandboxSign error
+		key, errSandboxSign = wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), signType)
+		if errSandboxSign != nil {
+			return errSandboxSign
 		}
-		sign = wxPayLocalSign(result, SignTypeMD5, key)
 	}
+	// 生成签名
+	sign := wxPayLocalSign(result, signType, key)
 	// 验证
 	if targetSign != sign {
-		err = errors.New("签名无效")
+		return errors.New("签名无效")
 	}
-	return
+	return nil
 }
 
 //WxPayJSAPISign 统一下单获取prepay_id参数后,再次计算出JSAPI需要的sign

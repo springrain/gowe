@@ -2,7 +2,6 @@ package gowe
 
 import (
 	"encoding/json"
-	"net/url"
 )
 
 //模板消息
@@ -53,7 +52,7 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 //WxMpSubscribeMsgURL 构造订阅模板消息的授权URL
 func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
 
-	apiurl := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + url.QueryEscape(body.RedirectURL)
+	apiurl := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + escapedPath(body.RedirectURL)
 	if len(body.Reserved) >= 0 {
 		apiurl = apiurl + "&reserved=" + body.Reserved
 	}
