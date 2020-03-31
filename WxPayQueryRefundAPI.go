@@ -113,7 +113,7 @@ func wxPayQueryRefundParseResponse(xmlStr []byte, rsp *WxPayQueryRefundResponse)
 				rsp.TotalRefunds[i].RefundSuccessTime = root.SelectElement(fmt.Sprintf("refund_success_time_%d", i)).Text()
 				if rsp.TotalRefunds[i].CouponRefundCount > 0 {
 					for j := int64(0); j < rsp.TotalRefunds[i].CouponRefundCount; j++ {
-						m := WxPayNewCouponResponseModel(root, "coupon_refund_id_%d_%d", "coupon_type_%d_%d", "coupon_refund_fee_%d_%d", i, j)
+						m := wxPayNewCouponResponseModel(root, "coupon_refund_id_%d_%d", "coupon_type_%d_%d", "coupon_refund_fee_%d_%d", i, j)
 						rsp.TotalRefunds[i].Coupons = append(rsp.TotalRefunds[i].Coupons, m)
 					}
 				}
