@@ -99,13 +99,18 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 	body = make(map[string]interface{})
 	_ = json.Unmarshal(bodyJson, &body)
 	// 添加固定参数
-	if wxPayConfig.IsMch() {
+	if wxPayConfig.MchType() == 1 { //特殊的商户接口(微信找零)
 		body["mch_appid"] = wxPayConfig.GetAppId()
 		body["mchid"] = wxPayConfig.GetMchId()
-	} else {
+	} else if wxPayConfig.MchType() == 2 { //红包
+		body["wxappid"] = wxPayConfig.GetAppId() //微信分配的公众账号ID(企业号corpid即为此appId).接口传入的所有appid应该为公众号的appid(在mp.weixin.qq.com申请的),不能为APP的appid(在open.weixin.qq.com申请的)
+		body["mch_id"] = wxPayConfig.GetMchId()
+	} else { //普通微信支付
 		body["appid"] = wxPayConfig.GetAppId()
 		body["mch_id"] = wxPayConfig.GetMchId()
 	}
+
+	//如果是服务商模式
 	if isWxPayFacilitator(wxPayConfig.GetServiceType()) {
 		body["sub_appid"] = wxPayConfig.GetSubAppId()
 		body["sub_mch_id"] = wxPayConfig.GetSubMchId()

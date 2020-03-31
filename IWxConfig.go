@@ -45,6 +45,6 @@ type IWxPayConfig interface {
 	GetSignType() string
 	GetServiceType() int // 服务模式
 	IsProd() bool        // 是否是生产环境
-	IsMch() bool         // 是否是特殊的商户接口(微信找零)
+	MchType() int        //0:普通商户接口, 1:特殊的商户接口(微信找零),2:红包
 
 }
