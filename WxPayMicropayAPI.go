@@ -9,7 +9,7 @@ func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMic
 		body.SceneInfoStr = jsonString(body.SceneInfo)
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/micropay", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/micropay", body, 0)
 	if err != nil {
 		return nil, err
 	}

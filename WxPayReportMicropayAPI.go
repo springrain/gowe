@@ -11,7 +11,7 @@ func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody
 	}
 	body.TradesStr = jsonString(body.Trades)
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/payitil/report", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/payitil/report", body, 0)
 	if err != nil {
 		return nil, err
 

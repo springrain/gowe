@@ -9,7 +9,7 @@ import "encoding/xml"
 func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*WxPaySendRedPackResponse, error) {
 	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/sendredpack"
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPack
 		body.AmtType = "ALL_RAND"
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 2)
 	if err != nil {
 		return nil, err
 	}

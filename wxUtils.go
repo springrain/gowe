@@ -93,16 +93,17 @@ func httpPostXmlWithCert(url string, xmlBody string, client *http.Client) (body 
 	return
 }
 
-func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[string]interface{}, err error) {
+// mchType 0:普通商户接口, 1:特殊的商户接口(企业付款,微信找零),2:红包
+func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) (body map[string]interface{}, err error) {
 	// 将bodyObj转换为map[string]interface{}类型
 	bodyJson, _ := json.Marshal(bodyObj)
 	body = make(map[string]interface{})
 	_ = json.Unmarshal(bodyJson, &body)
 	// 添加固定参数
-	if wxPayConfig.MchType() == 1 { //特殊的商户接口(企业付款,微信找零)
+	if mchType == 1 { //特殊的商户接口(企业付款,微信找零)
 		body["mch_appid"] = wxPayConfig.GetAppId()
 		body["mchid"] = wxPayConfig.GetMchId()
-	} else if wxPayConfig.MchType() == 2 { //红包
+	} else if mchType == 2 { //红包
 		body["wxappid"] = wxPayConfig.GetAppId() //微信分配的公众账号ID(企业号corpid即为此appId).接口传入的所有appid应该为公众号的appid(在mp.weixin.qq.com申请的),不能为APP的appid(在open.weixin.qq.com申请的)
 		body["mch_id"] = wxPayConfig.GetMchId()
 	} else { //普通微信支付
@@ -203,9 +204,9 @@ func getRandomString(length int) string {
 }
 
 //wxPayDoWeChat 向微信发送请求
-func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}) (bytes []byte, err error) {
+func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
 	// 转换参数
-	body, err := wxPayBuildBody(wxPayConfig, bodyObj)
+	body, err := wxPayBuildBody(wxPayConfig, bodyObj, mchType)
 	if err != nil {
 		return
 	}
@@ -215,9 +216,10 @@ func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{})
 }
 
 //wxPayDoWeChatWithCert 向微信发送带证书请求
-func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}) ([]byte, error) {
+// mchType 0:普通商户接口, 1:特殊的商户接口(企业付款,微信找零),2:红包
+func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}, mchType int) ([]byte, error) {
 	// 转换参数
-	body, err := wxPayBuildBody(wxPayConfig, bodyObj)
+	body, err := wxPayBuildBody(wxPayConfig, bodyObj, mchType)
 	if err != nil {
 		return nil, err
 	}

@@ -9,7 +9,7 @@ import (
 //WxPayRefund 申请退款  https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
 func WxPayRefund(wxPayConfig IWxPayConfig, body *WxPayRefundBody) (*WxPayRefundResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxPayMchAPIURL+"/secapi/pay/refund", body)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, WxPayMchAPIURL+"/secapi/pay/refund", body, 0)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 //WxPayQueryOrder 查询订单
 func WxPayQueryOrder(wxPayConfig IWxPayConfig, body *WxPayQueryOrderBody) (*WxPayQueryOrderResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/orderquery", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/orderquery", body, 0)
 	if err != nil {
 		return nil, err
 	}

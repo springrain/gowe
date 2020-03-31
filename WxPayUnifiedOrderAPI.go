@@ -2,14 +2,14 @@ package gowe
 
 import "encoding/xml"
 
-//WxPayUnifiedOrder 统一下单
+//WxPayUnifiedOrder 统一下单  https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
 func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*WxPayUnifiedOrderResponse, error) {
 	// 处理参数
 	if body.SceneInfoModel != nil {
 		body.SceneInfo = jsonString(*body.SceneInfoModel)
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/unifiedorder", body)
+	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/unifiedorder", body, 0)
 	if err != nil {
 		return nil, err
 	}
