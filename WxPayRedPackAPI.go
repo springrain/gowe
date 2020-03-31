@@ -23,6 +23,39 @@ func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*Wx
 	return res, err
 }
 
+//WxPaySendGroupRedPack 发送裂变红包
+//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_5&index=4
+func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPackBody) (*WxPaySendGroupRedPackResponse, error) {
+	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/sendgroupredpack"
+	if len(body.AmtType) < 1 {
+		body.AmtType = "ALL_RAND"
+	}
+	// 业务逻辑
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body)
+	if err != nil {
+		return nil, err
+	}
+	// 结果校验
+	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+		return nil, err
+	}
+	// 解析返回值
+	res := &WxPaySendGroupRedPackResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
+}
+
+//WxPaySendGroupRedPackBody 微信裂变红包参数
+type WxPaySendGroupRedPackBody struct {
+	WxPaySendRedPackBody
+	AmtType string `json:"amt_type"` //红包金额设置方式 ALL_RAND—全部随机,商户指定总金额和红包发放总人数，由微信支付随机计算出各红包金额
+}
+
+//WxPaySendGroupRedPackResponse 微信裂变红包返回值
+type WxPaySendGroupRedPackResponse struct {
+	WxPaySendRedPackResponse
+}
+
 //WxPaySendRedPackBody 微信发送红包参数
 type WxPaySendRedPackBody struct {
 	MchBillno   string `json:"mch_billno"`          // 商户订单号(每个订单号必须唯一.取值范围:0~9,a~z,A~Z)	接口根据商户订单号支持重入,如出现超时可再调用.
