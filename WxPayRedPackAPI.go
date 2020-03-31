@@ -45,6 +45,72 @@ func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPack
 	return res, err
 }
 
+//WxPayGetHBInfo 查看红包记录,用于商户对已发放的红包进行查询红包的具体信息,可支持普通红包和裂变包.
+//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_6&index=5
+func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayGetHBInfoResponse, error) {
+	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/gethbinfo"
+	// 业务逻辑
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 0)
+	if err != nil {
+		return nil, err
+	}
+	// 结果校验
+	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+		return nil, err
+	}
+	// 解析返回值
+	res := &WxPayGetHBInfoResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
+}
+
+//WxPayGetHBInfoBody 查看红包记录的请求参数
+type WxPayGetHBInfoBody struct {
+	MchBillno string `json:"mch_billno"` //商户发放红包的商户订单号
+	BillType  string `json:"bill_type"`  //MCHT:通过商户订单号获取红包信息
+}
+
+//WxPayGetHBInfoResponse 查看红包记录的返回值
+type WxPayGetHBInfoResponse struct {
+	ReturnCode string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识,非交易标识,交易是否成功需要查看result_code来判断
+	ReturnMsg  string `xml:"return_msg"`  // 返回信息,如非空,为错误原因:签名失败/参数格式校验错误
+
+	//以下字段在return_code为SUCCESS的时候有返回
+	ResultCode string `xml:"result_code"`  // SUCCESS/FAIL
+	ErrCode    string `xml:"err_code"`     // 详细参见第6节错误列表
+	ErrCodeDes string `xml:"err_code_des"` // 错误返回的信息描述
+
+	//以下字段在return_code 和result_code都为SUCCESS的时候有返回
+	MchBillno    string `xml:"mch_billno"`    // 商户使用查询API填写的商户单号的原路返回
+	MchId        string `xml:"mch_id"`        // 微信支付分配的商户号
+	DetailId     string `xml:"detail_id"`     // 使用API发放现金红包时返回的红包单号
+	Status       string `xml:"status"`        // SENDING:发放中,SENT:已发放待领取,FAILED：发放失败,RECEIVED:已领取,RFUND_ING:退款中,REFUND:已退款
+	SendType     string `xml:"send_type"`     // 发送类型 API:通过API接口发放,UPLOAD:通过上传文件方式发放,ACTIVITY:通过活动方式发放
+	HBType       string `xml:"hb_type"`       // 红包类型 GROUP:裂变红包,NORMAL:普通红包
+	TotalNum     int    `json:"total_num"`    // 红包个数
+	TotalAmount  int    `xml:"total_amount"`  // 红包总金额(单位分)
+	Reason       string `xml:"reason"`        // 发送失败原因
+	SendTime     string `xml:"send_time"`     // 红包发送时间 2015-04-21 20:00:00
+	RefundTime   string `xml:"refund_time"`   // 红包的退款时间(如果其未领取的退款) 2015-04-21 23:03:00
+	RefundAmount int    `xml:"refund_amount"` // 红包退款金额(单位分)
+	Wishing      string `xml:"wishing"`       // 红包祝福语
+	ActName      string `xml:"act_name"`      // 活动名称
+	Remark       string `xml:"remark"`        // 活动描述，低版本微信可见
+
+	Openid  string             `xml:"openid"`   // 领取红包的openid
+	Amount  int                `xml:"amount"`   // 领取金额(单位分)
+	RcvTime string             `xml:"rcv_time"` // 领取红包的时间 2015-04-21 20:00:00
+	HBList  []WxPayHBInfoModel `xml:"hblist"`   //
+}
+
+//WxPayHBInfoModel 返回的微信裂变红包信息
+type WxPayHBInfoModel struct {
+	Openid  string `xml:"openid"`   // 领取红包的openid
+	Amount  int    `xml:"amount"`   // 领取金额(单位分)
+	RcvTime string `xml:"rcv_time"` // 领取红包的时间 2015-04-21 20:00:00
+
+}
+
 //WxPaySendGroupRedPackBody 微信裂变红包参数
 type WxPaySendGroupRedPackBody struct {
 	WxPaySendRedPackBody
