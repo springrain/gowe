@@ -33,7 +33,7 @@ func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body *WxPayQueryMktTransfer
 	return res, err
 }
 
-//WxPayPromotionMktTransfersBody 微信找零的参数
+//WxPayPromotionMktTransfersBody 企业付款,微信找零的参数
 type WxPayPromotionMktTransfersBody struct {
 	DeviceInfo     string `json:"device_info,omitempty"`  // 终端设备号
 	PartnerTradeNo string `json:"partner_trade_no"`       // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*且在同一个商户号下唯一.详见商户订单号
@@ -45,7 +45,7 @@ type WxPayPromotionMktTransfersBody struct {
 	SpbillCreateIP string `json:"spbill_create_ip"`       // IP可传用户端或者服务端的IP
 }
 
-//WxPayPromotionMktTransfersResponse 微信找零的返回值
+//WxPayPromotionMktTransfersResponse 企业付款,微信找零的返回值
 type WxPayPromotionMktTransfersResponse struct {
 	WxResponseModel
 	WxPayMchServiceResponseModel
@@ -55,12 +55,12 @@ type WxPayPromotionMktTransfersResponse struct {
 	PaymentTime    string `xml:"payment_time"`     // 企业付款成功时间
 }
 
-//WxPayQueryMktTransferBody 微信找零查询的参数
+//WxPayQueryMktTransferBody 企业付款,微信找零查询的参数
 type WxPayQueryMktTransferBody struct {
 	PartnerTradeNo string `json:"partner_trade_no"` // 商户系统内部订单号
 }
 
-//WxPayQueryMktTransferResponse 微信找零查询的返回值
+//WxPayQueryMktTransferResponse 企业付款,微信找零查询的返回值
 type WxPayQueryMktTransferResponse struct {
 	WxResponseModel
 	WxPayMchServiceResponseModel

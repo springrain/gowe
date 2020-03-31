@@ -99,7 +99,7 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}) (body map[str
 	body = make(map[string]interface{})
 	_ = json.Unmarshal(bodyJson, &body)
 	// 添加固定参数
-	if wxPayConfig.MchType() == 1 { //特殊的商户接口(微信找零)
+	if wxPayConfig.MchType() == 1 { //特殊的商户接口(企业付款,微信找零)
 		body["mch_appid"] = wxPayConfig.GetAppId()
 		body["mchid"] = wxPayConfig.GetMchId()
 	} else if wxPayConfig.MchType() == 2 { //红包
