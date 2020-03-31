@@ -88,7 +88,7 @@ func wxPayNotifyParseParams(xmlStr []byte, body *WxPayNotifyPayBody) (err error)
 		}
 		root := doc.SelectElement("xml")
 		for i := 0; i < body.CouponCount; i++ {
-			m := WxPayNewCouponResponseModel(root, "coupon_id_%d", "coupon_type_%d", "coupon_fee_%d", i)
+			m := wxPayNewCouponResponseModel(root, "coupon_id_%d", "coupon_type_%d", "coupon_fee_%d", i)
 			body.Coupons = append(body.Coupons, m)
 		}
 	}

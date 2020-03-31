@@ -71,7 +71,7 @@ func wxPayRefundParseResponse(xmlStr []byte, rsp *WxPayRefundResponse) (err erro
 		}
 		root := doc.SelectElement("xml")
 		for i := 0; i < rsp.CouponRefundCount; i++ {
-			m := WxPayNewCouponResponseModel(root, "coupon_refund_id_%d", "coupon_type_%d", "coupon_refund_fee_%d", i)
+			m := wxPayNewCouponResponseModel(root, "coupon_refund_id_%d", "coupon_type_%d", "coupon_refund_fee_%d", i)
 			rsp.RefundCoupons = append(rsp.RefundCoupons, m)
 		}
 	}

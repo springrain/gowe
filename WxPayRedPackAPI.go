@@ -1,6 +1,11 @@
 package gowe
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"strconv"
+
+	"github.com/beevik/etree"
+)
 
 //微信红包APi
 
@@ -60,8 +65,45 @@ func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayG
 	}
 	// 解析返回值
 	res := &WxPayGetHBInfoResponse{}
-	err = xml.Unmarshal(bytes, res)
+	err = wxPayNewHBInfoResponse(bytes, res)
 	return res, err
+}
+
+//封装返回的裂变红包列表
+func wxPayNewHBInfoResponse(xmlStr []byte, rsp *WxPayGetHBInfoResponse) error {
+	// 常规解析
+	if err := xml.Unmarshal(xmlStr, rsp); err != nil {
+		return err
+	}
+
+	doc := etree.NewDocument()
+	if err := doc.ReadFromBytes(xmlStr); err != nil {
+		return err
+	}
+	hblistXML := doc.SelectElement("hblist")
+	if hblistXML == nil {
+		return nil
+	}
+
+	hbList := make([]WxPayHBInfoModel, 0)
+	for _, hbinfoXML := range hblistXML.SelectElements("hbinfo") {
+		hbInfo := WxPayHBInfoModel{}
+		if openid := hbinfoXML.SelectElement("openid"); openid != nil {
+			hbInfo.Openid = openid.Text()
+		} else if amount := hbinfoXML.SelectElement("amount"); amount != nil {
+			am, err := strconv.Atoi(amount.Text())
+			if err == nil {
+				hbInfo.Amount = am
+			}
+		} else if rcv := hbinfoXML.SelectElement("rcv_time"); rcv != nil {
+			hbInfo.RcvTime = rcv.Text()
+		}
+		hbList = append(hbList, hbInfo)
+
+	}
+	rsp.HBList = hbList
+	return nil
+
 }
 
 //WxPayGetHBInfoBody 查看红包记录的请求参数
@@ -100,14 +142,14 @@ type WxPayGetHBInfoResponse struct {
 	Openid  string             `xml:"openid"`   // 领取红包的openid
 	Amount  int                `xml:"amount"`   // 领取金额(单位分)
 	RcvTime string             `xml:"rcv_time"` // 领取红包的时间 2015-04-21 20:00:00
-	HBList  []WxPayHBInfoModel `xml:"hblist"`   //
+	HBList  []WxPayHBInfoModel `xml:"-"`        // 裂变红包的列表
 }
 
 //WxPayHBInfoModel 返回的微信裂变红包信息
 type WxPayHBInfoModel struct {
-	Openid  string `xml:"openid"`   // 领取红包的openid
-	Amount  int    `xml:"amount"`   // 领取金额(单位分)
-	RcvTime string `xml:"rcv_time"` // 领取红包的时间 2015-04-21 20:00:00
+	Openid  string // 领取红包的openid
+	Amount  int    // 领取金额(单位分)
+	RcvTime string // 领取红包的时间 2015-04-21 20:00:00
 
 }
 

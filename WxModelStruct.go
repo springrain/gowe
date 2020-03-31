@@ -59,8 +59,8 @@ type WxPayCouponResponseModel struct {
 	CouponFee  int64  // 单个代金券或立减优惠支付金额
 }
 
-//WxPayNewCouponResponseModel 在XML节点树中,查找labels对应的
-func WxPayNewCouponResponseModel(
+//wxPayNewCouponResponseModel 在XML节点树中,查找labels对应的
+func wxPayNewCouponResponseModel(
 	doc *etree.Element,
 	idFormat string,
 	typeFormat string,

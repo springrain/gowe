@@ -77,7 +77,7 @@ func wxPayQueryOrderParseResponse(xmlStr []byte, rsp *WxPayQueryOrderResponse) (
 		}
 		root := doc.SelectElement("xml")
 		for i := 0; i < rsp.CouponCount; i++ {
-			m := WxPayNewCouponResponseModel(root, "coupon_id_%d", "coupon_type_%d", "coupon_fee_%d", i)
+			m := wxPayNewCouponResponseModel(root, "coupon_id_%d", "coupon_type_%d", "coupon_fee_%d", i)
 			rsp.Coupons = append(rsp.Coupons, m)
 		}
 	}
