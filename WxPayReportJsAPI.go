@@ -10,7 +10,7 @@ func WxPayReportJsApi(wxPayConfig IWxPayConfig, body *WxPayReportJsAPIBody) (*Wx
 		return nil, err
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/payitil/report", body, 0)
+	bytes, err := wxPayDoWeChat(wxPayConfig, "/payitil/report", body, 0)
 	if err != nil {
 		return nil, err
 	}

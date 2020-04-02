@@ -5,7 +5,7 @@ import "encoding/xml"
 //WxPayCloseOrder 关闭订单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_3
 func WxPayCloseOrder(wxPayConfig IWxPayConfig, body *WxPayCloseOrderBody) (*WxPayCloseOrderResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/closeorder", body, 0)
+	bytes, err := wxPayDoWeChat(wxPayConfig, "/pay/closeorder", body, 0)
 	if err != nil {
 		return nil, err
 	}

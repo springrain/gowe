@@ -12,9 +12,8 @@ import (
 //WxPaySendRedPack 发送红包
 //https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
 func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*WxPaySendRedPackResponse, error) {
-	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/sendredpack"
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 2)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/sendredpack", body, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -31,12 +30,11 @@ func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*Wx
 //WxPaySendGroupRedPack 发送裂变红包
 //https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_5&index=4
 func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPackBody) (*WxPaySendGroupRedPackResponse, error) {
-	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/sendgroupredpack"
 	if len(body.AmtType) < 1 {
 		body.AmtType = "ALL_RAND"
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 2)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/sendgroupredpack", body, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -53,9 +51,8 @@ func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPack
 //WxPayGetHBInfo 查看红包记录,用于商户对已发放的红包进行查询红包的具体信息,可支持普通红包和裂变包.
 //https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_6&index=5
 func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayGetHBInfoResponse, error) {
-	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/gethbinfo"
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 0)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/gethbinfo", body, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +69,6 @@ func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayG
 //WxPaySendMiniProgramHB 发送小程序红包
 //https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=18_2&index=3
 func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgramHBBody) (*WxPaySendMiniProgramHBResponse, error) {
-	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/sendminiprogramhb"
 
 	//通过JSAPI方式领取红包,小程序红包固定传MINI_PROGRAM_JSAPI
 	if len(body.NotifyWay) < 1 {
@@ -80,7 +76,7 @@ func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgram
 	}
 
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 2)
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/sendminiprogramhb", body, 2)
 	if err != nil {
 		return nil, err
 	}

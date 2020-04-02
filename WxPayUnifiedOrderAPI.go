@@ -9,7 +9,7 @@ func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*
 		body.SceneInfo = jsonString(*body.SceneInfoModel)
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, WxPayMchAPIURL+"/pay/unifiedorder", body, 0)
+	bytes, err := wxPayDoWeChat(wxPayConfig, "/pay/unifiedorder", body, 0)
 	if err != nil {
 		return nil, err
 	}

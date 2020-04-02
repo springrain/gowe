@@ -204,7 +204,11 @@ func getRandomString(length int) string {
 }
 
 //wxPayDoWeChat 向微信发送请求
-func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
+func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
+	apiurl := WxPayMchAPIURL + apiuri
+	if !wxPayConfig.IsProd() {
+		apiurl = WxPaySanBoxAPIURL + apiuri
+	}
 	// 转换参数
 	body, err := wxPayBuildBody(wxPayConfig, bodyObj, mchType)
 	if err != nil {
@@ -217,7 +221,7 @@ func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{},
 
 //wxPayDoWeChatWithCert 向微信发送带证书请求
 // mchType 0:普通商户接口, 1:特殊的商户接口(企业付款,微信找零),2:红包
-func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj interface{}, mchType int) ([]byte, error) {
+func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) ([]byte, error) {
 	// 转换参数
 	body, err := wxPayBuildBody(wxPayConfig, bodyObj, mchType)
 	if err != nil {
@@ -228,6 +232,12 @@ func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiurl string, bodyObj inte
 	if err != nil {
 		return nil, err
 	}
+
+	apiurl := WxPayMchAPIURL + apiuri
+	if !wxPayConfig.IsProd() {
+		apiurl = WxPaySanBoxAPIURL + apiuri
+	}
+
 	// 发起请求
 	bytes, err := httpPostXmlWithCert(apiurl, generateXml(body), client)
 	return bytes, err
