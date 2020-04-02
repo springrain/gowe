@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"gitee.com/chunanyong/gouuid"
 	"golang.org/x/crypto/pkcs12"
 )
 
