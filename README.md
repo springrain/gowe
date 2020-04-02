@@ -84,6 +84,18 @@ func TestGetAccessToken(t *testing.T)  {
 * 交易保障(JSAPI)：`WxPayReportJsApi`
 * 交易保障(MICROPAY)：`WxPayReportMicropay` 
 
+#### 微信红包
+
+* 发送现金红包 `WxPaySendRedPack`
+* 发送裂变红包 `WxPaySendGroupRedPack`
+* 发送小程序红包 `WxPaySendMiniProgramHB`
+* 查询红包记录  `WxPayGetHBInfo`
+
+#### 企业付款
+
+* 企业付款到零钱 `WxPayPromotionMktTransfers`
+* 查询企业付款 `WxPayQueryMktTransfer`
+
 #### 微信支付回调
 
 * 支付回调：`WxPayNotifyPay`
