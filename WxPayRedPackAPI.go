@@ -69,6 +69,31 @@ func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayG
 	return res, err
 }
 
+//WxPaySendMiniProgramHB 发送小程序红包
+//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=18_2&index=3
+func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgramHBBody) (*WxPaySendMiniProgramHBResponse, error) {
+	apiurl := WxPayMchAPIURL + "/mmpaymkttransfers/sendminiprogramhb"
+
+	//通过JSAPI方式领取红包,小程序红包固定传MINI_PROGRAM_JSAPI
+	if len(body.NotifyWay) < 1 {
+		body.NotifyWay = "MINI_PROGRAM_JSAPI"
+	}
+
+	// 业务逻辑
+	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, apiurl, body, 2)
+	if err != nil {
+		return nil, err
+	}
+	// 结果校验
+	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+		return nil, err
+	}
+	// 解析返回值
+	res := &WxPaySendMiniProgramHBResponse{}
+	err = xml.Unmarshal(bytes, res)
+	return res, err
+}
+
 //封装返回的裂变红包列表
 func wxPayNewHBInfoResponse(xmlStr []byte, rsp *WxPayGetHBInfoResponse) error {
 	// 常规解析
@@ -172,7 +197,7 @@ type WxPaySendRedPackBody struct {
 	TotalAmount int    `json:"total_amount"`        //付款金额,单位分
 	TotalNum    int    `json:"total_num"`           //红包发放总人数 total_num=1
 	Wishing     string `json:"wishing"`             //红包祝福语 注意:敏感词会被转义成字符*
-	ClientIp    string `json:"client_ip"`           //调用接口的机器Ip地址
+	ClientIp    string `json:"client_ip,omitempty"` //调用接口的机器Ip地址
 	ActName     string `json:"act_name"`            //活动名称 注意:敏感词会被转义成字符*
 	Remark      string `json:"remark"`              //备注信息
 	SceneId     string `json:"scene_id,omitempty"`  //发放红包使用场景,红包金额大于200或者小于1元时必传. PRODUCT_1:商品促, PRODUCT_2:抽奖, PRODUCT_3:虚拟物品兑奖, PRODUCT_4:企业内部福利, PRODUCT_5:渠道分润, PRODUCT_6:保险回馈, PRODUCT_7:彩票派奖, PRODUCT_8:税务刮奖
@@ -195,4 +220,16 @@ type WxPaySendRedPackResponse struct {
 	TotalAmount int    `xml:"total_amount"` // 付款金额,单位分
 	SendListid  string `xml:"send_listid"`  // 红包订单的微信单号
 
+}
+
+//WxPaySendMiniProgramHBBody 微信发送小程序红包参数
+type WxPaySendMiniProgramHBBody struct {
+	WxPaySendRedPackBody
+	NotifyWay string `json:"notify_way"` //通知用户形式	 通过JSAPI方式领取红包,小程序红包固定传MINI_PROGRAM_JSAPI
+}
+
+//WxPaySendMiniProgramHBResponse 微信发送小程序红包返回值
+type WxPaySendMiniProgramHBResponse struct {
+	WxPaySendRedPackResponse
+	JSAPIPackage string `xml:"package"` // 返回jaspi的入参package的值
 }
