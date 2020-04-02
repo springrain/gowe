@@ -203,6 +203,22 @@ func getRandomString(length int) string {
 	return string(result)
 }
 
+var FuncGenerateStringID func() string = generateStringID
+
+
+//generateStringID 生成主键字符串
+func generateStringID() string {
+	//pk := strconv.FormatInt(time.Now().UnixNano(), 10)
+	pk, errUUID := gouuid.NewV4()
+	if errUUID != nil {
+		return ""
+	}
+
+	return strings.Replace(pk.String(), "-", "", -1)
+
+}
+
+
 //wxPayDoWeChat 向微信发送请求
 func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
 	apiurl := WxPayMchAPIURL + apiuri
