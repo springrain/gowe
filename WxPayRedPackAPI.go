@@ -105,13 +105,14 @@ func wxPayNewHBInfoResponse(xmlStr []byte, rsp *WxPayGetHBInfoResponse) error {
 	if err := doc.ReadFromBytes(xmlStr); err != nil {
 		return err
 	}
-	hblistXML := doc.SelectElement("hblist")
-	if hblistXML == nil {
-		return nil
-	}
+	//rootXML := doc.SelectElement("xml")
+	//hblistXML := rootXML.SelectElement("hblist")
+	//if hblistXML == nil {
+	//	return nil
+	//}
 
 	hbList := make([]WxPayHBInfoModel, 0)
-	for _, hbinfoXML := range hblistXML.SelectElements("hbinfo") {
+	for _, hbinfoXML := range doc.FindElements("./xml/hblist/*") {
 		hbInfo := WxPayHBInfoModel{}
 		if openid := hbinfoXML.SelectElement("openid"); openid != nil {
 			hbInfo.Openid = openid.Text()
