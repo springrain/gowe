@@ -5,8 +5,12 @@ import "encoding/xml"
 //WxPayReportMicropay 交易保障(MICROPAY) https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_14&index=8
 func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody) (*WxResponseModel, error) {
 	// 处理参数
+	interfaceUrl := WxPayMchAPIURL + "/pay/batchreport/micropay/total"
+	if !wxPayConfig.IsProd() {
+		interfaceUrl = WxPaySanBoxAPIURL + "/pay/batchreport/micropay/total"
+	}
 	var err error
-	if body.InterfaceUrl, err = encodePath(WxPayMchAPIURL + "/pay/batchreport/micropay/total"); err != nil {
+	if body.InterfaceUrl, err = encodePath(interfaceUrl); err != nil {
 		return nil, err
 	}
 	body.TradesStr = jsonString(body.Trades)
