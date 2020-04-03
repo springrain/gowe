@@ -18,9 +18,9 @@ func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*Wx
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return nil, err
-	}
+	//if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	//	return nil, err
+	//}
 	// 解析返回值
 	res := &WxPaySendRedPackResponse{}
 	err = xml.Unmarshal(bytes, res)
@@ -39,9 +39,9 @@ func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPack
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return nil, err
-	}
+	//if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	//	return nil, err
+	//}
 	// 解析返回值
 	res := &WxPaySendGroupRedPackResponse{}
 	err = xml.Unmarshal(bytes, res)
@@ -57,9 +57,9 @@ func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayG
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return nil, err
-	}
+	//if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	//	return nil, err
+	//}
 	// 解析返回值
 	res := &WxPayGetHBInfoResponse{}
 	err = wxPayNewHBInfoResponse(bytes, res)
@@ -81,11 +81,10 @@ func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgram
 		return nil, err
 	}
 
-
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-		return nil, err
-	}
+	//if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	//	return nil, err
+	//}
 	// 解析返回值
 	res := &WxPaySendMiniProgramHBResponse{}
 	err = xml.Unmarshal(bytes, res)
@@ -190,7 +189,7 @@ type WxPaySendGroupRedPackResponse struct {
 
 //WxPaySendRedPackBody 微信发送红包参数
 type WxPaySendRedPackBody struct {
- 	MchBillno   string `json:"mch_billno"`          // 商户订单号(每个订单号必须唯一.取值范围:0~9,a~z,A~Z)	接口根据商户订单号支持重入,如出现超时可再调用.
+	MchBillno   string `json:"mch_billno"`          // 商户订单号(每个订单号必须唯一.取值范围:0~9,a~z,A~Z)	接口根据商户订单号支持重入,如出现超时可再调用.
 	SendName    string `json:"send_name"`           // 红包发送者名称 注意:敏感词会被转义成字符*
 	ReOpenid    string `json:"re_openid"`           // 接受红包的用户openid openid为用户在wxappid下的唯一标识(获取openid参见微信公众平台开发者文档:网页授权获取用户基本信息)
 	TotalAmount int    `json:"total_amount"`        //付款金额,单位分
