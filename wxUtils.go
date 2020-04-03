@@ -7,7 +7,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -117,7 +116,8 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) 
 		body["sub_appid"] = wxPayConfig.GetSubAppId()
 		body["sub_mch_id"] = wxPayConfig.GetSubMchId()
 	}
-	nonceStr := getRandomString(32)
+	//nonceStr := getRandomString(32)
+	nonceStr := FuncGenerateRandomString()
 	body["nonce_str"] = nonceStr
 	// 生成签名
 	signType, _ := body["sign_type"].(string)
@@ -192,6 +192,7 @@ func isValidAuthCode(authcode string) (ok bool) {
 	return
 }
 
+/*
 //getRandomString 获取随机字符串
 func getRandomString(length int) string {
 	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
@@ -203,22 +204,19 @@ func getRandomString(length int) string {
 	}
 	return string(result)
 }
+*/
 
-var FuncGenerateStringID func() string = generateStringID
+//FuncGenerateRandomString 生成32位的随机字符串
+var FuncGenerateRandomString func() string = generateRandomString
 
-
-//generateStringID 生成主键字符串
-func generateStringID() string {
-	//pk := strconv.FormatInt(time.Now().UnixNano(), 10)
+//generateRandomString 生成32位随机字符串
+func generateRandomString() string {
 	pk, errUUID := gouuid.NewV4()
 	if errUUID != nil {
 		return ""
 	}
-
 	return strings.Replace(pk.String(), "-", "", -1)
-
 }
-
 
 //wxPayDoWeChat 向微信发送请求
 func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
