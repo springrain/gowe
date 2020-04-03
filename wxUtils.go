@@ -6,16 +6,16 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"gitee.com/chunanyong/gouuid"
+	"golang.org/x/crypto/pkcs12"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
-
-	"gitee.com/chunanyong/gouuid"
-	"golang.org/x/crypto/pkcs12"
 )
 
 //http请求的client
@@ -191,9 +191,8 @@ func isValidAuthCode(authcode string) (ok bool) {
 	ok, _ = regexp.MatchString(pattern, authcode)
 	return
 }
-
-/*
-//getRandomString 获取随机字符串
+var FungetRandomString func(int) string = getRandomString
+ //getRandomString 获取随机字符串
 func getRandomString(length int) string {
 	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 	b := []byte(str)
@@ -204,7 +203,6 @@ func getRandomString(length int) string {
 	}
 	return string(result)
 }
-*/
 
 //FuncGenerateRandomString 生成32位的随机字符串
 var FuncGenerateRandomString func() string = generateRandomString
