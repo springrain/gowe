@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"gitee.com/chunanyong/gouuid"
-	"golang.org/x/crypto/pkcs12"
 	"io/ioutil"
 	"math/rand"
 	"net"
@@ -16,6 +14,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/pkcs12"
 )
 
 //http请求的client
@@ -117,7 +117,7 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) 
 		body["sub_mch_id"] = wxPayConfig.GetSubMchId()
 	}
 	//nonceStr := getRandomString(32)
-	nonceStr := FuncGenerateRandomString()
+	nonceStr := FuncGenerateRandomString(32)
 	body["nonce_str"] = nonceStr
 	// 生成签名
 	signType, _ := body["sign_type"].(string)
@@ -191,9 +191,12 @@ func isValidAuthCode(authcode string) (ok bool) {
 	ok, _ = regexp.MatchString(pattern, authcode)
 	return
 }
-var FungetRandomString func(int) string = getRandomString
- //getRandomString 获取随机字符串
-func getRandomString(length int) string {
+
+//FuncGenerateRandomString 生成指定位数的随机字符串
+var FuncGenerateRandomString func(int) string = generateRandomString
+
+//generateRandomString 获取随机字符串
+func generateRandomString(length int) string {
 	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 	b := []byte(str)
 	var result []byte
@@ -201,19 +204,7 @@ func getRandomString(length int) string {
 	for i := 0; i < length; i++ {
 		result = append(result, b[r.Intn(len(b))])
 	}
-	return string(result)
-}
-
-//FuncGenerateRandomString 生成32位的随机字符串
-var FuncGenerateRandomString func() string = generateRandomString
-
-//generateRandomString 生成32位随机字符串
-func generateRandomString() string {
-	pk, errUUID := gouuid.NewV4()
-	if errUUID != nil {
-		return ""
-	}
-	return strings.Replace(pk.String(), "-", "", -1)
+	return strings.ToLower(string(result))
 }
 
 //wxPayDoWeChat 向微信发送请求
