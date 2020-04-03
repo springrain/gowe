@@ -81,10 +81,11 @@ func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgram
 		return nil, err
 	}
 
+
 	// 结果校验
-	//if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
-	//	return nil, err
-	//}
+	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+		return nil, err
+	}
 	// 解析返回值
 	res := &WxPaySendMiniProgramHBResponse{}
 	err = xml.Unmarshal(bytes, res)
