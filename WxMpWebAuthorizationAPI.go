@@ -90,7 +90,7 @@ func WxMpGetUserInfo(wxMpConfig IWxMpConfig, openId, lang string) (*WxMpUserInfo
 	if len(lang) <= 0 {
 		lang = "zh_CN"
 	}
-	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "s&lang=" + lang
+	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "&lang=" + lang
 	body, err := httpGet(apiurl)
 	if err != nil {
 		return nil, err
