@@ -115,7 +115,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	result, targetSign := make(map[string]interface{}), ""
 	for _, elem := range root.ChildElements() {
 		// 跳过空值
-		if elem.Text() == "" || elem.Text() == "0" {
+		if elem.Text() == "" {
 			continue
 		}
 		if elem.Tag != "sign" {
