@@ -14,10 +14,6 @@ go get gitee.com/chunanyong/gowe
 * 支持跳板请求微信API服务.例如内网服务器没有网络出口权限,可以使用Nginx跳板请求微信API服务 
 * 原生支持集群部署  
  
-## 博客/微信公众号
-**博客 [https://www.jiagou.com](https://www.jiagou.com)**  
-![架构经验公众号](https://images.gitee.com/uploads/images/2020/0913/092555_22726551_686.jpeg "qrcode_300x300.jpg")   
-
 ## 初始化
 
 ```go
@@ -134,4 +130,8 @@ func TestGetAccessToken(t *testing.T)  {
 * 银行类型:[https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_2](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_2)
 * 单品优惠功能字段:[https://pay.weixin.qq.com/wiki/doc/api/danpin.php?chapter=9_101&index=1](https://pay.weixin.qq.com/wiki/doc/api/danpin.php?chapter=9_101&index=1)
 * 代金券或立减优惠:[https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=12_1](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=12_1)
-* 最新县及县以上行政区划代码:[https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv](https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv)
+* 最新县及县以上行政区划代码:[https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv](https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv)  
+
+## 博客/微信公众号
+**博客 [https://www.jiagou.com](https://www.jiagou.com)**  
+![架构经验公众号](https://images.gitee.com/uploads/images/2020/0913/092555_22726551_686.jpeg "qrcode_300x300.jpg")   
