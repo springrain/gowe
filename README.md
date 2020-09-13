@@ -1,6 +1,5 @@
-# gowe
 
-#### 介绍
+## 介绍
 golang 多微信号SDK,[readygo](https://gitee.com/chunanyong/readygo)子项目  [API文档](https://pkg.go.dev/gitee.com/chunanyong/gowe?tab=doc)  
 
 感谢 [https://gitee.com/xiaochengtech/wechat](https://gitee.com/xiaochengtech/wechat) 提供的基础代码
@@ -15,7 +14,11 @@ go get gitee.com/chunanyong/gowe
 * 支持跳板请求微信API服务.例如内网服务器没有网络出口权限,可以使用Nginx跳板请求微信API服务 
 * 原生支持集群部署  
  
-### 初始化
+## 博客/微信公众号
+**博客 [https://www.jiagou.com](https://www.jiagou.com)**  
+![架构经验公众号](https://images.gitee.com/uploads/images/2020/0913/092555_22726551_686.jpeg "qrcode_300x300.jpg")   
+
+## 初始化
 
 ```go
 type WxConfig struct {
@@ -53,7 +56,7 @@ func (wxConfig *WxConfig) GetSecret() string {
 
 ```
 
-### 使用
+## 使用
 
 以下是通用的接口，WxConfig 设置为全局变量，使用`gowe.XXX`调用
 
@@ -71,7 +74,7 @@ func TestGetAccessToken(t *testing.T)  {
 
 ```
 
-#### 微信支付
+## 微信支付
 
 * 提交付款码支付 `WxPayMicropay`
 * 统一下单：`WxPayUnifiedOrder`
@@ -84,24 +87,24 @@ func TestGetAccessToken(t *testing.T)  {
 * 交易保障(JSAPI)：`WxPayReportJsApi`
 * 交易保障(MICROPAY)：`WxPayReportMicropay` 
 
-#### 微信红包
+## 微信红包
 
 * 发送现金红包 `WxPaySendRedPack`
 * 发送裂变红包 `WxPaySendGroupRedPack`
 * 发送小程序红包 `WxPaySendMiniProgramHB`
 * 查询红包记录  `WxPayGetHBInfo`
 
-#### 企业付款
+## 企业付款
 
 * 企业付款到零钱 `WxPayPromotionMktTransfers`
 * 查询企业付款 `WxPayQueryMktTransfer`
 
-#### 微信支付回调
+## 微信支付回调
 
 * 支付回调：`WxPayNotifyPay`
 * 退款回调：`WxPayNotifyRefund`
 
-#### 微信公众号
+## 微信公众号
 
 * 获取基础支持的AccessToken：`WxMpWebAuthAccessToken`
 * 获取用户基本信息(UnionId机制)：`WxMpGetUserInfo`
@@ -111,13 +114,13 @@ func TestGetAccessToken(t *testing.T)  {
 * 发送模板消息：`WxMpTemplateMsgSend` 
 * 发送订阅消息: `WxMpSubscribeMsgSend`
 
-#### 微信小程序
+## 微信小程序
 
 * 获取小程序支付签名：`WxPayMaSign`
 * 获取小程序码：`WxMaCodeGetUnlimited`
 * 发送订阅消息：`WxMaSubscribeMessageSend`
 
-### 文档
+## 文档
 
 * 微信支付文档:[https://pay.weixin.qq.com/wiki/doc/api/index.html](https://pay.weixin.qq.com/wiki/doc/api/index.html)
 * 随机数生成算法:[https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3)
