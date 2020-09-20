@@ -132,6 +132,6 @@ func TestGetAccessToken(t *testing.T)  {
 * 代金券或立减优惠:[https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=12_1](https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=12_1)
 * 最新县及县以上行政区划代码:[https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv](https://pay.weixin.qq.com/wiki/doc/api/download/store_adress.csv)  
 
-## 博客/微信公众号
+## 头条号
 **博客 [https://www.jiagou.com](https://www.jiagou.com)**  
-![架构经验公众号](https://images.gitee.com/uploads/images/2020/0913/092555_22726551_686.jpeg "qrcode_300x300.jpg")   
+![头条号](https://images.gitee.com/uploads/images/2020/0920/213826_38708bb4_686.jpeg "toutiao_300x300.jpg")   
