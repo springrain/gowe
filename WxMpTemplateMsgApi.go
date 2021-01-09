@@ -56,7 +56,7 @@ func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
 		return "", errEncodePath
 	}
 	apiurl := WxMpWeiXinURL + "/mp/subscribemsg?action=get_confirm&appid=" + body.AppId + "&scene=" + body.Scene + "&template_id=" + body.TemplateId + "&redirect_url=" + encodeurl
-	if len(body.Reserved) >= 0 {
+	if len(body.Reserved) > 0 {
 		apiurl = apiurl + "&reserved=" + body.Reserved
 	}
 	apiurl = apiurl + "#wechat_redirect"
