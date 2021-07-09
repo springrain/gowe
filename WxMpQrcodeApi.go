@@ -69,7 +69,7 @@ func WxMpQrShowQrCodeUrl(wxMpConfig IWxMpConfig, ticket string) (string, error) 
 	if len(ticket) < 1 {
 		return "", errors.New("ticket不能为空")
 	}
-	return WxMpAPIURL + "/cgi-bin/showqrcode?ticket=" + ticket, nil
+	return WxMpWeiXinURL + "/cgi-bin/showqrcode?ticket=" + ticket, nil
 }
 
 type WxMpQrCreateResponse struct {
