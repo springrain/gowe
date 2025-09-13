@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 )
@@ -8,12 +9,12 @@ import (
 //网页授权获取 access_token API
 //https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
 
-//WxMpWrapAuthorizeURL 包装网页授权的url
+// WxMpWrapAuthorizeURL 包装网页授权的url
 func WxMpWrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, snsapiBase bool) (string, error) {
 	return wrapAuthorizeURL(wxMpConfig, redirectUri, "", snsapiBase)
 }
 
-//wrapAuthorizeURL 包装网页授权的url
+// wrapAuthorizeURL 包装网页授权的url
 func wrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, state string, snsapiBase bool) (string, error) {
 	apiurl := WxMpAPIURL + "/connect/oauth2/authorize?appid=" + wxMpConfig.GetAppId() + "&response_type=code&redirect_uri=" + redirectUri
 	if snsapiBase {
@@ -30,13 +31,13 @@ func wrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, state string, 
 
 }
 
-//WxMpWebAuthAccessToken 用code换取accessToken. 认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
-func WxMpWebAuthAccessToken(wxMpConfig IWxMpConfig, code string) (*WxAccessToken, error) {
+// WxMpWebAuthAccessToken 用code换取accessToken. 认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
+func WxMpWebAuthAccessToken(ctx context.Context, wxMpConfig IWxMpConfig, code string) (*WxAccessToken, error) {
 	if len(code) < 1 {
 		return nil, errors.New("code不能为空")
 	}
 	apiurl := WxMpAPIURL + "/sns/oauth2?appid=" + wxMpConfig.GetAppId() + "&secret=" + wxMpConfig.GetSecret() + "&code=" + code + "&grant_type=authorization_code"
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}
@@ -45,13 +46,13 @@ func WxMpWebAuthAccessToken(wxMpConfig IWxMpConfig, code string) (*WxAccessToken
 	return wxAccessToken, err
 }
 
-//WxMpWebAuthRefreshAccessToken 刷新认证的AccessToken.认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
-func WxMpWebAuthRefreshAccessToken(wxMpConfig IWxMpConfig, refreshToken string) (*WxAccessToken, error) {
+// WxMpWebAuthRefreshAccessToken 刷新认证的AccessToken.认证的accessToken 和API的accessToken不一样,暂时使用同一个struct进行接收
+func WxMpWebAuthRefreshAccessToken(ctx context.Context, wxMpConfig IWxMpConfig, refreshToken string) (*WxAccessToken, error) {
 	if len(refreshToken) < 1 {
 		return nil, errors.New("refreshToken不能为空")
 	}
 	apiurl := WxMpAPIURL + "/sns/oauth2/refresh_token?appid=" + wxMpConfig.GetAppId() + "&grant_type=refresh_token&refresh_token=" + refreshToken
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func WxMpWebAuthRefreshAccessToken(wxMpConfig IWxMpConfig, refreshToken string) 
 	return wxAccessToken, err
 }
 
-//WxMpUserInfo 用户信息
+// WxMpUserInfo 用户信息
 type WxMpUserInfo struct {
 	OpenId         string   `json:"openid"`          // 用户唯一标识
 	Nickname       string   `json:"nickname"`        // 用户的昵称
@@ -84,14 +85,14 @@ type WxMpUserInfo struct {
 	ErrMsg         string   `json:"errmsg"`          // 错误信息
 }
 
-//WxMpGetUserInfo 获取用户基本信息,包括UnionID机制(授权机制)
-//https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html
-func WxMpGetUserInfo(wxMpConfig IWxMpConfig, openId, lang string) (*WxMpUserInfo, error) {
+// WxMpGetUserInfo 获取用户基本信息,包括UnionID机制(授权机制)
+// https://developers.weixin.qq.com/doc/offiaccount/User_Management/Get_users_basic_information_UnionID.html
+func WxMpGetUserInfo(ctx context.Context, wxMpConfig IWxMpConfig, openId, lang string) (*WxMpUserInfo, error) {
 	if len(lang) <= 0 {
 		lang = "zh_CN"
 	}
 	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "&lang=" + lang
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}
@@ -100,21 +101,21 @@ func WxMpGetUserInfo(wxMpConfig IWxMpConfig, openId, lang string) (*WxMpUserInfo
 	return &userInfo, err
 }
 
-type WxMpUserOpenIds struct{
- 	Total 		int 		`json:"total"`  //	关注该公众账号的总用户数
-	Count       int 		`json:"count"` //	拉取的OPENID个数，最大值为10000
-	Data 	    map[string][]string 	`json:"data"` //列表数据，OPENID的列表
-	NextOpenid	string 		`json:"next_openid"` //拉取列表的最后一个用户的OPENID
-	ErrCode        int      `json:"errcode"`         // 错误码
-	ErrMsg         string   `json:"errmsg"`          // 错误信息
+type WxMpUserOpenIds struct {
+	Total      int                 `json:"total"`       //	关注该公众账号的总用户数
+	Count      int                 `json:"count"`       //	拉取的OPENID个数，最大值为10000
+	Data       map[string][]string `json:"data"`        //列表数据，OPENID的列表
+	NextOpenid string              `json:"next_openid"` //拉取列表的最后一个用户的OPENID
+	ErrCode    int                 `json:"errcode"`     // 错误码
+	ErrMsg     string              `json:"errmsg"`      // 错误信息
 }
 
-//WxMpGetUserInfos 获取用户基本信息,包括UnionID机制(授权机制)
-//https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html
-func WxMpGetUserOpenIds(wxMpConfig IWxMpConfig, openId string) (*WxMpUserOpenIds, error) {
+// WxMpGetUserInfos 获取用户基本信息,包括UnionID机制(授权机制)
+// https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html
+func WxMpGetUserOpenIds(ctx context.Context, wxMpConfig IWxMpConfig, openId string) (*WxMpUserOpenIds, error) {
 
 	apiurl := WxMpAPIURL + "/cgi-bin/user/get?access_token=" + wxMpConfig.GetAccessToken() + "&next_openid=" + openId
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}

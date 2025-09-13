@@ -1,20 +1,21 @@
 package gowe
 
 import (
+	"context"
 	"encoding/xml"
 
 	"github.com/beevik/etree"
 )
 
-//WxPayRefund 申请退款  https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
-func WxPayRefund(wxPayConfig IWxPayConfig, body *WxPayRefundBody) (*WxPayRefundResponse, error) {
+// WxPayRefund 申请退款  https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_4
+func WxPayRefund(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayRefundBody) (*WxPayRefundResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/secapi/pay/refund", body, 0)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/secapi/pay/refund", body, 0)
 	if err != nil {
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	if err = wxPayDoVerifySign(ctx, wxPayConfig, bytes, true); err != nil {
 		return nil, err
 	}
 	// 解析返回值
@@ -23,7 +24,7 @@ func WxPayRefund(wxPayConfig IWxPayConfig, body *WxPayRefundBody) (*WxPayRefundR
 	return res, err
 }
 
-//WxPayRefundBody 申请退款的参数
+// WxPayRefundBody 申请退款的参数
 type WxPayRefundBody struct {
 	TransactionId string `json:"transaction_id"`            // 微信支付订单号
 	OutTradeNo    string `json:"out_trade_no"`              // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*@ ,且在同一个商户号下唯一.
@@ -36,7 +37,7 @@ type WxPayRefundBody struct {
 	NotifyUrl     string `json:"notify_url,omitempty"`      // 异步接收微信支付退款结果通知的回调地址
 }
 
-//WxResponseModel 申请退款的返回值
+// WxResponseModel 申请退款的返回值
 type WxPayRefundResponse struct {
 	WxResponseModel
 	WxPayPartnerResponseModel
@@ -57,7 +58,7 @@ type WxPayRefundResponse struct {
 	RefundCoupons []WxPayCouponResponseModel `xml:"-"`
 }
 
-//wxPayRefundParseResponse 申请退款-解析XML返回值
+// wxPayRefundParseResponse 申请退款-解析XML返回值
 func wxPayRefundParseResponse(xmlStr []byte, rsp *WxPayRefundResponse) (err error) {
 	// 常规解析
 	if err = xml.Unmarshal(xmlStr, rsp); err != nil {

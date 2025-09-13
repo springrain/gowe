@@ -1,20 +1,23 @@
 package gowe
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+)
 
-//WxPayUnifiedOrder 统一下单  https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
-func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*WxPayUnifiedOrderResponse, error) {
+// WxPayUnifiedOrder 统一下单  https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_1
+func WxPayUnifiedOrder(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*WxPayUnifiedOrderResponse, error) {
 	// 处理参数
 	if body.SceneInfoModel != nil {
 		body.SceneInfo = jsonString(*body.SceneInfoModel)
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, "/pay/unifiedorder", body, 0)
+	bytes, err := wxPayDoWeChat(ctx, wxPayConfig, "/pay/unifiedorder", body, 0)
 	if err != nil {
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	if err = wxPayDoVerifySign(ctx, wxPayConfig, bytes, true); err != nil {
 		return nil, err
 	}
 	res := &WxPayUnifiedOrderResponse{}
@@ -23,7 +26,7 @@ func WxPayUnifiedOrder(wxPayConfig IWxPayConfig, body *WxPayUnifiedOrderBody) (*
 	return res, err
 }
 
-//WxPayUnifiedOrderBody 统一下单的参数
+// WxPayUnifiedOrderBody 统一下单的参数
 type WxPayUnifiedOrderBody struct {
 	SignType       string `json:"sign_type,omitempty"`   // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	DeviceInfo     string `json:"device_info,omitempty"` // (非必填) 终端设备号(门店号或收银设备ID),注意:PC网页或JSAPI支付请传"WEB"
@@ -49,7 +52,7 @@ type WxPayUnifiedOrderBody struct {
 	SceneInfoModel *WxPaySceneInfoModel `json:"-"`
 }
 
-//WxPayUnifiedOrderResponse 统一下单的返回值
+// WxPayUnifiedOrderResponse 统一下单的返回值
 type WxPayUnifiedOrderResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时

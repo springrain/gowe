@@ -1,6 +1,9 @@
 package gowe
 
-import "encoding/json"
+import (
+	"context"
+	"encoding/json"
+)
 
 /*
 //WxMaTemplateMsgSend 发送模板消息
@@ -11,14 +14,14 @@ func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) 
 }
 */
 
-//WxMaSubscribeMessageSend 发送订阅消息
-//https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html
-func WxMaSubscribeMessageSend(wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) (*ResponseBase, error) {
+// WxMaSubscribeMessageSend 发送订阅消息
+// https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html
+func WxMaSubscribeMessageSend(ctx context.Context, wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) (*ResponseBase, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/message/subscribe/send?access_token=" + wxMaConfig.GetAccessToken()
-	return wxMaSendTemplateMsg(wxMaConfig, apiurl, body)
+	return wxMaSendTemplateMsg(ctx, wxMaConfig, apiurl, body)
 }
 
-func wxMaSendTemplateMsg(wxMaConfig IWxMaConfig, apiurl string, body *WxMaTemplateMsgSendBody) (*ResponseBase, error) {
+func wxMaSendTemplateMsg(ctx context.Context, wxMaConfig IWxMaConfig, apiurl string, body *WxMaTemplateMsgSendBody) (*ResponseBase, error) {
 
 	// 参数处理
 	bodyStr, err := json.Marshal(body)
@@ -34,7 +37,7 @@ func wxMaSendTemplateMsg(wxMaConfig IWxMaConfig, apiurl string, body *WxMaTempla
 	if body.dataMap != nil {
 		params["data"] = body.dataMap
 	}
-	data, err := httpPost(apiurl, params)
+	data, err := httpPost(ctx, apiurl, params)
 	// 发送请求
 	if err != nil {
 		return nil, err
@@ -45,7 +48,7 @@ func wxMaSendTemplateMsg(wxMaConfig IWxMaConfig, apiurl string, body *WxMaTempla
 	return res, err
 }
 
-//WxMaTemplateMsgSendBody 小程序模板消息的请求参数
+// WxMaTemplateMsgSendBody 小程序模板消息的请求参数
 type WxMaTemplateMsgSendBody struct {
 	Touser     string `json:"touser"`         // 接收者(用户)的 openid
 	TemplateId string `json:"template_id"`    // 所需下发的模板消息的id
@@ -59,7 +62,7 @@ type WxMaTemplateMsgSendBody struct {
 	Lang             string `json:"lang,omitempty"`              //进入小程序查看”的语言类型，支持zh_CN(简体中文)、en_US(英文)、zh_HK(繁体中文)、zh_TW(繁体中文)，默认为zh_CN
 }
 
-//AddData 模板内容,不填则下发空模板.具体格式请参考示例.
+// AddData 模板内容,不填则下发空模板.具体格式请参考示例.
 func (wxMaTemplateMsg *WxMaTemplateMsgSendBody) AddData(key string, value string) {
 	if wxMaTemplateMsg.dataMap == nil {
 		wxMaTemplateMsg.dataMap = make(map[string]interface{})

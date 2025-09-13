@@ -2,15 +2,17 @@ package gowe
 
 import (
 	"bytes"
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -18,10 +20,10 @@ import (
 	"golang.org/x/crypto/pkcs12"
 )
 
-//http请求的client
+// http请求的client
 var client *http.Client
 
-//初始化 http连接信息
+// 初始化 http连接信息
 func init() {
 	client = &http.Client{
 		Timeout: 30 * time.Second,
@@ -37,21 +39,26 @@ func init() {
 	}
 }
 
-//httpGet 发起get请求
-func httpGet(apiurl string) ([]byte, error) {
-	resp, errGet := client.Get(apiurl)
+// httpGet 发起get请求
+func httpGet(ctx context.Context, apiurl string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", apiurl, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, errGet := client.Do(req)
+	//resp, errGet := client.Get(apiurl)
 
 	if errGet != nil {
 		return nil, errGet
 	}
 	defer resp.Body.Close()
 
-	body, errRead := ioutil.ReadAll(resp.Body)
+	body, errRead := io.ReadAll(resp.Body)
 	return body, errRead
 }
 
-//httpPost post请求,返回原始的字节数组
-func httpPost(apiurl string, params map[string]interface{}) ([]byte, error) {
+// httpPost post请求,返回原始的字节数组
+func httpPost(ctx context.Context, apiurl string, params map[string]interface{}) ([]byte, error) {
 	//data := make(url.Values)
 	//for k, v := range params {
 	//	data.Add(k, v)
@@ -60,41 +67,59 @@ func httpPost(apiurl string, params map[string]interface{}) ([]byte, error) {
 	if errparams != nil {
 		return nil, errparams
 	}
-	resp, errPost := client.Post(apiurl, "application/json", bytes.NewReader(byteparams))
+	req, err := http.NewRequestWithContext(ctx, "POST", apiurl, bytes.NewReader(byteparams))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	resp, errPost := client.Do(req)
+	//resp, errPost := client.Post(apiurl, "application/json", bytes.NewReader(byteparams))
 	if errPost != nil {
 		return nil, errPost
 	}
 	defer resp.Body.Close()
 
-	body, errRead := ioutil.ReadAll(resp.Body)
+	body, errRead := io.ReadAll(resp.Body)
 
 	return body, errRead
 }
 
-//httpPostXml 发送Post请求,参数是XML格式的字符串
-func httpPostXml(url string, xmlBody string) (body []byte, err error) {
-	resp, err := client.Post(url, "application/xml", strings.NewReader(xmlBody))
+// httpPostXml 发送Post请求,参数是XML格式的字符串
+func httpPostXml(ctx context.Context, url string, xmlBody string) (body []byte, err error) {
+	req, err := http.NewRequestWithContext(ctx, "POST", url, strings.NewReader(xmlBody))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/xml")
+	resp, err := client.Do(req)
+	//resp, err := client.Post(url, "application/xml", strings.NewReader(xmlBody))
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	body, err = ioutil.ReadAll(resp.Body)
+	body, err = io.ReadAll(resp.Body)
 	return
 }
 
-//httpPostXmlWithCert 发送带证书的Post请求,参数是XML格式的字符串
-func httpPostXmlWithCert(url string, xmlBody string, client *http.Client) (body []byte, err error) {
-	resp, err := client.Post(url, "application/xml", strings.NewReader(xmlBody))
+// httpPostXmlWithCert 发送带证书的Post请求,参数是XML格式的字符串
+func httpPostXmlWithCert(ctx context.Context, url string, xmlBody string, client *http.Client) (body []byte, err error) {
+	req, err := http.NewRequestWithContext(ctx, "POST", url, strings.NewReader(xmlBody))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/xml")
+	resp, err := client.Do(req)
+	//resp, err := client.Post(url, "application/xml", strings.NewReader(xmlBody))
 	if err != nil {
 		return
 	}
 	defer resp.Body.Close()
-	body, err = ioutil.ReadAll(resp.Body)
+	body, err = io.ReadAll(resp.Body)
 	return
 }
 
 // mchType 0:普通商户接口, 1:特殊的商户接口(企业付款,微信找零),2:红包
-func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) (body map[string]interface{}, err error) {
+func wxPayBuildBody(ctx context.Context, wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) (body map[string]interface{}, err error) {
 	// 将bodyObj转换为map[string]interface{}类型
 	bodyJson, _ := json.Marshal(bodyObj)
 	body = make(map[string]interface{})
@@ -117,7 +142,7 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) 
 		body["sub_mch_id"] = wxPayConfig.GetSubMchId()
 	}
 	//nonceStr := getRandomString(32)
-	nonceStr := FuncGenerateRandomString(32)
+	nonceStr := FuncGenerateRandomString(ctx, 32)
 	body["nonce_str"] = nonceStr
 	// 生成签名
 	signType, _ := body["sign_type"].(string)
@@ -126,7 +151,7 @@ func wxPayBuildBody(wxPayConfig IWxPayConfig, bodyObj interface{}, mchType int) 
 		sign = wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
 	} else {
 		body["sign_type"] = SignTypeMD5
-		key, iErr := wxPaySandboxSign(wxPayConfig, nonceStr, SignTypeMD5)
+		key, iErr := wxPaySandboxSign(ctx, wxPayConfig, nonceStr, SignTypeMD5)
 		if err = iErr; iErr != nil {
 			return
 		}
@@ -146,7 +171,7 @@ func isWxPayFacilitator(serviceType int) bool {
 	}
 }
 
-//generateXml 生成请求XML的Body体
+// generateXml 生成请求XML的Body体
 func generateXml(data map[string]interface{}) string {
 	buffer := new(bytes.Buffer)
 	buffer.WriteString("<xml>")
@@ -157,18 +182,18 @@ func generateXml(data map[string]interface{}) string {
 	return buffer.String()
 }
 
-//jsonString 生成模型字符串
+// jsonString 生成模型字符串
 func jsonString(m interface{}) string {
 	bs, _ := json.Marshal(m)
 	return string(bs)
 }
 
-//formatDateTime 格式化时间,按照yyyyMMddHHmmss格式
+// formatDateTime 格式化时间,按照yyyyMMddHHmmss格式
 func formatDateTime(t time.Time) string {
 	return t.Format("20060102150405")
 }
 
-//encodePath 对URL进行Encode编码
+// encodePath 对URL进行Encode编码
 func encodePath(u string) (path string, err error) {
 	uriObj, err := url.Parse(u)
 	if err != nil {
@@ -178,25 +203,25 @@ func encodePath(u string) (path string, err error) {
 	return
 }
 
-//pkcs7UnPadding 解密填充模式(去除补全码) pkcs7UnPadding 解密时,需要在最后面去掉加密时添加的填充byte
+// pkcs7UnPadding 解密填充模式(去除补全码) pkcs7UnPadding 解密时,需要在最后面去掉加密时添加的填充byte
 func pkcs7UnPadding(plainText []byte) []byte {
 	length := len(plainText)
 	unpadding := int(plainText[length-1])   // 找到Byte数组最后的填充byte
 	return plainText[:(length - unpadding)] // 只截取返回有效数字内的byte数组
 }
 
-//isValidAuthCode 18位纯数字,以10、11、12、13、14、15开头
+// isValidAuthCode 18位纯数字,以10、11、12、13、14、15开头
 func isValidAuthCode(authcode string) (ok bool) {
 	pattern := "^1[0-5][0-9]{16}$"
 	ok, _ = regexp.MatchString(pattern, authcode)
 	return
 }
 
-//FuncGenerateRandomString 生成指定位数的随机字符串
-var FuncGenerateRandomString func(int) string = generateRandomString
+// FuncGenerateRandomString 生成指定位数的随机字符串
+var FuncGenerateRandomString func(context.Context, int) string = generateRandomString
 
-//generateRandomString 获取随机字符串
-func generateRandomString(length int) string {
+// generateRandomString 获取随机字符串
+func generateRandomString(ctx context.Context, length int) string {
 	str := "0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 	b := []byte(str)
 	var result []byte
@@ -207,32 +232,32 @@ func generateRandomString(length int) string {
 	return strings.ToLower(string(result))
 }
 
-//wxPayDoWeChat 向微信发送请求
-func wxPayDoWeChat(wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
+// wxPayDoWeChat 向微信发送请求
+func wxPayDoWeChat(ctx context.Context, wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
 	apiurl := WxPayMchAPIURL + apiuri
 	if !wxPayConfig.IsProd() {
 		apiurl = WxPaySanBoxAPIURL + apiuri
 	}
 	// 转换参数
-	body, err := wxPayBuildBody(wxPayConfig, bodyObj, mchType)
+	body, err := wxPayBuildBody(ctx, wxPayConfig, bodyObj, mchType)
 	if err != nil {
 		return
 	}
 	// 发起请求
-	bytes, err = httpPostXml(apiurl, generateXml(body))
+	bytes, err = httpPostXml(ctx, apiurl, generateXml(body))
 	return
 }
 
-//wxPayDoWeChatWithCert 向微信发送带证书请求
+// wxPayDoWeChatWithCert 向微信发送带证书请求
 // mchType 0:普通商户接口, 1:特殊的商户接口(企业付款,微信找零),2:红包
-func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) ([]byte, error) {
+func wxPayDoWeChatWithCert(ctx context.Context, wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) ([]byte, error) {
 	// 转换参数
-	body, err := wxPayBuildBody(wxPayConfig, bodyObj, mchType)
+	body, err := wxPayBuildBody(ctx, wxPayConfig, bodyObj, mchType)
 	if err != nil {
 		return nil, err
 	}
 	// 设置证书和连接池
-	client, err := wxPayGetCertHttpClient(wxPayConfig)
+	client, err := wxPayGetCertHttpClient(ctx, wxPayConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -243,24 +268,24 @@ func wxPayDoWeChatWithCert(wxPayConfig IWxPayConfig, apiuri string, bodyObj inte
 	}
 
 	// 发起请求
-	bytes, err := httpPostXmlWithCert(apiurl, generateXml(body), client)
+	bytes, err := httpPostXmlWithCert(ctx, apiurl, generateXml(body), client)
 	return bytes, err
 }
 
-//wxPayGetCertHttpClient 获取带证数的httpClient
-func wxPayGetCertHttpClient(wxPayConfig IWxPayConfig) (*http.Client, error) {
+// wxPayGetCertHttpClient 获取带证数的httpClient
+func wxPayGetCertHttpClient(ctx context.Context, wxPayConfig IWxPayConfig) (*http.Client, error) {
 	certPath := wxPayConfig.GetCertificateFile()
-	certData, err := ioutil.ReadFile(certPath)
+	certData, err := os.ReadFile(certPath)
 	if err != nil {
 		return nil, err
 	}
-	client, err := wxPayBuildClient(certData, wxPayConfig.GetMchId())
+	client, err := wxPayBuildClient(ctx, certData, wxPayConfig.GetMchId())
 
 	return client, err
 }
 
-//wxPayBuildClient 构建带证数的httpClient
-func wxPayBuildClient(data []byte, mchId string) (client *http.Client, err error) {
+// wxPayBuildClient 构建带证数的httpClient
+func wxPayBuildClient(ctx context.Context, data []byte, mchId string) (client *http.Client, err error) {
 	// 将pkcs12证书转成pem
 	cert, err := wxPayPkc12ToPerm(data, mchId)
 	if err != nil {
@@ -286,7 +311,7 @@ func wxPayBuildClient(data []byte, mchId string) (client *http.Client, err error
 	return
 }
 
-//wxPayPkc12ToPerm 证数格式转化
+// wxPayPkc12ToPerm 证数格式转化
 func wxPayPkc12ToPerm(data []byte, mchId string) (cert tls.Certificate, err error) {
 	blocks, err := pkcs12.ToPEM(data, mchId)
 	if err != nil {

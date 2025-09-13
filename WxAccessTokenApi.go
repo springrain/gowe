@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/json"
 	"time"
 )
@@ -17,7 +18,7 @@ import (
  * https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#54
  */
 
-//WxAccessToken 微信accessToken
+// WxAccessToken 微信accessToken
 type WxAccessToken struct {
 	AccessToken            string `json:"access_token"`  // 获取到的凭证
 	ExpiresIn              int    `json:"expires_in"`    // SessionKey超时时间(秒)
@@ -29,12 +30,12 @@ type WxAccessToken struct {
 	AccessTokenExpiresTime int64  //过期的时间,验证是否过期
 }
 
-//IsAccessTokenExpired token是否过期
+// IsAccessTokenExpired token是否过期
 func (wxAccessToken *WxAccessToken) IsAccessTokenExpired() bool {
 	return time.Now().Unix() > wxAccessToken.AccessTokenExpiresTime
 }
 
-//WxCardTicket 微信卡券Ticket
+// WxCardTicket 微信卡券Ticket
 type WxCardTicket struct {
 	CardTicket            string `json:"ticket"`     // 获取到的凭证
 	ExpiresIn             int    `json:"expires_in"` // SessionKey超时时间(秒)
@@ -43,12 +44,12 @@ type WxCardTicket struct {
 	CardTicketExpiresTime int64
 }
 
-//IsCardTicketExpired 微信卡券Ticket是否过期
+// IsCardTicketExpired 微信卡券Ticket是否过期
 func (wxCardTicket *WxCardTicket) IsCardTicketExpired() bool {
 	return time.Now().Unix() > wxCardTicket.CardTicketExpiresTime
 }
 
-//WxJsTicket 微信WxJsTicket
+// WxJsTicket 微信WxJsTicket
 type WxJsTicket struct {
 	JsTicket            string `json:"ticket"`     // 获取到的凭证
 	ExpiresIn           int    `json:"expires_in"` // SessionKey超时时间(秒)
@@ -57,15 +58,15 @@ type WxJsTicket struct {
 	JsTicketExpiresTime int64
 }
 
-//IsJsTicketExpired WxJsTicket 是否过期
+// IsJsTicketExpired WxJsTicket 是否过期
 func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
 	return time.Now().Unix() > wxJsTicket.JsTicketExpiresTime
 }
 
-//GetAccessToken 获取 access token,如果未取到或者 access token 不可用则先更新再获取
-func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
+// GetAccessToken 获取 access token,如果未取到或者 access token 不可用则先更新再获取
+func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}
@@ -82,10 +83,10 @@ func GetAccessToken(wxConfig IWxConfig) (*WxAccessToken, error) {
 	return wxAccessToken, err
 }
 
-//GetJsTicket 获取jsTicket
-func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
+// GetJsTicket 获取jsTicket
+func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken() + "&type=jsapi"
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}
@@ -101,10 +102,10 @@ func GetJsTicket(wxConfig IWxConfig) (*WxJsTicket, error) {
 	return wxJsTicket, err
 }
 
-//GetCardTicket 获取cardTicket
-func GetCardTicket(wxConfig IWxConfig) (*WxCardTicket, error) {
+// GetCardTicket 获取cardTicket
+func GetCardTicket(ctx context.Context, wxConfig IWxConfig) (*WxCardTicket, error) {
 	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken() + "&type=wx_card"
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}

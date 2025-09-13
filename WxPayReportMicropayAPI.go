@@ -1,9 +1,12 @@
 package gowe
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+)
 
-//WxPayReportMicropay 交易保障(MICROPAY) https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_14&index=8
-func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody) (*WxResponseModel, error) {
+// WxPayReportMicropay 交易保障(MICROPAY) https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_14&index=8
+func WxPayReportMicropay(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody) (*WxResponseModel, error) {
 	// 处理参数
 	interfaceUrl := WxPayMchAPIURL + "/pay/batchreport/micropay/total"
 	if !wxPayConfig.IsProd() {
@@ -15,7 +18,7 @@ func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody
 	}
 	body.TradesStr = jsonString(body.Trades)
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, "/payitil/report", body, 0)
+	bytes, err := wxPayDoWeChat(ctx, wxPayConfig, "/payitil/report", body, 0)
 	if err != nil {
 		return nil, err
 
@@ -26,7 +29,7 @@ func WxPayReportMicropay(wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody
 	return res, err
 }
 
-//WxPayReportMicropayBody 交易保障(MICROPAY)的参数
+// WxPayReportMicropayBody 交易保障(MICROPAY)的参数
 type WxPayReportMicropayBody struct {
 	SignType     string `json:"sign_type,omitempty"`   // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	DeviceInfo   string `json:"device_info,omitempty"` // (非必填) 微信支付分配的终端设备号,商户自定义
@@ -37,7 +40,7 @@ type WxPayReportMicropayBody struct {
 	Trades []WxPayReportMicropayBodyTrade `json:"-"`
 }
 
-//WxPayReportMicropayBodyTrade 生成TradesStr
+// WxPayReportMicropayBodyTrade 生成TradesStr
 type WxPayReportMicropayBodyTrade struct {
 	OutTradeNo string `json:"out_trade_no"`      // 商户订单号
 	BeginTime  string `json:"begin_time"`        // 交易开始时间(扫码时间)

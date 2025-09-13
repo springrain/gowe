@@ -2,16 +2,17 @@ package gowe
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
 
 	"github.com/beevik/etree"
 )
 
-//WxPayNotifyPay 支付结果通知
-func WxPayNotifyPay(wxPayConfig IWxPayConfig, requestBody []byte, handler func(wxPayNotifyPayBody WxPayNotifyPayBody) error) (rspBody string, err error) {
+// WxPayNotifyPay 支付结果通知
+func WxPayNotifyPay(ctx context.Context, wxPayConfig IWxPayConfig, requestBody []byte, handler func(wxPayNotifyPayBody WxPayNotifyPayBody) error) (rspBody string, err error) {
 	// 验证Sign
-	if err = wxPayDoVerifySign(wxPayConfig, requestBody, false); err != nil {
+	if err = wxPayDoVerifySign(ctx, wxPayConfig, requestBody, false); err != nil {
 		return
 	}
 	// 解析参数
@@ -32,7 +33,7 @@ func WxPayNotifyPay(wxPayConfig IWxPayConfig, requestBody []byte, handler func(w
 	return
 }
 
-//wxPayNotifyResponseModel 微信通知的结果返回值
+// wxPayNotifyResponseModel 微信通知的结果返回值
 type wxPayNotifyResponseModel struct {
 	ReturnCode string // SUCCESS/FAIL
 	ReturnMsg  string // 返回信息,如非空,为错误原因,或OK
@@ -47,7 +48,7 @@ func (m *wxPayNotifyResponseModel) toXMLString() string {
 	return buffer.String()
 }
 
-//WxPayNotifyPayBody 支付结果通知的参数
+// WxPayNotifyPayBody 支付结果通知的参数
 type WxPayNotifyPayBody struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
@@ -75,7 +76,7 @@ type WxPayNotifyPayBody struct {
 	Coupons []WxPayCouponResponseModel `xml:"-"`
 }
 
-//wxPayNotifyParseParams 支付结果通知-解析XML参数
+// wxPayNotifyParseParams 支付结果通知-解析XML参数
 func wxPayNotifyParseParams(xmlStr []byte, body *WxPayNotifyPayBody) (err error) {
 	if err = xml.Unmarshal(xmlStr, &body); err != nil {
 		return

@@ -1,15 +1,16 @@
 package gowe
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 )
 
-//WxMpQrCreateTemporary 生成带参数的临时二维码 API
-//https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html
-//expireSeconds:该二维码有效时间,以秒为单位. 最大不超过2592000(即30天),默认2592000
-//sceneStr:场景值ID(字符串形式的ID),字符串类型,长度限制为1到64.这里只使用字符串了,用途更广
-func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSeconds int) (*WxMpQrCreateResponse, error) {
+// WxMpQrCreateTemporary 生成带参数的临时二维码 API
+// https://developers.weixin.qq.com/doc/offiaccount/Account_Management/Generating_a_Parametric_QR_Code.html
+// expireSeconds:该二维码有效时间,以秒为单位. 最大不超过2592000(即30天),默认2592000
+// sceneStr:场景值ID(字符串形式的ID),字符串类型,长度限制为1到64.这里只使用字符串了,用途更广
+func WxMpQrCreateTemporary(ctx context.Context, wxMpConfig IWxMpConfig, sceneStr string, expireSeconds int) (*WxMpQrCreateResponse, error) {
 	if len(sceneStr) < 1 {
 		return nil, errors.New("sceneStr不能为空")
 	}
@@ -26,7 +27,7 @@ func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSecond
 	scene["scene_str"] = sceneStr
 	actionInfo["scene"] = scene
 	params["action_info"] = actionInfo
-	data, err := httpPost(apiurl, params)
+	data, err := httpPost(ctx, apiurl, params)
 	// 发送请求
 	if err != nil {
 		return nil, err
@@ -37,8 +38,8 @@ func WxMpQrCreateTemporary(wxMpConfig IWxMpConfig, sceneStr string, expireSecond
 	return res, err
 }
 
-//WxMpQrCreatePermanent 创建永久的带参数二维码
-func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (*WxMpQrCreateResponse, error) {
+// WxMpQrCreatePermanent 创建永久的带参数二维码
+func WxMpQrCreatePermanent(ctx context.Context, wxMpConfig IWxMpConfig, sceneStr string) (*WxMpQrCreateResponse, error) {
 	if len(sceneStr) < 1 {
 		return nil, errors.New("sceneStr不能为空")
 	}
@@ -53,7 +54,7 @@ func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (*WxMpQrCrea
 	actionInfo["scene"] = scene
 	params["action_info"] = actionInfo
 
-	data, err := httpPost(apiurl, params)
+	data, err := httpPost(ctx, apiurl, params)
 	// 发送请求
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func WxMpQrCreatePermanent(wxMpConfig IWxMpConfig, sceneStr string) (*WxMpQrCrea
 	return res, err
 }
 
-//WxMpQrShowQrCodeUrl 通过ticket换取二维码地址
+// WxMpQrShowQrCodeUrl 通过ticket换取二维码地址
 func WxMpQrShowQrCodeUrl(wxMpConfig IWxMpConfig, ticket string) (string, error) {
 	if len(ticket) < 1 {
 		return "", errors.New("ticket不能为空")

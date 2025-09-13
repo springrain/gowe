@@ -1,16 +1,19 @@
 package gowe
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+)
 
-//WxPayReportJsApi  交易保障(JSAPI) https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_8&index=9
-func WxPayReportJsApi(wxPayConfig IWxPayConfig, body *WxPayReportJsAPIBody) (*WxResponseModel, error) {
+// WxPayReportJsApi  交易保障(JSAPI) https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_8&index=9
+func WxPayReportJsApi(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayReportJsAPIBody) (*WxResponseModel, error) {
 	var err error
 	// 处理参数
 	if body.InterfaceUrl, err = encodePath(body.InterfaceUrl); err != nil {
 		return nil, err
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, "/payitil/report", body, 0)
+	bytes, err := wxPayDoWeChat(ctx, wxPayConfig, "/payitil/report", body, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +23,7 @@ func WxPayReportJsApi(wxPayConfig IWxPayConfig, body *WxPayReportJsAPIBody) (*Wx
 	return res, err
 }
 
-//WxPayReportJsAPIBody 交易保障(JSAPI)的参数
+// WxPayReportJsAPIBody 交易保障(JSAPI)的参数
 type WxPayReportJsAPIBody struct {
 	SignType     string `json:"sign_type,omitempty"`    // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	DeviceInfo   string `json:"device_info,omitempty"`  // (非必填) 微信支付分配的终端设备号,商户自定义

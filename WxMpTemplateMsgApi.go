@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/json"
 )
 
@@ -8,8 +9,8 @@ import (
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/Template_Message_Interface.html
 //https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
 
-//WxMpTemplateMsgSend 发送模板消息
-func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
+// WxMpTemplateMsgSend 发送模板消息
+func WxMpTemplateMsgSend(ctx context.Context, wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
 	apiurl := WxMpAPIURL + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken()
 
@@ -37,7 +38,7 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 		params["miniprogram"] = maMap
 	}
 
-	data, err := httpPost(apiurl, params)
+	data, err := httpPost(ctx, apiurl, params)
 	// 发送请求
 	if err != nil {
 		return nil, err
@@ -49,7 +50,7 @@ func WxMpTemplateMsgSend(wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) 
 	return res, err
 }
 
-//WxMpSubscribeMsgURL 构造订阅模板消息的授权URL
+// WxMpSubscribeMsgURL 构造订阅模板消息的授权URL
 func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
 	encodeurl, errEncodePath := encodePath(body.RedirectURL)
 	if errEncodePath != nil {
@@ -64,9 +65,9 @@ func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
 
 }
 
-//WxMpSubscribeMsgSend 发送一次订阅消息
-//https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
-func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
+// WxMpSubscribeMsgSend 发送一次订阅消息
+// https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
+func WxMpSubscribeMsgSend(ctx context.Context, wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
 	apiurl := WxMpAPIURL + "/cgi-bin/message/template/subscribe?access_token=" + wxMpConfig.GetAccessToken()
 
@@ -94,7 +95,7 @@ func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody
 		params["miniprogram"] = maMap
 	}
 
-	data, err := httpPost(apiurl, params)
+	data, err := httpPost(ctx, apiurl, params)
 	// 发送请求
 	if err != nil {
 		return nil, err
@@ -106,7 +107,7 @@ func WxMpSubscribeMsgSend(wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody
 	return res, err
 }
 
-//用于生成授权URL的实体类
+// 用于生成授权URL的实体类
 type WxMpSubscribeMsgURLBody struct {
 	AppId       string //公众号的唯一标识
 	Scene       string //重定向后会带上scene参数，开发者可以填0-10000的整形值，用来标识订阅场景值
@@ -115,21 +116,21 @@ type WxMpSubscribeMsgURLBody struct {
 	Reserved    string //用于保持请求和回调的状态，授权请后原样带回给第三方。该参数可用于防止csrf攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加session进行校验，开发者可以填写a-zA-Z0-9的参数值，最多128字节，要求做urlencode
 }
 
-//WxMpSubscribeMsgSendBody 一次订阅消息的请求参数
+// WxMpSubscribeMsgSendBody 一次订阅消息的请求参数
 type WxMpSubscribeMsgSendBody struct {
 	wxMpTemplateMsgBody
 	Scene string `json:"scene"` //订阅场景值
 	Title string `json:"title"` // 消息标题，15字以内
 }
 
-//WxMpTemplateMsgSendBody 模板消息的请求参数
+// WxMpTemplateMsgSendBody 模板消息的请求参数
 type WxMpTemplateMsgSendBody struct {
 	wxMpTemplateMsgBody
 	EmphasisKeyword string `json:"emphasis_keyword,omitempty"` // 模板需要放大的关键词,不填则默认无放大
 
 }
 
-//wxMpTemplateMsgBody 公用的模板消息参数
+// wxMpTemplateMsgBody 公用的模板消息参数
 type wxMpTemplateMsgBody struct {
 	Touser     string                 `json:"touser"`        // 接收者(用户)的 openid
 	TemplateId string                 `json:"template_id"`   // 所需下发的模板消息的id
@@ -139,14 +140,14 @@ type wxMpTemplateMsgBody struct {
 	dataMap    map[string]interface{} `json:"-"`             //模板数据
 }
 
-//WxMpTemplateMsgSendResponse 发送模板消息的返回值
+// WxMpTemplateMsgSendResponse 发送模板消息的返回值
 type WxMpTemplateMsgSendResponse struct {
 	MsgId   int64  `json:"msgid"`   // 用户唯一标识,调用成功后返回
 	ErrCode int    `json:"errcode"` // 错误码
 	ErrMsg  string `json:"errmsg"`  // 错误信息
 }
 
-//AddData 模板内容,不填则下发空模板.具体格式请参考示例,color默认#173177
+// AddData 模板内容,不填则下发空模板.具体格式请参考示例,color默认#173177
 func (wxMpTemplateMsg *wxMpTemplateMsgBody) AddData(key string, value string, color string) {
 	if wxMpTemplateMsg.dataMap == nil {
 		wxMpTemplateMsg.dataMap = make(map[string]interface{})

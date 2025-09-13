@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/xml"
 
 	"github.com/beevik/etree"
@@ -8,15 +9,15 @@ import (
 
 //查询支付订单 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_2
 
-//WxPayQueryOrder 查询订单
-func WxPayQueryOrder(wxPayConfig IWxPayConfig, body *WxPayQueryOrderBody) (*WxPayQueryOrderResponse, error) {
+// WxPayQueryOrder 查询订单
+func WxPayQueryOrder(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayQueryOrderBody) (*WxPayQueryOrderResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, "/pay/orderquery", body, 0)
+	bytes, err := wxPayDoWeChat(ctx, wxPayConfig, "/pay/orderquery", body, 0)
 	if err != nil {
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	if err = wxPayDoVerifySign(ctx, wxPayConfig, bytes, true); err != nil {
 		return nil, err
 	}
 	// 解析返回值
@@ -25,14 +26,14 @@ func WxPayQueryOrder(wxPayConfig IWxPayConfig, body *WxPayQueryOrderBody) (*WxPa
 	return res, err
 }
 
-//WxPayQueryOrderBody 查询订单的参数
+// WxPayQueryOrderBody 查询订单的参数
 type WxPayQueryOrderBody struct {
 	SignType      string `json:"sign_type,omitempty"`      // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	TransactionId string `json:"transaction_id,omitempty"` // (非必填,二选一) 微信的订单号,优先使用
 	OutTradeNo    string `json:"out_trade_no,omitempty"`   // (非必填,二选一) 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*且在同一个商户号下唯一.详见商户订单号
 }
 
-//WxPayQueryOrderResponse 查询订单的返回值
+// WxPayQueryOrderResponse 查询订单的返回值
 type WxPayQueryOrderResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
@@ -63,7 +64,7 @@ type WxPayQueryOrderResponse struct {
 	Coupons []WxPayCouponResponseModel `xml:"-"`
 }
 
-//wxPayQueryOrderParseResponse 查询订单-解析XML返回值
+// wxPayQueryOrderParseResponse 查询订单-解析XML返回值
 func wxPayQueryOrderParseResponse(xmlStr []byte, rsp *WxPayQueryOrderResponse) (err error) {
 	// 常规解析
 	if err = xml.Unmarshal(xmlStr, rsp); err != nil {

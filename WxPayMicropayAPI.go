@@ -1,20 +1,23 @@
 package gowe
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+)
 
-//WxPayMicropay 提交付款码支付 https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
-func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMicropayResponse, error) {
+// WxPayMicropay 提交付款码支付 https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=9_10&index=1
+func WxPayMicropay(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMicropayResponse, error) {
 	// 处理参数
 	if body.SceneInfo != nil {
 		body.SceneInfoStr = jsonString(body.SceneInfo)
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, "/pay/micropay", body, 0)
+	bytes, err := wxPayDoWeChat(ctx, wxPayConfig, "/pay/micropay", body, 0)
 	if err != nil {
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	if err = wxPayDoVerifySign(ctx, wxPayConfig, bytes, true); err != nil {
 		return nil, err
 	}
 	// 解析返回值
@@ -23,7 +26,7 @@ func WxPayMicropay(wxPayConfig IWxPayConfig, body *WxPayMicropayBody) (*WxPayMic
 	return res, err
 }
 
-//WxPayMicropayBody 付款码支付的参数
+// WxPayMicropayBody 付款码支付的参数
 type WxPayMicropayBody struct {
 	SignType       string `json:"sign_type,omitempty"`   // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	DeviceInfo     string `json:"device_info,omitempty"` // 终端设备号(商户自定义,如门店编号)
@@ -45,7 +48,7 @@ type WxPayMicropayBody struct {
 	SceneInfo *WxPaySceneInfoModel `json:"-"`
 }
 
-//WxPayMicropayResponse 付款码支付的返回值
+// WxPayMicropayResponse 付款码支付的返回值
 type WxPayMicropayResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时

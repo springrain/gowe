@@ -1,14 +1,17 @@
 package gowe
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+)
 
 // 企业付款到零钱
 //https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_1
 
-//WxPayPromotionMktTransfers 企业付款到零钱(前提用户必须关注公众号)
-func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body *WxPayPromotionMktTransfersBody) (*WxPayPromotionMktTransfersResponse, error) {
+// WxPayPromotionMktTransfers 企业付款到零钱(前提用户必须关注公众号)
+func WxPayPromotionMktTransfers(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayPromotionMktTransfersBody) (*WxPayPromotionMktTransfersResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/promotion/transfers", body, 1)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/mmpaymkttransfers/promotion/transfers", body, 1)
 	if err != nil {
 		return nil, err
 	}
@@ -19,10 +22,10 @@ func WxPayPromotionMktTransfers(wxPayConfig IWxPayConfig, body *WxPayPromotionMk
 	return res, err
 }
 
-//WxPayQueryMktTransfer 企业付款到零钱的查询
-func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body *WxPayQueryMktTransferBody) (*WxPayQueryMktTransferResponse, error) {
+// WxPayQueryMktTransfer 企业付款到零钱的查询
+func WxPayQueryMktTransfer(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayQueryMktTransferBody) (*WxPayQueryMktTransferResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/gettransferinfo", body, 0)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/mmpaymkttransfers/gettransferinfo", body, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +36,7 @@ func WxPayQueryMktTransfer(wxPayConfig IWxPayConfig, body *WxPayQueryMktTransfer
 	return res, err
 }
 
-//WxPayPromotionMktTransfersBody 企业付款,微信找零的参数
+// WxPayPromotionMktTransfersBody 企业付款,微信找零的参数
 type WxPayPromotionMktTransfersBody struct {
 	DeviceInfo     string `json:"device_info,omitempty"`  // 终端设备号
 	PartnerTradeNo string `json:"partner_trade_no"`       // 商户系统内部订单号,要求32个字符内,只能是数字、大小写字母_-|*且在同一个商户号下唯一.详见商户订单号
@@ -45,7 +48,7 @@ type WxPayPromotionMktTransfersBody struct {
 	SpbillCreateIP string `json:"spbill_create_ip"`       // IP可传用户端或者服务端的IP
 }
 
-//WxPayPromotionMktTransfersResponse 企业付款,微信找零的返回值
+// WxPayPromotionMktTransfersResponse 企业付款,微信找零的返回值
 type WxPayPromotionMktTransfersResponse struct {
 	WxResponseModel
 	WxPayMchServiceResponseModel
@@ -55,12 +58,12 @@ type WxPayPromotionMktTransfersResponse struct {
 	PaymentTime    string `xml:"payment_time"`     // 企业付款成功时间
 }
 
-//WxPayQueryMktTransferBody 企业付款,微信找零查询的参数
+// WxPayQueryMktTransferBody 企业付款,微信找零查询的参数
 type WxPayQueryMktTransferBody struct {
 	PartnerTradeNo string `json:"partner_trade_no"` // 商户系统内部订单号
 }
 
-//WxPayQueryMktTransferResponse 企业付款,微信找零查询的返回值
+// WxPayQueryMktTransferResponse 企业付款,微信找零查询的返回值
 type WxPayQueryMktTransferResponse struct {
 	WxResponseModel
 	WxPayMchServiceResponseModel

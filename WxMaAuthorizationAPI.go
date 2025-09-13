@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 )
@@ -9,7 +10,7 @@ import (
 
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/user-info/auth.getPaidUnionId.html
 
-//SessionKey jsCode换取用户信息,获得sessionKey
+// SessionKey jsCode换取用户信息,获得sessionKey
 type SessionKey struct {
 	OpenId     string `json:"openid"`      // 用户唯一标识
 	SessionKey string `json:"session_key"` // 会话密钥
@@ -18,14 +19,14 @@ type SessionKey struct {
 	ErrMsg     string `json:"errmsg"`      // 错误信息
 }
 
-//WxMaCode2Session 登录凭证校验.通过 wx.login 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
+// WxMaCode2Session 登录凭证校验.通过 wx.login 接口获得临时登录凭证 code 后传到开发者服务器调用此接口完成登录流程
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/login/auth.code2Session.html
-func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (*SessionKey, error) {
+func WxMaCode2Session(ctx context.Context, wxMaConfig IWxMaConfig, jsCode string) (*SessionKey, error) {
 	if len(jsCode) < 1 {
 		return nil, errors.New("jsCode不能为空")
 	}
 	apiurl := WxMpAPIURL + "/sns/jscode2session?appid=" + wxMaConfig.GetAppId() + "&secret=" + wxMaConfig.GetSecret() + "&js_code=" + jsCode + "&&grant_type=authorization_code"
-	body, err := httpGet(apiurl)
+	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
 	}
@@ -34,14 +35,14 @@ func WxMaCode2Session(wxMaConfig IWxMaConfig, jsCode string) (*SessionKey, error
 	return sessionKey, err
 }
 
-//WxMaAuthGetPaidUnionId 用户支付完成后,获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
-func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (*WxMaAuthGetPaidUnionIdResponse, error) {
+// WxMaAuthGetPaidUnionId 用户支付完成后,获取该用户的 UnionId,无需用户授权.本接口支持第三方平台代理查询
+func WxMaAuthGetPaidUnionId(ctx context.Context, wxMaConfig IWxMaConfig, openId string) (*WxMaAuthGetPaidUnionIdResponse, error) {
 	if len(openId) < 1 {
 		return nil, errors.New("openId不能为空")
 	}
 
 	apiurl := WxMpAPIURL + "/wxa/getpaidunionid?access_token=" + wxMaConfig.GetAccessToken() + "&openid=" + openId
-	data, err := httpGet(apiurl)
+	data, err := httpGet(ctx, apiurl)
 	// 发送请求
 	if err != nil {
 		return nil, err
@@ -53,7 +54,7 @@ func WxMaAuthGetPaidUnionId(wxMaConfig IWxMaConfig, openId string) (*WxMaAuthGet
 	return res, err
 }
 
-//WxMaAuthGetPaidUnionIdResponse 支付后获取用户unionid
+// WxMaAuthGetPaidUnionIdResponse 支付后获取用户unionid
 type WxMaAuthGetPaidUnionIdResponse struct {
 	UnionId string `json:"unionid"` // 用户唯一标识,调用成功后返回
 	ErrCode int    `json:"errcode"` // 错误码

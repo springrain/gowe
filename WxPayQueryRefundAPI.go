@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"strconv"
@@ -10,15 +11,15 @@ import (
 
 //退款查询 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_5
 
-//WxPayQueryRefund 查询退款
-func WxPayQueryRefund(wxPayConfig IWxPayConfig, body *WxPayQueryRefundBody) (*WxPayQueryRefundResponse, error) {
+// WxPayQueryRefund 查询退款
+func WxPayQueryRefund(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayQueryRefundBody) (*WxPayQueryRefundResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChat(wxPayConfig, "/pay/refundquery", body, 0)
+	bytes, err := wxPayDoWeChat(ctx, wxPayConfig, "/pay/refundquery", body, 0)
 	if err != nil {
 		return nil, err
 	}
 	// 结果校验
-	if err = wxPayDoVerifySign(wxPayConfig, bytes, true); err != nil {
+	if err = wxPayDoVerifySign(ctx, wxPayConfig, bytes, true); err != nil {
 		return nil, err
 	}
 	// 解析返回值
@@ -27,7 +28,7 @@ func WxPayQueryRefund(wxPayConfig IWxPayConfig, body *WxPayQueryRefundBody) (*Wx
 	return res, err
 }
 
-//WxPayQueryRefundBody 查询退款的参数
+// WxPayQueryRefundBody 查询退款的参数
 type WxPayQueryRefundBody struct {
 	SignType      string `json:"sign_type,omitempty"`      // 签名类型,目前支持HMAC-SHA256和MD5,默认为MD5
 	TransactionId string `json:"transaction_id,omitempty"` // (非必填,四选一) 微信订单号 查询的优先级是: refund_id > out_refund_no > transaction_id > out_trade_no
@@ -37,7 +38,7 @@ type WxPayQueryRefundBody struct {
 	Offset        string `json:"offset,omitempty"`         // (非必填) 偏移量,当部分退款次数超过10次时可使用,表示返回的查询结果从这个偏移量开始取记录
 }
 
-//WxPayQueryRefundResponse 查询退款的返回值
+// WxPayQueryRefundResponse 查询退款的返回值
 type WxPayQueryRefundResponse struct {
 	WxResponseModel
 	// 当return_code为SUCCESS时
@@ -56,14 +57,14 @@ type WxPayQueryRefundResponse struct {
 	TotalRefunds []WxPayQueryRefundResponseTotalRefund `xml:"-"`
 }
 
-//WxPayQueryRefundResponseCurrentRefund 使用refund_count的序号生成的当前退款项
+// WxPayQueryRefundResponseCurrentRefund 使用refund_count的序号生成的当前退款项
 type WxPayQueryRefundResponseCurrentRefund struct {
 	OutRefundNo   string // 商户系统内部的退款单号,商户系统内部唯一,只能是数字、大小写字母_-|*@ ,同一退款单号多次请求只退一笔.
 	RefundId      string // 微信退款单号
 	RefundChannel string // ORIGINAL—原路退款 BALANCE—退回到余额 OTHER_BALANCE—原账户异常退到其他余额账户 OTHER_BANKCARD—原银行卡异常退到其他银行卡
 }
 
-//WxPayQueryRefundResponseTotalRefund 使用total_refund_count的序号生成的总退款项
+// WxPayQueryRefundResponseTotalRefund 使用total_refund_count的序号生成的总退款项
 type WxPayQueryRefundResponseTotalRefund struct {
 	RefundFee           int64  // 退款总金额,单位为分,可以做部分退款
 	SettlementRefundFee int64  // 退款金额=申请退款金额-非充值代金券退款金额,退款金额<=申请退款金额
@@ -77,7 +78,7 @@ type WxPayQueryRefundResponseTotalRefund struct {
 	Coupons []WxPayCouponResponseModel
 }
 
-//wxPayQueryRefundParseResponse 查询退款-解析返回值
+// wxPayQueryRefundParseResponse 查询退款-解析返回值
 func wxPayQueryRefundParseResponse(xmlStr []byte, rsp *WxPayQueryRefundResponse) (err error) {
 	// 常规解析
 	if err = xml.Unmarshal(xmlStr, rsp); err != nil {

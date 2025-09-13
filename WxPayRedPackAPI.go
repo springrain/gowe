@@ -1,6 +1,7 @@
 package gowe
 
 import (
+	"context"
 	"encoding/xml"
 	"strconv"
 
@@ -9,11 +10,11 @@ import (
 
 //微信红包APi
 
-//WxPaySendRedPack 发送红包
-//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
-func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*WxPaySendRedPackResponse, error) {
+// WxPaySendRedPack 发送红包
+// https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_4&index=3
+func WxPaySendRedPack(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*WxPaySendRedPackResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/sendredpack", body, 2)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/mmpaymkttransfers/sendredpack", body, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -27,14 +28,14 @@ func WxPaySendRedPack(wxPayConfig IWxPayConfig, body *WxPaySendRedPackBody) (*Wx
 	return res, err
 }
 
-//WxPaySendGroupRedPack 发送裂变红包
-//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_5&index=4
-func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPackBody) (*WxPaySendGroupRedPackResponse, error) {
+// WxPaySendGroupRedPack 发送裂变红包
+// https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_5&index=4
+func WxPaySendGroupRedPack(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPackBody) (*WxPaySendGroupRedPackResponse, error) {
 	if len(body.AmtType) < 1 {
 		body.AmtType = "ALL_RAND"
 	}
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/sendgroupredpack", body, 2)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/mmpaymkttransfers/sendgroupredpack", body, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -48,11 +49,11 @@ func WxPaySendGroupRedPack(wxPayConfig IWxPayConfig, body *WxPaySendGroupRedPack
 	return res, err
 }
 
-//WxPayGetHBInfo 查看红包记录,用于商户对已发放的红包进行查询红包的具体信息,可支持普通红包和裂变包.
-//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_6&index=5
-func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayGetHBInfoResponse, error) {
+// WxPayGetHBInfo 查看红包记录,用于商户对已发放的红包进行查询红包的具体信息,可支持普通红包和裂变包.
+// https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=13_6&index=5
+func WxPayGetHBInfo(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayGetHBInfoResponse, error) {
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/gethbinfo", body, 0)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/mmpaymkttransfers/gethbinfo", body, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -66,9 +67,9 @@ func WxPayGetHBInfo(wxPayConfig IWxPayConfig, body *WxPayGetHBInfoBody) (*WxPayG
 	return res, err
 }
 
-//WxPaySendMiniProgramHB 发送小程序红包
-//https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=18_2&index=3
-func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgramHBBody) (*WxPaySendMiniProgramHBResponse, error) {
+// WxPaySendMiniProgramHB 发送小程序红包
+// https://pay.weixin.qq.com/wiki/doc/api/tools/cash_coupon.php?chapter=18_2&index=3
+func WxPaySendMiniProgramHB(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPaySendMiniProgramHBBody) (*WxPaySendMiniProgramHBResponse, error) {
 
 	//通过JSAPI方式领取红包,小程序红包固定传MINI_PROGRAM_JSAPI
 	if len(body.NotifyWay) < 1 {
@@ -76,7 +77,7 @@ func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgram
 	}
 
 	// 业务逻辑
-	bytes, err := wxPayDoWeChatWithCert(wxPayConfig, "/mmpaymkttransfers/sendminiprogramhb", body, 2)
+	bytes, err := wxPayDoWeChatWithCert(ctx, wxPayConfig, "/mmpaymkttransfers/sendminiprogramhb", body, 2)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +92,7 @@ func WxPaySendMiniProgramHB(wxPayConfig IWxPayConfig, body *WxPaySendMiniProgram
 	return res, err
 }
 
-//封装返回的裂变红包列表
+// 封装返回的裂变红包列表
 func wxPayNewHBInfoResponse(xmlStr []byte, rsp *WxPayGetHBInfoResponse) error {
 	// 常规解析
 	if err := xml.Unmarshal(xmlStr, rsp); err != nil {
@@ -129,13 +130,13 @@ func wxPayNewHBInfoResponse(xmlStr []byte, rsp *WxPayGetHBInfoResponse) error {
 
 }
 
-//WxPayGetHBInfoBody 查看红包记录的请求参数
+// WxPayGetHBInfoBody 查看红包记录的请求参数
 type WxPayGetHBInfoBody struct {
 	MchBillno string `json:"mch_billno"` //商户发放红包的商户订单号
 	BillType  string `json:"bill_type"`  //MCHT:通过商户订单号获取红包信息
 }
 
-//WxPayGetHBInfoResponse 查看红包记录的返回值
+// WxPayGetHBInfoResponse 查看红包记录的返回值
 type WxPayGetHBInfoResponse struct {
 	ReturnCode string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识,非交易标识,交易是否成功需要查看result_code来判断
 	ReturnMsg  string `xml:"return_msg"`  // 返回信息,如非空,为错误原因:签名失败/参数格式校验错误
@@ -168,7 +169,7 @@ type WxPayGetHBInfoResponse struct {
 	HBList  []WxPayHBInfoModel `xml:"-"`        // 裂变红包的列表
 }
 
-//WxPayHBInfoModel 返回的微信裂变红包信息
+// WxPayHBInfoModel 返回的微信裂变红包信息
 type WxPayHBInfoModel struct {
 	Openid  string // 领取红包的openid
 	Amount  int    // 领取金额(单位分)
@@ -176,18 +177,18 @@ type WxPayHBInfoModel struct {
 
 }
 
-//WxPaySendGroupRedPackBody 微信裂变红包参数
+// WxPaySendGroupRedPackBody 微信裂变红包参数
 type WxPaySendGroupRedPackBody struct {
 	WxPaySendRedPackBody
 	AmtType string `json:"amt_type"` //红包金额设置方式 ALL_RAND—全部随机,商户指定总金额和红包发放总人数，由微信支付随机计算出各红包金额
 }
 
-//WxPaySendGroupRedPackResponse 微信裂变红包返回值
+// WxPaySendGroupRedPackResponse 微信裂变红包返回值
 type WxPaySendGroupRedPackResponse struct {
 	WxPaySendRedPackResponse
 }
 
-//WxPaySendRedPackBody 微信发送红包参数
+// WxPaySendRedPackBody 微信发送红包参数
 type WxPaySendRedPackBody struct {
 	MchBillno   string `json:"mch_billno"`          // 商户订单号(每个订单号必须唯一.取值范围:0~9,a~z,A~Z)	接口根据商户订单号支持重入,如出现超时可再调用.
 	SendName    string `json:"send_name"`           // 红包发送者名称 注意:敏感词会被转义成字符*
@@ -202,7 +203,7 @@ type WxPaySendRedPackBody struct {
 	RiskInfo    string `json:"risk_info,omitempty"` //活动信息 posttime:用户操作的时间戳 mobile:业务系统账号的手机号,国家代码-手机号.不需要+号 deviceid :mac 地址或者设备唯一标识 clientversion :用户操作的客户端版本 把值为非空的信息用key=value进行拼接,再进行urlencode urlencode(posttime=xx& mobile =xx&deviceid=xx)
 }
 
-//WxPaySendRedPackResponse 微信发送红包返回值
+// WxPaySendRedPackResponse 微信发送红包返回值
 type WxPaySendRedPackResponse struct {
 	ReturnCode string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识,非交易标识,交易是否成功需要查看result_code来判断
 	ReturnMsg  string `xml:"return_msg"`  // 返回信息,如非空,为错误原因:签名失败/参数格式校验错误
@@ -220,13 +221,13 @@ type WxPaySendRedPackResponse struct {
 
 }
 
-//WxPaySendMiniProgramHBBody 微信发送小程序红包参数
+// WxPaySendMiniProgramHBBody 微信发送小程序红包参数
 type WxPaySendMiniProgramHBBody struct {
 	WxPaySendRedPackBody
 	NotifyWay string `json:"notify_way"` //通知用户形式	 通过JSAPI方式领取红包,小程序红包固定传MINI_PROGRAM_JSAPI
 }
 
-//WxPaySendMiniProgramHBResponse 微信发送小程序红包返回值
+// WxPaySendMiniProgramHBResponse 微信发送小程序红包返回值
 type WxPaySendMiniProgramHBResponse struct {
 	WxPaySendRedPackResponse
 	JSAPIPackage string `xml:"package"` // 返回jaspi的入参package的值

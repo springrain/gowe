@@ -2,6 +2,7 @@ package gowe
 
 import (
 	"bytes"
+	"context"
 	"crypto/hmac"
 	"crypto/md5"
 	"crypto/sha1"
@@ -16,7 +17,7 @@ import (
 	"github.com/beevik/etree"
 )
 
-//wxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
+// wxPayLocalSign 本地通过支付参数计算签名值, 生成算法:https://pay.weixin.qq.com/wiki/doc/api/micropay.php?chapter=4_3
 func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string) string {
 	signStr := wxPaySortSignParams(body)
 	signStr = signStr + "&key=" + apiKey
@@ -33,7 +34,7 @@ func wxPayLocalSign(body map[string]interface{}, signType string, apiKey string)
 	return strings.ToUpper(hex.EncodeToString(hashSign))
 }
 
-//wxPaySortSignParams 获取根据Key排序后的请求参数字符串
+// wxPaySortSignParams 获取根据Key排序后的请求参数字符串
 func wxPaySortSignParams(body map[string]interface{}) string {
 	keyList := make([]string, 0)
 	for k := range body {
@@ -53,7 +54,7 @@ func wxPaySortSignParams(body map[string]interface{}) string {
 	return buffer.String()
 }
 
-//getSignKeyResponse 获取沙盒签名Key的返回值
+// getSignKeyResponse 获取沙盒签名Key的返回值
 type getSignKeyResponse struct {
 	ReturnCode     string `xml:"return_code"` // SUCCESS/FAIL 此字段是通信标识,非交易标识,交易是否成功需要查看result_code来判断
 	ReturnMsg      string `xml:"return_msg"`  // 返回信息,如非空,为错误原因:签名失败/参数格式校验错误
@@ -63,26 +64,26 @@ type getSignKeyResponse struct {
 	SandboxSignkey string `xml:"sandbox_signkey"`
 }
 
-//wxPaySandboxSign 获取沙盒的签名
-func wxPaySandboxSign(wxPayConfig IWxPayConfig, nonceStr string, signType string) (key string, err error) {
+// wxPaySandboxSign 获取沙盒的签名
+func wxPaySandboxSign(ctx context.Context, wxPayConfig IWxPayConfig, nonceStr string, signType string) (key string, err error) {
 	body := make(map[string]interface{})
 	body["mch_id"] = wxPayConfig.GetMchId()
 	body["nonce_str"] = nonceStr
 	// 计算沙箱参数Sign
 	sanboxSign := wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
 	// 沙箱环境:获取key后,重新计算Sign
-	key, err = getSandBoxSignKey(wxPayConfig.GetMchId(), nonceStr, sanboxSign)
+	key, err = getSandBoxSignKey(ctx, wxPayConfig.GetMchId(), nonceStr, sanboxSign)
 	return
 }
 
-//getSandBoxSignKey 调用微信提供的接口获取SandboxSignkey
-func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, err error) {
+// getSandBoxSignKey 调用微信提供的接口获取SandboxSignkey
+func getSandBoxSignKey(ctx context.Context, mchId string, nonceStr string, sign string) (key string, err error) {
 	params := make(map[string]interface{})
 	params["mch_id"] = mchId
 	params["nonce_str"] = nonceStr
 	params["sign"] = sign
 	paramXml := generateXml(params)
-	bytes, err := httpPostXml(WxPaySanBoxAPIURL+"/pay/getsignkey", paramXml)
+	bytes, err := httpPostXml(ctx, WxPaySanBoxAPIURL+"/pay/getsignkey", paramXml)
 	if err != nil {
 		return
 	}
@@ -98,8 +99,8 @@ func getSandBoxSignKey(mchId string, nonceStr string, sign string) (key string, 
 	return
 }
 
-//wxPayDoVerifySign 验证微信返回的结果签名
-func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bool) error {
+// wxPayDoVerifySign 验证微信返回的结果签名
+func wxPayDoVerifySign(ctx context.Context, wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bool) error {
 	// 生成XML文档
 	doc := etree.NewDocument()
 	if err := doc.ReadFromBytes(xmlStr); err != nil {
@@ -133,7 +134,7 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	key := wxPayConfig.GetAPIKey()
 	if !wxPayConfig.IsProd() { //测试的沙箱环境
 		var errSandboxSign error
-		key, errSandboxSign = wxPaySandboxSign(wxPayConfig, result["nonce_str"].(string), signType)
+		key, errSandboxSign = wxPaySandboxSign(ctx, wxPayConfig, result["nonce_str"].(string), signType)
 		if errSandboxSign != nil {
 			return errSandboxSign
 		}
@@ -147,8 +148,8 @@ func wxPayDoVerifySign(wxPayConfig IWxPayConfig, xmlStr []byte, breakWhenFail bo
 	return nil
 }
 
-//WxPayJSAPISign 统一下单获取prepay_id参数后,再次计算出JSAPI需要的sign
-//https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
+// WxPayJSAPISign 统一下单获取prepay_id参数后,再次计算出JSAPI需要的sign
+// https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_7&index=6
 func WxPayJSAPISign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
 	signParams := make(map[string]interface{})
 	signParams["appId"] = appId
@@ -159,14 +160,14 @@ func WxPayJSAPISign(appId, nonceStr, packages, signType, timeStamp, apiKey strin
 	return wxPayLocalSign(signParams, signType, apiKey)
 }
 
-//WxPayMaSign 统一下单获取prepay_id参数后,再次计算出小程序需要的sign
-//https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=7_7&index=5
+// WxPayMaSign 统一下单获取prepay_id参数后,再次计算出小程序需要的sign
+// https://pay.weixin.qq.com/wiki/doc/api/wxa/wxa_api.php?chapter=7_7&index=5
 func WxPayMaSign(appId, nonceStr, packages, signType, timeStamp, apiKey string) (paySign string) {
 	return WxPayJSAPISign(appId, nonceStr, packages, signType, timeStamp, apiKey)
 }
 
-//WxPayAppSign APP支付,统一下单获取支付参数后,再次计算APP支付所需要的的sign
-//https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_3
+// WxPayAppSign APP支付,统一下单获取支付参数后,再次计算APP支付所需要的的sign
+// https://pay.weixin.qq.com/wiki/doc/api/app/app.php?chapter=8_3
 func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, apiKey string) (paySign string) {
 	signParams := make(map[string]interface{}, 0)
 	signParams["appId"] = appId
@@ -177,8 +178,8 @@ func WxPayAppSign(appId, nonceStr, partnerId, prepayId, signType, timeStamp, api
 	return wxPayLocalSign(signParams, signType, apiKey)
 }
 
-//WxJSSDKTicketSign 生成JS-SDK权限验证的签名
-//https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62
+// WxJSSDKTicketSign 生成JS-SDK权限验证的签名
+// https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62
 func WxJSSDKTicketSign(nonceStr, ticket, timeStamp, url string) (ticketSign string) {
 	signParams := make(map[string]interface{})
 	signParams["noncestr"] = nonceStr
