@@ -65,7 +65,7 @@ func (wxJsTicket *WxJsTicket) IsJsTicketExpired() bool {
 
 // GetAccessToken 获取 access token,如果未取到或者 access token 不可用则先更新再获取
 func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, error) {
-	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId() + "&secret=" + wxConfig.GetSecret()
+	apiurl := WxMpAPIURL + "/cgi-bin/token?grant_type=client_credential&appid=" + wxConfig.GetAppId(ctx) + "&secret=" + wxConfig.GetSecret(ctx)
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
@@ -85,7 +85,7 @@ func GetAccessToken(ctx context.Context, wxConfig IWxConfig) (*WxAccessToken, er
 
 // GetJsTicket 获取jsTicket
 func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
-	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken() + "&type=jsapi"
+	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken(ctx) + "&type=jsapi"
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func GetJsTicket(ctx context.Context, wxConfig IWxConfig) (*WxJsTicket, error) {
 
 // GetCardTicket 获取cardTicket
 func GetCardTicket(ctx context.Context, wxConfig IWxConfig) (*WxCardTicket, error) {
-	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken() + "&type=wx_card"
+	apiurl := WxMpAPIURL + "/cgi-bin/ticket/getticket?access_token=" + wxConfig.GetAccessToken(ctx) + "&type=wx_card"
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err

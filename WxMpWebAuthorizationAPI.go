@@ -10,13 +10,13 @@ import (
 //https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html
 
 // WxMpWrapAuthorizeURL 包装网页授权的url
-func WxMpWrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, snsapiBase bool) (string, error) {
-	return wrapAuthorizeURL(wxMpConfig, redirectUri, "", snsapiBase)
+func WxMpWrapAuthorizeURL(ctx context.Context, wxMpConfig IWxMpConfig, redirectUri string, snsapiBase bool) (string, error) {
+	return wrapAuthorizeURL(ctx, wxMpConfig, redirectUri, "", snsapiBase)
 }
 
 // wrapAuthorizeURL 包装网页授权的url
-func wrapAuthorizeURL(wxMpConfig IWxMpConfig, redirectUri string, state string, snsapiBase bool) (string, error) {
-	apiurl := WxMpAPIURL + "/connect/oauth2/authorize?appid=" + wxMpConfig.GetAppId() + "&response_type=code&redirect_uri=" + redirectUri
+func wrapAuthorizeURL(ctx context.Context, wxMpConfig IWxMpConfig, redirectUri string, state string, snsapiBase bool) (string, error) {
+	apiurl := WxMpAPIURL + "/connect/oauth2/authorize?appid=" + wxMpConfig.GetAppId(ctx) + "&response_type=code&redirect_uri=" + redirectUri
 	if snsapiBase {
 		apiurl = apiurl + "&scope=snsapi_base"
 	} else {
@@ -36,7 +36,7 @@ func WxMpWebAuthAccessToken(ctx context.Context, wxMpConfig IWxMpConfig, code st
 	if len(code) < 1 {
 		return nil, errors.New("code不能为空")
 	}
-	apiurl := WxMpAPIURL + "/sns/oauth2?appid=" + wxMpConfig.GetAppId() + "&secret=" + wxMpConfig.GetSecret() + "&code=" + code + "&grant_type=authorization_code"
+	apiurl := WxMpAPIURL + "/sns/oauth2?appid=" + wxMpConfig.GetAppId(ctx) + "&secret=" + wxMpConfig.GetSecret(ctx) + "&code=" + code + "&grant_type=authorization_code"
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func WxMpWebAuthRefreshAccessToken(ctx context.Context, wxMpConfig IWxMpConfig, 
 	if len(refreshToken) < 1 {
 		return nil, errors.New("refreshToken不能为空")
 	}
-	apiurl := WxMpAPIURL + "/sns/oauth2/refresh_token?appid=" + wxMpConfig.GetAppId() + "&grant_type=refresh_token&refresh_token=" + refreshToken
+	apiurl := WxMpAPIURL + "/sns/oauth2/refresh_token?appid=" + wxMpConfig.GetAppId(ctx) + "&grant_type=refresh_token&refresh_token=" + refreshToken
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func WxMpGetUserInfo(ctx context.Context, wxMpConfig IWxMpConfig, openId, lang s
 	if len(lang) <= 0 {
 		lang = "zh_CN"
 	}
-	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken() + "&openid=" + openId + "&lang=" + lang
+	apiurl := WxMpAPIURL + "/cgi-bin/user/info?access_token=" + wxMpConfig.GetAccessToken(ctx) + "&openid=" + openId + "&lang=" + lang
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
@@ -114,7 +114,7 @@ type WxMpUserOpenIds struct {
 // https://developers.weixin.qq.com/doc/offiaccount/User_Management/Getting_a_User_List.html
 func WxMpGetUserOpenIds(ctx context.Context, wxMpConfig IWxMpConfig, openId string) (*WxMpUserOpenIds, error) {
 
-	apiurl := WxMpAPIURL + "/cgi-bin/user/get?access_token=" + wxMpConfig.GetAccessToken() + "&next_openid=" + openId
+	apiurl := WxMpAPIURL + "/cgi-bin/user/get?access_token=" + wxMpConfig.GetAccessToken(ctx) + "&next_openid=" + openId
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err

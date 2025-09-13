@@ -17,7 +17,7 @@ func WxMaTemplateMsgSend(wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) 
 // WxMaSubscribeMessageSend 发送订阅消息
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html
 func WxMaSubscribeMessageSend(ctx context.Context, wxMaConfig IWxMaConfig, body *WxMaTemplateMsgSendBody) (*ResponseBase, error) {
-	apiurl := WxMpAPIURL + "/cgi-bin/message/subscribe/send?access_token=" + wxMaConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/message/subscribe/send?access_token=" + wxMaConfig.GetAccessToken(ctx)
 	return wxMaSendTemplateMsg(ctx, wxMaConfig, apiurl, body)
 }
 

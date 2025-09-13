@@ -126,20 +126,20 @@ func wxPayBuildBody(ctx context.Context, wxPayConfig IWxPayConfig, bodyObj inter
 	_ = json.Unmarshal(bodyJson, &body)
 	// 添加固定参数
 	if mchType == 1 { //特殊的商户接口(企业付款,微信找零)
-		body["mch_appid"] = wxPayConfig.GetAppId()
-		body["mchid"] = wxPayConfig.GetMchId()
+		body["mch_appid"] = wxPayConfig.GetAppId(ctx)
+		body["mchid"] = wxPayConfig.GetMchId(ctx)
 	} else if mchType == 2 { //红包
-		body["wxappid"] = wxPayConfig.GetAppId() //微信分配的公众账号ID(企业号corpid即为此appId).接口传入的所有appid应该为公众号的appid(在mp.weixin.qq.com申请的),不能为APP的appid(在open.weixin.qq.com申请的)
-		body["mch_id"] = wxPayConfig.GetMchId()
+		body["wxappid"] = wxPayConfig.GetAppId(ctx) //微信分配的公众账号ID(企业号corpid即为此appId).接口传入的所有appid应该为公众号的appid(在mp.weixin.qq.com申请的),不能为APP的appid(在open.weixin.qq.com申请的)
+		body["mch_id"] = wxPayConfig.GetMchId(ctx)
 	} else { //普通微信支付
-		body["appid"] = wxPayConfig.GetAppId()
-		body["mch_id"] = wxPayConfig.GetMchId()
+		body["appid"] = wxPayConfig.GetAppId(ctx)
+		body["mch_id"] = wxPayConfig.GetMchId(ctx)
 	}
 
 	//如果是服务商模式
-	if isWxPayFacilitator(wxPayConfig.GetServiceType()) {
-		body["sub_appid"] = wxPayConfig.GetSubAppId()
-		body["sub_mch_id"] = wxPayConfig.GetSubMchId()
+	if isWxPayFacilitator(wxPayConfig.GetServiceType(ctx)) {
+		body["sub_appid"] = wxPayConfig.GetSubAppId(ctx)
+		body["sub_mch_id"] = wxPayConfig.GetSubMchId(ctx)
 	}
 	//nonceStr := getRandomString(32)
 	nonceStr := FuncGenerateRandomString(ctx, 32)
@@ -147,8 +147,8 @@ func wxPayBuildBody(ctx context.Context, wxPayConfig IWxPayConfig, bodyObj inter
 	// 生成签名
 	signType, _ := body["sign_type"].(string)
 	var sign string
-	if wxPayConfig.IsProd() {
-		sign = wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
+	if wxPayConfig.IsProd(ctx) {
+		sign = wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey(ctx))
 	} else {
 		body["sign_type"] = SignTypeMD5
 		key, iErr := wxPaySandboxSign(ctx, wxPayConfig, nonceStr, SignTypeMD5)
@@ -235,7 +235,7 @@ func generateRandomString(ctx context.Context, length int) string {
 // wxPayDoWeChat 向微信发送请求
 func wxPayDoWeChat(ctx context.Context, wxPayConfig IWxPayConfig, apiuri string, bodyObj interface{}, mchType int) (bytes []byte, err error) {
 	apiurl := WxPayMchAPIURL + apiuri
-	if !wxPayConfig.IsProd() {
+	if !wxPayConfig.IsProd(ctx) {
 		apiurl = WxPaySanBoxAPIURL + apiuri
 	}
 	// 转换参数
@@ -263,7 +263,7 @@ func wxPayDoWeChatWithCert(ctx context.Context, wxPayConfig IWxPayConfig, apiuri
 	}
 
 	apiurl := WxPayMchAPIURL + apiuri
-	if !wxPayConfig.IsProd() {
+	if !wxPayConfig.IsProd(ctx) {
 		apiurl = WxPaySanBoxAPIURL + apiuri
 	}
 
@@ -274,12 +274,12 @@ func wxPayDoWeChatWithCert(ctx context.Context, wxPayConfig IWxPayConfig, apiuri
 
 // wxPayGetCertHttpClient 获取带证数的httpClient
 func wxPayGetCertHttpClient(ctx context.Context, wxPayConfig IWxPayConfig) (*http.Client, error) {
-	certPath := wxPayConfig.GetCertificateFile()
+	certPath := wxPayConfig.GetCertificateFile(ctx)
 	certData, err := os.ReadFile(certPath)
 	if err != nil {
 		return nil, err
 	}
-	client, err := wxPayBuildClient(ctx, certData, wxPayConfig.GetMchId())
+	client, err := wxPayBuildClient(ctx, certData, wxPayConfig.GetMchId(ctx))
 
 	return client, err
 }

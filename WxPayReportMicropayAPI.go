@@ -9,7 +9,7 @@ import (
 func WxPayReportMicropay(ctx context.Context, wxPayConfig IWxPayConfig, body *WxPayReportMicropayBody) (*WxResponseModel, error) {
 	// 处理参数
 	interfaceUrl := WxPayMchAPIURL + "/pay/batchreport/micropay/total"
-	if !wxPayConfig.IsProd() {
+	if !wxPayConfig.IsProd(ctx) {
 		interfaceUrl = WxPaySanBoxAPIURL + "/pay/batchreport/micropay/total"
 	}
 	var err error

@@ -29,24 +29,24 @@ var wxConfig = &WxConfig{
 	Secret: "XXXXXXXXXXXXXXX",
 }
 
-func (wxConfig *WxConfig) GetId() string {
+func (wxConfig *WxConfig) GetId(ctx context.Context) string {
 	return wxConfig.Id
 }
 
-func (wxConfig *WxConfig) GetAppId() string {
+func (wxConfig *WxConfig) GetAppId(ctx context.Context) string {
 	return wxConfig.AppId
 }
 
-func (wxConfig *WxConfig) GetAccessToken() string {
+func (wxConfig *WxConfig) GetAccessToken(ctx context.Context) string {
 	//从缓存中获取wxAccessToken,这里只是演示
-	wxAccessToken, err := gowe.GetAccessToken(wxConfig)
+	wxAccessToken, err := gowe.GetAccessToken(ctx, wxConfig)
 	if err == nil && wxAccessToken.ErrCode == 0 {
 		return wxAccessToken.AccessToken
 	}
 	return ""
 }
 
-func (wxConfig *WxConfig) GetSecret() string {
+func (wxConfig *WxConfig) GetSecret(ctx context.Context) string {
 	return wxConfig.Secret
 }
 

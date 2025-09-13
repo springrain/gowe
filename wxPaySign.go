@@ -67,12 +67,12 @@ type getSignKeyResponse struct {
 // wxPaySandboxSign 获取沙盒的签名
 func wxPaySandboxSign(ctx context.Context, wxPayConfig IWxPayConfig, nonceStr string, signType string) (key string, err error) {
 	body := make(map[string]interface{})
-	body["mch_id"] = wxPayConfig.GetMchId()
+	body["mch_id"] = wxPayConfig.GetMchId(ctx)
 	body["nonce_str"] = nonceStr
 	// 计算沙箱参数Sign
-	sanboxSign := wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey())
+	sanboxSign := wxPayLocalSign(body, signType, wxPayConfig.GetAPIKey(ctx))
 	// 沙箱环境:获取key后,重新计算Sign
-	key, err = getSandBoxSignKey(ctx, wxPayConfig.GetMchId(), nonceStr, sanboxSign)
+	key, err = getSandBoxSignKey(ctx, wxPayConfig.GetMchId(ctx), nonceStr, sanboxSign)
 	return
 }
 
@@ -131,8 +131,8 @@ func wxPayDoVerifySign(ctx context.Context, wxPayConfig IWxPayConfig, xmlStr []b
 		signType = result["sign_type"].(string)
 	}
 
-	key := wxPayConfig.GetAPIKey()
-	if !wxPayConfig.IsProd() { //测试的沙箱环境
+	key := wxPayConfig.GetAPIKey(ctx)
+	if !wxPayConfig.IsProd(ctx) { //测试的沙箱环境
 		var errSandboxSign error
 		key, errSandboxSign = wxPaySandboxSign(ctx, wxPayConfig, result["nonce_str"].(string), signType)
 		if errSandboxSign != nil {

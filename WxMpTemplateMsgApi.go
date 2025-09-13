@@ -12,7 +12,7 @@ import (
 // WxMpTemplateMsgSend 发送模板消息
 func WxMpTemplateMsgSend(ctx context.Context, wxMpConfig IWxMpConfig, body *WxMpTemplateMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
-	apiurl := WxMpAPIURL + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/message/template/send?access_token=" + wxMpConfig.GetAccessToken(ctx)
 
 	// 参数处理
 	bodyStr, err := json.Marshal(body)
@@ -69,7 +69,7 @@ func WxMpSubscribeMsgURL(body *WxMpSubscribeMsgURLBody) (string, error) {
 // https://developers.weixin.qq.com/doc/offiaccount/Message_Management/One-time_subscription_info.html
 func WxMpSubscribeMsgSend(ctx context.Context, wxMpConfig IWxMpConfig, body *WxMpSubscribeMsgSendBody) (*WxMpTemplateMsgSendResponse, error) {
 
-	apiurl := WxMpAPIURL + "/cgi-bin/message/template/subscribe?access_token=" + wxMpConfig.GetAccessToken()
+	apiurl := WxMpAPIURL + "/cgi-bin/message/template/subscribe?access_token=" + wxMpConfig.GetAccessToken(ctx)
 
 	// 参数处理
 	bodyStr, err := json.Marshal(body)

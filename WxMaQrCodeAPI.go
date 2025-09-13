@@ -9,7 +9,7 @@ import (
 // WxMaCodeGetUnlimited 小程序码接口
 // https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/qr-code/wxacode.getUnlimited.html
 func WxMaCodeGetUnlimited(ctx context.Context, wxMaConfig IWxMaConfig, body *WxMaCodeGetUnlimitedBody) ([]byte, *ResponseBase, error) {
-	apiurl := WxMpAPIURL + fmt.Sprintf("/wxa/getwxacodeunlimit?access_token=%s", wxMaConfig.GetAccessToken())
+	apiurl := WxMpAPIURL + fmt.Sprintf("/wxa/getwxacodeunlimit?access_token=%s", wxMaConfig.GetAccessToken(ctx))
 	// 参数处理
 	bodyStr, err := json.Marshal(body)
 	if err != nil {

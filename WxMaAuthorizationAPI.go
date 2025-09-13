@@ -25,7 +25,7 @@ func WxMaCode2Session(ctx context.Context, wxMaConfig IWxMaConfig, jsCode string
 	if len(jsCode) < 1 {
 		return nil, errors.New("jsCode不能为空")
 	}
-	apiurl := WxMpAPIURL + "/sns/jscode2session?appid=" + wxMaConfig.GetAppId() + "&secret=" + wxMaConfig.GetSecret() + "&js_code=" + jsCode + "&&grant_type=authorization_code"
+	apiurl := WxMpAPIURL + "/sns/jscode2session?appid=" + wxMaConfig.GetAppId(ctx) + "&secret=" + wxMaConfig.GetSecret(ctx) + "&js_code=" + jsCode + "&&grant_type=authorization_code"
 	body, err := httpGet(ctx, apiurl)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func WxMaAuthGetPaidUnionId(ctx context.Context, wxMaConfig IWxMaConfig, openId 
 		return nil, errors.New("openId不能为空")
 	}
 
-	apiurl := WxMpAPIURL + "/wxa/getpaidunionid?access_token=" + wxMaConfig.GetAccessToken() + "&openid=" + openId
+	apiurl := WxMpAPIURL + "/wxa/getpaidunionid?access_token=" + wxMaConfig.GetAccessToken(ctx) + "&openid=" + openId
 	data, err := httpGet(ctx, apiurl)
 	// 发送请求
 	if err != nil {
