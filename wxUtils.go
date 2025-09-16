@@ -3,7 +3,13 @@ package gowe
 import (
 	"bytes"
 	"context"
+	"crypto"
+	crand "crypto/rand"
+	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
@@ -127,13 +133,13 @@ func wxPayBuildBody(ctx context.Context, wxPayConfig IWxPayConfig, bodyObj inter
 	// 添加固定参数
 	if mchType == 1 { //特殊的商户接口(企业付款,微信找零)
 		body["mch_appid"] = wxPayConfig.GetAppId(ctx)
-		body["mchid"] = wxPayConfig.GetMchId(ctx)
+		body["mchid"] = wxPayConfig.GetMchID(ctx)
 	} else if mchType == 2 { //红包
 		body["wxappid"] = wxPayConfig.GetAppId(ctx) //微信分配的公众账号ID(企业号corpid即为此appId).接口传入的所有appid应该为公众号的appid(在mp.weixin.qq.com申请的),不能为APP的appid(在open.weixin.qq.com申请的)
-		body["mch_id"] = wxPayConfig.GetMchId(ctx)
+		body["mch_id"] = wxPayConfig.GetMchID(ctx)
 	} else { //普通微信支付
 		body["appid"] = wxPayConfig.GetAppId(ctx)
-		body["mch_id"] = wxPayConfig.GetMchId(ctx)
+		body["mch_id"] = wxPayConfig.GetMchID(ctx)
 	}
 
 	//如果是服务商模式
@@ -279,7 +285,7 @@ func wxPayGetCertHttpClient(ctx context.Context, wxPayConfig IWxPayConfig) (*htt
 	if err != nil {
 		return nil, err
 	}
-	client, err := wxPayBuildClient(ctx, certData, wxPayConfig.GetMchId(ctx))
+	client, err := wxPayBuildClient(ctx, certData, wxPayConfig.GetMchID(ctx))
 
 	return client, err
 }
@@ -323,4 +329,206 @@ func wxPayPkc12ToPerm(data []byte, mchId string) (cert tls.Certificate, err erro
 	}
 	cert, err = tls.X509KeyPair(pemData, pemData)
 	return
+}
+
+// 以上是v2
+// --------------------------------------v3微信支付util--------------------------------------------------------
+// ------------------创建JSAPI支付订单---------------------
+func createJsapiOrder(ctx context.Context, wxPayConfig IWxPayConfig, openid, outTradeNo string, totalFee int, description string) (string, error) {
+	appId := wxPayConfig.GetAppId(ctx)
+	mchId := wxPayConfig.GetMchID(ctx)
+	notifyUrl := wxPayConfig.GetNotifyURL(ctx)
+	certSerialNo := wxPayConfig.GetCertSerialNo(ctx)
+	reqData := JsapiOrderRequest{
+		AppID:       appId,
+		MchID:       mchId,
+		Description: description,
+		OutTradeNo:  outTradeNo,
+		NotifyURL:   notifyUrl,
+		TimeExpire:  time.Now().Add(30 * time.Minute).Format("2006-01-02T15:04:05Z07:00"),
+	}
+	reqData.Amount.Total = totalFee
+	reqData.Amount.Currency = "CNY"
+	reqData.Payer.OpenID = openid
+
+	body, _ := json.Marshal(reqData)
+
+	req, _ := http.NewRequest("POST", "https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi", bytes.NewBuffer(body))
+
+	timestamp := time.Now().Unix()
+	nonceStr := generateNonceStr()
+	signature, err := generateSignature(ctx, wxPayConfig, "POST", "/v3/pay/transactions/jsapi", timestamp, nonceStr, body)
+	if err != nil {
+		return "", fmt.Errorf("生成签名失败: %v", err)
+	}
+
+	authHeader := fmt.Sprintf(
+		"WECHATPAY2-SHA256-RSA2048 mchid=\"%s\",nonce_str=\"%s\",timestamp=\"%d\",serial_no=\"%s\",signature=\"%s\"",
+		mchId, nonceStr, timestamp, certSerialNo, signature,
+	)
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", authHeader)
+	req.Header.Set("User-Agent", "go-wechatpay-client")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("请求微信API失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+
+	if resp.StatusCode != 200 && resp.StatusCode != 201 {
+		var errResp ErrorResponse
+		if err := json.Unmarshal(respBody, &errResp); err != nil {
+			return "", fmt.Errorf("响应解析失败: %s", string(respBody))
+		}
+		return "", fmt.Errorf("微信API错误: %s(%s)", errResp.Message, errResp.Code)
+	}
+
+	var orderResp JsapiOrderResponse
+	if err := json.Unmarshal(respBody, &orderResp); err != nil {
+		return "", fmt.Errorf("响应解析失败: %v", err)
+	}
+
+	return orderResp.PrepayID, nil
+}
+
+// 生成商户订单号
+func generateOutTradeNo() string {
+	return fmt.Sprintf("ORDER%d", time.Now().UnixNano())
+}
+
+func generateJsapiPayParams(ctx context.Context, wxPayConfig IWxPayConfig, prepayID string) (*JsapiPayParams, error) {
+	timestamp := fmt.Sprintf("%d", time.Now().Unix())
+	nonceStr := generateNonceStr()
+	packageStr := fmt.Sprintf("prepay_id=%s", prepayID)
+	appId := wxPayConfig.GetAppId(ctx)
+	signStr := fmt.Sprintf("%s\n%s\n%s\n%s\n", appId, timestamp, nonceStr, packageStr)
+
+	signature, err := signWithPrivateKey(ctx, wxPayConfig, signStr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &JsapiPayParams{
+		AppID:     appId,
+		Timestamp: timestamp,
+		NonceStr:  nonceStr,
+		Package:   packageStr,
+		SignType:  "RSA",
+		PaySign:   signature,
+	}, nil
+}
+
+// 生成随机字符串
+func generateNonceStr() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano())
+}
+
+// 生成V3 API签名
+func generateSignature(ctx context.Context, wxPayConfig IWxPayConfig, method, path string, timestamp int64, nonceStr string, body []byte) (string, error) {
+	signStr := fmt.Sprintf("%s\n%s\n%d\n%s\n%s\n",
+		method, path, timestamp, nonceStr, string(body),
+	)
+	return signWithPrivateKey(ctx, wxPayConfig, signStr)
+}
+
+// 使用私钥签名
+func signWithPrivateKey(ctx context.Context, wxPayConfig IWxPayConfig, data string) (string, error) {
+	// 1. 读取私钥文件
+	apiPrivateKey := wxPayConfig.GetPrivateKey(ctx)
+	keyBytes, err := os.ReadFile(apiPrivateKey)
+	if err != nil {
+		return "", fmt.Errorf("读取私钥文件失败: %v", err)
+	}
+	//2 解析 PEM
+	block, _ := pem.Decode([]byte(keyBytes))
+	if block == nil {
+		return "", fmt.Errorf("私钥解析失败")
+	}
+	privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return "", fmt.Errorf("私钥解析失败: %v", err)
+	}
+	rsaKey, ok := privateKey.(*rsa.PrivateKey)
+	if !ok {
+		return "", fmt.Errorf("不是有效的RSA私钥")
+	}
+
+	hashed := sha256.Sum256([]byte(data))
+	signature, err := rsa.SignPKCS1v15(crand.Reader, rsaKey, crypto.SHA256, hashed[:])
+	if err != nil {
+		return "", fmt.Errorf("签名失败: %v", err)
+	}
+
+	return base64.StdEncoding.EncodeToString(signature), nil
+}
+
+// -------------------- 创建Native支付订单--------------------------------------
+func createNativeOrder(ctx context.Context, wxPayConfig IWxPayConfig, ip string, storeId string, outTradeNo string, totalFee int, description string) (string, error) {
+	appId := wxPayConfig.GetAppId(ctx)
+	mchId := wxPayConfig.GetMchID(ctx)
+	notifyUrl := wxPayConfig.GetNotifyURL(ctx)
+	certSerialNo := wxPayConfig.GetCertSerialNo(ctx)
+	reqData := NativeOrderRequest{
+		AppID:       appId,
+		MchID:       mchId,
+		Description: description,
+		OutTradeNo:  outTradeNo,
+		NotifyURL:   notifyUrl,
+		TimeExpire:  time.Now().Add(30 * time.Minute).Format("2006-01-02T15:04:05Z07:00"),
+	}
+	reqData.Amount.Total = totalFee
+	reqData.Amount.Currency = "CNY"
+	reqData.SceneInfo.PayerClientIp = ip
+	reqData.SceneInfo.StoreInfo.ID = storeId
+
+	body, _ := json.Marshal(reqData)
+
+	req, _ := http.NewRequest("POST", "https://api.mch.weixin.qq.com/v3/pay/transactions/native", bytes.NewBuffer(body))
+
+	timestamp := time.Now().Unix()
+	nonceStr := generateNonceStr()
+	signature, err := generateSignature(ctx, wxPayConfig, "POST", "/v3/pay/transactions/native", timestamp, nonceStr, body)
+	if err != nil {
+		return "", fmt.Errorf("生成签名失败: %v", err)
+	}
+
+	authHeader := fmt.Sprintf(
+		"WECHATPAY2-SHA256-RSA2048 mchid=\"%s\",nonce_str=\"%s\",timestamp=\"%d\",serial_no=\"%s\",signature=\"%s\"",
+		mchId, nonceStr, timestamp, certSerialNo, signature,
+	)
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", authHeader)
+	req.Header.Set("User-Agent", "go-wechatpay-client")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("请求微信API失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, _ := io.ReadAll(resp.Body)
+
+	if resp.StatusCode != 200 && resp.StatusCode != 201 {
+		var errResp ErrorResponse
+		if err := json.Unmarshal(respBody, &errResp); err != nil {
+			return "", fmt.Errorf("响应解析失败: %s", string(respBody))
+		}
+		return "", fmt.Errorf("微信API错误: %s(%s)", errResp.Message, errResp.Code)
+	}
+
+	var orderResp NativeOrderResponse
+	if err := json.Unmarshal(respBody, &orderResp); err != nil {
+		return "", fmt.Errorf("响应解析失败: %v", err)
+	}
+
+	return orderResp.CodeUrl, nil
 }

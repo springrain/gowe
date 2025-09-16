@@ -18,15 +18,72 @@ go get gitee.com/chunanyong/gowe
 
 ```go
 type WxConfig struct {
-	Id     string
-	AppId  string
-	Secret string
+	Id                   string
+	AppId                string
+	Secret               string
+	MchID                string // 商户号
+	MchAPIv3Key          string // 商户API v3密钥
+	WechatPayCertificate string // 微信支付平台证书
+	CertSerialNo         string // 商户证书序列号
+	PrivateKey           string // 商户API私钥
+	NotifyURL            string // 支付结果通知地址
 }
 
-var wxConfig = &WxConfig{
-	Id:     "test",
-	AppId:  "XXXXXXXXXXXXXXxxx",
-	Secret: "XXXXXXXXXXXXXXX",
+func (wxConfig *WxConfig) GetCertificateFile(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetMchId(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetSubAppId(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetSubMchId(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetAPIKey(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetNotifyUrl(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetSignType(ctx context.Context) string {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) GetServiceType(ctx context.Context) int {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (wxConfig *WxConfig) IsProd(ctx context.Context) bool {
+	//TODO implement me
+	panic("implement me")
+}
+
+var Wx = &WxConfig{
+	Id:                   "xxx",
+	AppId:                "xxx",               // 小程序/公众号AppID
+	Secret:               "xxx", // 小程序/公众号密钥
+	MchID:                "xxx",                       // 商户号
+	MchAPIv3Key:          "xxx",  // 商户API v3密钥 (32字节)
+	WechatPayCertificate: "xxx",//商户证书wechatpay_开头的
+	CertSerialNo:         "xxx",// 商户API证书的序列号
+	PrivateKey:           "xxx",// 商户API私钥
+	NotifyURL:            "https://xxx/xxx/xxx",//回调地址
 }
 
 func (wxConfig *WxConfig) GetId(ctx context.Context) string {
@@ -50,6 +107,25 @@ func (wxConfig *WxConfig) GetSecret(ctx context.Context) string {
 	return wxConfig.Secret
 }
 
+func (wxConfig *WxConfig) GetMchID(ctx context.Context) string {
+	return wxConfig.MchID
+}
+func (wxConfig *WxConfig) GetMchAPIv3Key(ctx context.Context) string {
+	return wxConfig.MchAPIv3Key
+}
+func (wxConfig *WxConfig) GetWechatPayCertificate(ctx context.Context) string {
+	return wxConfig.WechatPayCertificate
+}
+func (wxConfig *WxConfig) GetCertSerialNo(ctx context.Context) string {
+	return wxConfig.CertSerialNo
+}
+func (wxConfig *WxConfig) GetPrivateKey(ctx context.Context) string {
+	return wxConfig.PrivateKey
+}
+func (wxConfig *WxConfig) GetNotifyURL(ctx context.Context) string {
+	return wxConfig.NotifyURL
+}
+
 ```
 
 ## 使用
@@ -69,8 +145,73 @@ func TestGetAccessToken(t *testing.T)  {
 }
 
 ```
+## 微信支付v3
 
-## 微信支付
+* Native支付(扫码支付) `WxV3PayTransactionsNative`
+* 统一下单：`WxV3PayTransactionsJsapi`
+## 微信支付v3回调
+
+* 验签：`VerifyWechatSignature`
+* 回调：`WechatPayCallback`
+
+##基于hertz框架(示例)
+
+```go
+//微信支付统一下单,返回一个prepay_id,参数解释请看方法注释
+jsapi := gowe.WxV3PayTransactionsJsapi(ctx, Wx, OpenId, 1, "测试微信支付")
+//扫码支付(Native方式),返回一个code_url,参数解释请看方法注释
+native := gowe.WxV3PayTransactionsNative(ctx, Wx, ip, "0001", 1, "测试微信支付")
+//回调
+func HandleWechatPayCallback(ctx context.Context, c *app.RequestContext) {
+	// 1. 验证签名
+	fmt.Println("微信回调请求到达----------")
+
+	// 从请求头获取签名相关字段
+	timestamp := string(c.Request.Header.Peek("Wechatpay-Timestamp"))
+	nonce := string(c.Request.Header.Peek("Wechatpay-Nonce"))
+	signature := string(c.Request.Header.Peek("Wechatpay-Signature"))
+	serial := string(c.Request.Header.Peek("Wechatpay-Serial"))
+
+	if timestamp == "" || nonce == "" || signature == "" || serial == "" {
+		fmt.Println("缺少签名头----------")
+		c.JSON(400, map[string]string{"message": "缺少签名头"})
+		return
+	}
+
+	body, err := c.Body()
+	if err != nil {
+		fmt.Println("读取请求体失败----------", err.Error())
+		c.JSON(400, map[string]string{"message": "读取请求体失败"})
+		return
+	}
+	// 通常不需要再手动调用 SetBody，但如果你后续处理需要，可以设置
+	c.Request.SetBody(body)
+	//验签
+	err = gowe.VerifyWechatSignature(ctx, Wx, timestamp, nonce, signature, serial, body)
+	if err != nil {
+		fmt.Printf("签名验证失败: %v", err)
+		c.JSON(400, map[string]string{"message": fmt.Sprintf("签名验证失败: %v", err)})
+		return
+	}
+
+	//回调
+	callback := gowe.WechatPayCallback(ctx, Wx, body)
+	if callback.Code == 0 {
+		fmt.Println("微信回调成功----------")
+		// 7. 返回成功
+		c.JSON(200, map[string]string{"message": "Success"})
+	} else {
+		fmt.Println("微信回调失败----------")
+		// 7. 返回成功
+		c.JSON(400, map[string]string{"message": "error"})
+	}
+
+}
+```
+
+
+
+## 微信支付v2
 
 * 提交付款码支付 `WxPayMicropay`
 * 统一下单：`WxPayUnifiedOrder`

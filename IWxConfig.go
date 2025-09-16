@@ -2,7 +2,7 @@ package gowe
 
 import "context"
 
-//IWxConfig 微信的基础配置
+// IWxConfig 微信的基础配置
 type IWxConfig interface {
 	//Id 数据库记录的Id
 	GetId(ctx context.Context) string
@@ -12,9 +12,21 @@ type IWxConfig interface {
 	GetAccessToken(ctx context.Context) string
 	//Secret 微信号的secret
 	GetSecret(ctx context.Context) string
+	// 商户号
+	GetMchID(ctx context.Context) string
+	// 商户API v3密钥 (32字节)
+	GetMchAPIv3Key(ctx context.Context) string
+	// 微信支付平台证书（示例，实际应从微信平台下载并定期更新）
+	GetWechatPayCertificate(ctx context.Context) string
+	// 商户证书序列号
+	GetCertSerialNo(ctx context.Context) string
+	// 商户API私钥
+	GetPrivateKey(ctx context.Context) string
+	// 支付结果通知地址
+	GetNotifyURL(ctx context.Context) string
 }
 
-//IWxMpConfig 公众号的配置
+// IWxMpConfig 公众号的配置
 type IWxMpConfig interface {
 	IWxConfig
 	//Token 获取token
@@ -25,24 +37,20 @@ type IWxMpConfig interface {
 	GetOauth2(ctx context.Context) bool
 }
 
-//IWxMaConfig 微信小程序配置
+// IWxMaConfig 微信小程序配置
 type IWxMaConfig interface {
 	IWxConfig
 }
 
-//IWxPayConfig 公众号的配置
+// IWxPayConfig 公众号的配置
 type IWxPayConfig interface {
 	IWxConfig
 	//证数文件路径
 	GetCertificateFile(ctx context.Context) string
-	//支付的mchId
-	GetMchId(ctx context.Context) string
 	GetSubAppId(ctx context.Context) string // 微信分配的子商户公众账号ID
 	GetSubMchId(ctx context.Context) string // 微信支付分配的子商户号,开发者模式下必填
 	//获取 API 密钥
 	GetAPIKey(ctx context.Context) string
-	//支付通知回调的地址
-	GetNotifyUrl(ctx context.Context) string
 	//摘要加密类型
 	GetSignType(ctx context.Context) string
 	GetServiceType(ctx context.Context) int // 服务模式
