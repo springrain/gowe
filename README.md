@@ -15,118 +15,92 @@ go get gitee.com/chunanyong/gowe
 * 原生支持集群部署  
  
 ## 初始化
-
+WxPayConfig初始化
 ```go
-type WxConfig struct {
-	Id                   string
-	AppId                string
-	Secret               string
-	MchID                string // 商户号
-	MchAPIv3Key          string // 商户API v3密钥
-	WechatPayCertificate string // 微信支付平台证书
-	CertSerialNo         string // 商户证书序列号
-	PrivateKey           string // 商户API私钥
-	NotifyURL            string // 支付结果通知地址
+type WxPayConfig struct {
+    Id                   string
+    AppId                string
+    Secret               string
+    MchID                string // 商户号
+    MchAPIv3Key          string // 商户API v3密钥 (32字节)
+    WechatPayCertificate string // 微信支付平台证书（示例，实际应从微信平台下载并定期更新）
+    CertSerialNo         string // 商户证书序列号
+    PrivateKey           string // 商户API私钥
+    NotifyURL            string // 支付结果通知地址
 }
 
-func (wxConfig *WxConfig) GetCertificateFile(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+var Wx = &WxPayConfig{
+    Id:                   "xxx",
+    AppId:                "xxx",               // 小程序/公众号AppID
+    Secret:               "xxx", // 小程序/公众号密钥
+    MchID:                "xxx",                       // 商户号
+    MchAPIv3Key:          "xxx",  // 商户API v3密钥 (32字节)
+    WechatPayCertificate: "xxx",//商户证书wechatpay_开头的
+    CertSerialNo:         "xxx",// 商户API证书的序列号
+    PrivateKey:           "xxx",// 商户API私钥
+    NotifyURL:            "https://xxx/xxx/xxx",//回调地址
 }
 
-func (wxConfig *WxConfig) GetMchId(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetId(ctx context.Context) string {
+    return w.Id
 }
 
-func (wxConfig *WxConfig) GetSubAppId(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetAppId(ctx context.Context) string {
+    return w.AppId
 }
 
-func (wxConfig *WxConfig) GetSubMchId(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetAccessToken(ctx context.Context) string {
+    panic("implement me")
 }
 
-func (wxConfig *WxConfig) GetAPIKey(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetSecret(ctx context.Context) string {
+    return w.Secret
 }
 
-func (wxConfig *WxConfig) GetNotifyUrl(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetCertificateFile(ctx context.Context) string {
+    return "../cert/apiclient_cert.pem"
 }
 
-func (wxConfig *WxConfig) GetSignType(ctx context.Context) string {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetSubAppId(ctx context.Context) string {
+    panic("implement me")
+}
+func (w WxPayConfig) GetAPIKey(ctx context.Context) string {
+    return w.MchAPIv3Key
 }
 
-func (wxConfig *WxConfig) GetServiceType(ctx context.Context) int {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetSignType(ctx context.Context) string {
+    return "MD5"
 }
 
-func (wxConfig *WxConfig) IsProd(ctx context.Context) bool {
-	//TODO implement me
-	panic("implement me")
+func (w WxPayConfig) GetServiceType(ctx context.Context) int {
+    return 1
 }
 
-var Wx = &WxConfig{
-	Id:                   "xxx",
-	AppId:                "xxx",               // 小程序/公众号AppID
-	Secret:               "xxx", // 小程序/公众号密钥
-	MchID:                "xxx",                       // 商户号
-	MchAPIv3Key:          "xxx",  // 商户API v3密钥 (32字节)
-	WechatPayCertificate: "xxx",//商户证书wechatpay_开头的
-	CertSerialNo:         "xxx",// 商户API证书的序列号
-	PrivateKey:           "xxx",// 商户API私钥
-	NotifyURL:            "https://xxx/xxx/xxx",//回调地址
+func (w WxPayConfig) IsProd(ctx context.Context) bool {
+    return true
 }
 
-func (wxConfig *WxConfig) GetId(ctx context.Context) string {
-	return wxConfig.Id
+func (w WxPayConfig) GetMchID(ctx context.Context) string {
+    return w.MchID
 }
-
-func (wxConfig *WxConfig) GetAppId(ctx context.Context) string {
-	return wxConfig.AppId
+func (w WxPayConfig) GetMchAPIv3Key(ctx context.Context) string {
+    return w.MchAPIv3Key
 }
-
-func (wxConfig *WxConfig) GetAccessToken(ctx context.Context) string {
-	//从缓存中获取wxAccessToken,这里只是演示
-	wxAccessToken, err := gowe.GetAccessToken(ctx, wxConfig)
-	if err == nil && wxAccessToken.ErrCode == 0 {
-		return wxAccessToken.AccessToken
-	}
-	return ""
+func (w WxPayConfig) GetWechatPayCertificate(ctx context.Context) string {
+    return w.WechatPayCertificate
 }
-
-func (wxConfig *WxConfig) GetSecret(ctx context.Context) string {
-	return wxConfig.Secret
+func (w WxPayConfig) GetCertSerialNo(ctx context.Context) string {
+    return w.CertSerialNo
 }
-
-func (wxConfig *WxConfig) GetMchID(ctx context.Context) string {
-	return wxConfig.MchID
+func (w WxPayConfig) GetPrivateKey(ctx context.Context) string {
+    return w.PrivateKey
 }
-func (wxConfig *WxConfig) GetMchAPIv3Key(ctx context.Context) string {
-	return wxConfig.MchAPIv3Key
-}
-func (wxConfig *WxConfig) GetWechatPayCertificate(ctx context.Context) string {
-	return wxConfig.WechatPayCertificate
-}
-func (wxConfig *WxConfig) GetCertSerialNo(ctx context.Context) string {
-	return wxConfig.CertSerialNo
-}
-func (wxConfig *WxConfig) GetPrivateKey(ctx context.Context) string {
-	return wxConfig.PrivateKey
-}
-func (wxConfig *WxConfig) GetNotifyURL(ctx context.Context) string {
-	return wxConfig.NotifyURL
+func (w WxPayConfig) GetNotifyURL(ctx context.Context) string {
+    return w.NotifyURL
 }
 
 ```
+
 
 ## 使用
 
@@ -214,7 +188,6 @@ func HandleWechatPayCallback(ctx context.Context, c *app.RequestContext) {
 ## 微信支付v2
 
 * 提交付款码支付 `WxPayMicropay`
-* 统一下单：`WxPayUnifiedOrder`
 * 查询订单：`WxPayQueryOrder`
 * 关闭订单：`WxPayCloseOrder`
 * 撤销订单：`WxPayReverse`
@@ -237,8 +210,6 @@ func HandleWechatPayCallback(ctx context.Context, c *app.RequestContext) {
 * 查询企业付款 `WxPayQueryMktTransfer`
 
 ## 微信支付回调
-
-* 支付回调：`WxPayNotifyPay`
 * 退款回调：`WxPayNotifyRefund`
 
 ## 微信公众号

@@ -60,8 +60,7 @@ type JsapiPayParams struct {
 //   - SignType: 签名类型（固定为"RSA"）
 //   - PaySign: 签名值
 //   - error: 错误信息（成功时为nil）
-func WxV3PayTransactionsJsapi(ctx context.Context, wxPayConfig IWxPayConfig, openid string, totalFee int, description string) JsapiPayParams {
-	outTradeNo := generateOutTradeNo()
+func WxV3PayTransactionsJsapi(ctx context.Context, wxPayConfig IWxPayConfig, openid string, outTradeNo string, totalFee int, description string) JsapiPayParams {
 
 	prepayID, err := createJsapiOrder(ctx, wxPayConfig, openid, outTradeNo, totalFee, description)
 	if err != nil {

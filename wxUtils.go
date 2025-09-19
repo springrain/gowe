@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"crypto"
+	"crypto/aes"
+	"crypto/cipher"
 	crand "crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
@@ -145,7 +147,7 @@ func wxPayBuildBody(ctx context.Context, wxPayConfig IWxPayConfig, bodyObj inter
 	//如果是服务商模式
 	if isWxPayFacilitator(wxPayConfig.GetServiceType(ctx)) {
 		body["sub_appid"] = wxPayConfig.GetSubAppId(ctx)
-		body["sub_mch_id"] = wxPayConfig.GetSubMchId(ctx)
+		body["sub_mch_id"] = wxPayConfig.GetMchID(ctx)
 	}
 	//nonceStr := getRandomString(32)
 	nonceStr := FuncGenerateRandomString(ctx, 32)
@@ -398,7 +400,7 @@ func createJsapiOrder(ctx context.Context, wxPayConfig IWxPayConfig, openid, out
 }
 
 // 生成商户订单号
-func generateOutTradeNo() string {
+func GenerateOutTradeNo() string {
 	return fmt.Sprintf("ORDER%d", time.Now().UnixNano())
 }
 
@@ -531,4 +533,64 @@ func createNativeOrder(ctx context.Context, wxPayConfig IWxPayConfig, ip string,
 	}
 
 	return orderResp.CodeUrl, nil
+}
+
+// ----------------------微信小程序登录相关方法-------------------------------------------
+// AES解密手机号数据
+func AesDecrypt(encryptedData, sessionKey, iv string) ([]byte, error) {
+	// Base64解码
+	keyBytes, err := base64.StdEncoding.DecodeString(sessionKey)
+	if err != nil {
+		return nil, err
+	}
+
+	ivBytes, err := base64.StdEncoding.DecodeString(iv)
+	if err != nil {
+		return nil, err
+	}
+
+	cryptData, err := base64.StdEncoding.DecodeString(encryptedData)
+	if err != nil {
+		return nil, err
+	}
+
+	block, err := aes.NewCipher(keyBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	mode := cipher.NewCBCDecrypter(block, ivBytes)
+	origData := make([]byte, len(cryptData))
+	mode.CryptBlocks(origData, cryptData)
+
+	// 去除填充
+	origData = PKCS7UnPadding(origData)
+	return origData, nil
+}
+
+// PKCS7去除填充
+func PKCS7UnPadding(plantText []byte) []byte {
+	length := len(plantText)
+	if length == 0 {
+		return plantText
+	}
+
+	unPadding := int(plantText[length-1])
+	return plantText[:(length - unPadding)]
+}
+
+// 验证手机号格式
+func ValidatePhoneNumber(phone string) bool {
+	// 国内手机号正则: 1开头，第二位3-9，后面9位数字
+	regex := `^1[3-9]\d{9}$`
+	matched, _ := regexp.MatchString(regex, phone)
+	return matched
+}
+
+// 手机号脱敏处理
+func MaskPhoneNumber(phoneNumber string) string {
+	if len(phoneNumber) != 11 {
+		return phoneNumber
+	}
+	return phoneNumber[:3] + "****" + phoneNumber[7:]
 }
