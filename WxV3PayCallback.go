@@ -50,8 +50,9 @@ type DecryptedPaymentResult struct {
 }
 
 type CallbackResponse struct {
-	Code    int    `json:"code"`
-	Massage string `json:"massage"`
+	Code    int                    `json:"code"`
+	Massage string                 `json:"massage"`
+	Data    DecryptedPaymentResult `json:"data"`
 }
 
 // ----------------微信支付回调-----------------
@@ -94,6 +95,7 @@ func WechatPayCallback(ctx context.Context, wxPayConfig IWxPayConfig, body []byt
 	}
 
 	if payment_bool {
+		callbackResponse.Data = paymentResult
 		return callbackResponse
 	} else {
 		callbackResponse.Code = 1
