@@ -29,7 +29,7 @@ type NativeOrderResponse struct {
 	CodeUrl string `json:"code_url"`
 }
 
-// WxV3PayTransactionsNative 微信支付V3 Native支付（扫码支付）下单接口
+// WxPayTransactionsNative 微信支付V3 Native支付（扫码支付）下单接口
 // 参数说明:
 //   - ctx: 上下文对象，用于传递截止时间、取消信号等跨API信息
 //   - wxPayConfig: 微信支付配置接口，必须实现以下方法:
@@ -42,7 +42,7 @@ type NativeOrderResponse struct {
 //   - NativeOrderResponse: Native支付下单响应结构，包含:
 //     - CodeURL string `json:"code_url"`  // 二维码链接（有效期2小时）
 
-func WxV3PayTransactionsNative(ctx context.Context, wxPayConfig IWxPayConfig, ip string, outTradeNo string, storeId string, totalFee int, description string) NativeOrderResponse {
+func WxPayansactionsNative(ctx context.Context, wxPayConfig IWxPayConfig, ip string, outTradeNo string, storeId string, totalFee int, description string) NativeOrderResponse {
 	resp := NativeOrderResponse{}
 	codeUrl, err := createNativeOrder(ctx, wxPayConfig, ip, storeId, outTradeNo, totalFee, description)
 	if err != nil {
