@@ -132,9 +132,9 @@ func TestGetAccessToken(t *testing.T)  {
 
 ```go
 //微信支付统一下单,返回一个prepay_id,参数解释请看方法注释
-jsapi := gowe.WxPayTransactionsJsapi(ctx, Wx, OpenId, 1, "测试微信支付")
+jsapi, err := gowe.WxPayTransactionsJsapi(ctx, Wx, OpenId, 1, "测试微信支付")
 //扫码支付(Native方式),返回一个code_url,参数解释请看方法注释
-native := gowe.WxPayTransactionsNative(ctx, Wx, ip, "0001", 1, "测试微信支付")
+native, err := gowe.WxPayTransactionsNative(ctx, Wx, ip, "0001", 1, "测试微信支付")
 //回调
 func HandleWechatPayCallback(ctx context.Context, c *app.RequestContext) {
 	// 1. 验证签名
