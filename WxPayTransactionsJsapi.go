@@ -60,22 +60,22 @@ type JsapiPayParams struct {
 //   - SignType: 签名类型（固定为"RSA"）
 //   - PaySign: 签名值
 //   - error: 错误信息（成功时为nil）
-func WxPayTransactionsJsapi(ctx context.Context, wxPayConfig IWxPayConfig, openid string, outTradeNo string, totalFee int, description string) JsapiPayParams {
+func WxPayTransactionsJsapi(ctx context.Context, wxPayConfig IWxPayConfig, openid string, outTradeNo string, totalFee int, description string) (*JsapiPayParams, error) {
 
 	prepayID, err := createJsapiOrder(ctx, wxPayConfig, openid, outTradeNo, totalFee, description)
 	if err != nil {
 		//fmt.Printf("下单失败: %v\n", err)
-		return JsapiPayParams{}
+		return nil, err
 	}
 	//fmt.Printf("下单成功! PrepayID: %s\n", prepayID)
 
 	payParams, err := generateJsapiPayParams(ctx, wxPayConfig, prepayID)
 	if err != nil {
 		fmt.Printf("生成支付参数失败: %v\n", err)
-		return JsapiPayParams{}
+		return nil, err
 	}
 
 	//fmt.Println("JSAPI支付参数:")
 	//fmt.Printf("%+v\n", payParams)
-	return *payParams
+	return payParams, nil
 }

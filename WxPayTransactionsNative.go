@@ -42,14 +42,14 @@ type NativeOrderResponse struct {
 //   - NativeOrderResponse: Native支付下单响应结构，包含:
 //     - CodeURL string `json:"code_url"`  // 二维码链接（有效期2小时）
 
-func WxPayansactionsNative(ctx context.Context, wxPayConfig IWxPayConfig, ip string, outTradeNo string, storeId string, totalFee int, description string) NativeOrderResponse {
+func WxPayansactionsNative(ctx context.Context, wxPayConfig IWxPayConfig, ip string, outTradeNo string, storeId string, totalFee int, description string) (*NativeOrderResponse, error) {
 	resp := NativeOrderResponse{}
 	codeUrl, err := createNativeOrder(ctx, wxPayConfig, ip, storeId, outTradeNo, totalFee, description)
 	if err != nil {
 		//fmt.Printf("下单失败: %v\n", err)
-		return resp
+		return nil, err
 	}
 	//fmt.Printf("下单成功! PrepayID: %s\n", codeUrl)
 	resp.CodeUrl = codeUrl
-	return resp
+	return &resp, nil
 }

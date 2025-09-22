@@ -203,8 +203,5 @@ func ProcessPayment(ctx context.Context, wxPayConfig IWxPayConfig, result Decryp
 	if result.TradeState != "SUCCESS" {
 		return false, fmt.Errorf("支付未成功: %s", result.TradeState)
 	}
-	// 幂等性校验 & 订单更新
-	fmt.Printf("支付成功：订单号=%s, 微信单号=%s, 金额=%d分, 用户=%s\n",
-		result.OutTradeNo, result.TransactionID, result.Amount.Total, result.Payer.OpenID)
 	return true, nil
 }
